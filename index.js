@@ -21,6 +21,7 @@ app.listen(PORT, () => console.log(`Server corriendo en el puerto ${PORT}`));
 app.get('/', (req, res) => {
     res.send("Oh, encontraste la api! Bueno, bienvenido, no toques nada porfi :)")
 })
+app.use("/mock", require('./mock/Mock.router.js'))
 //import rutas
 
 //rutas

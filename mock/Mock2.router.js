@@ -4,6 +4,6 @@ const rutas = express.Router();
 const { root } = require('./Mock.functions')
 
 
-rutas.get('/ola', root); 
+rutas.get('/', root); 
 
 module.exports = rutas;

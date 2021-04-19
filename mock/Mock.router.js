@@ -1,9 +1,9 @@
 const express = require('express');
-const rutas = express.Router();
+const router = express.Router();
 
 const { root } = require('./Mock.functions')
 
 
-rutas.get('/', root) 
+router.get('/', root); 
 
-module.exports = rutas;
+module.exports = router;

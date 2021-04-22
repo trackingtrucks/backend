@@ -4,7 +4,7 @@
   "description": "Servidor del proyecto Tracking Trucks.",
   "main": "build/index.js",
   "scripts": {
-    "start": "npm run build && node ./build/index.js",
+    "start": "node ./build/index.js",
     "start:node": "node build/index.js",
     "start:babel": "babel-build build/index.js",
     "dev": "nodemon src/index.js --exec babel-node",

@@ -4,12 +4,13 @@
   "description": "Servidor del proyecto Tracking Trucks.",
   "main": "build/index.js",
   "scripts": {
-    "start": "node build/index.js",
+    "start": "npm run build && node ./build/index.js",
     "start:node": "node build/index.js",
     "start:babel": "babel-build build/index.js",
     "dev": "nodemon src/index.js --exec babel-node",
-    "build": "babel src --out-dir build && node build/index.js",
-    "prod": "babel src --out-dir build && node build/index.js"
+    "build": "npm run build-babel",
+    "prod": "babel src --out-dir build && node build/index.js",
+    "build-babel": "babel -d ./build ./src -s"
   },
   "keywords": [],
   "author": "Gati & Sucri",
@@ -22,10 +23,10 @@
     "helmet": "^4.5.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.5",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "@babel/cli": "^7.13.16"
   },
   "devDependencies": {
-    "@babel/cli": "^7.13.16",
     "@babel/core": "^7.13.16",
     "@babel/node": "^7.13.13",
     "@babel/preset-env": "^7.13.15",

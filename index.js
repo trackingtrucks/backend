@@ -10,7 +10,7 @@ const app = express();
 app.use(bodyParser.json({limit: "30mb", extended: true}));
 app.use(bodyParser.urlencoded({limit: "30mb", extended: true}));
 app.use(cors());
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 4000;
 
 //setup de la api
 app.listen(PORT, () => console.log(`Server corriendo en el puerto ${PORT}`));
@@ -22,7 +22,6 @@ app.get('/', (req, res) => {
     res.send("Oh, encontraste la api! Bueno, bienvenido, no toques nada porfi :)")
 })
 app.use("/mock", require('./mock/Mock.router.js'))
-app.use("/mock/mock2", require('./mock/Mock2.router'))
 //import rutas
 
 //rutas

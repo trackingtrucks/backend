@@ -7,14 +7,14 @@ import pkg from '../package.json'
 import testRutas from './Mock/Mock.routes'
 
 // RUTAS
-import productosRutas from './Routes/products.routes'
-import userRutas from './Routes/user.routes'
-import authRutas from './Routes/auth.routes'
+// import productosRutas from './Routes/products.routes'
+// import userRutas from './Routes/user.routes'
+// import authRutas from './Routes/auth.routes'
 
 // CONFIG
 import config from './config'
-import {crearRoles} from './Libs/initSetup'
-crearRoles()
+// import {crearRoles} from './Libs/initSetup'
+// crearRoles()
 const app = express();
 import cors from 'cors'
 
@@ -38,9 +38,9 @@ app.get('/info', (req, res) => {
 })
 
 // APLICANDO RUTAS
-app.use('/productos', productosRutas)
-app.use('/auth', authRutas)
-app.use('/user', userRutas)
+// app.use('/productos', productosRutas)
+// app.use('/auth', authRutas)
+// app.use('/user', userRutas)
 app.use("/mock", testRutas)
 
 export default app;

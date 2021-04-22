@@ -43,4 +43,10 @@ app.get('/info', (req, res) => {
 // app.use('/user', userRutas)
 app.use("/mock", testRutas)
 
+app.all('*', function (req, res) {
+    res.status(404).json({
+        message: 'No se pudo obtener la ruta ' + req.url,
+        status: 404
+    });
+});
 export default app;

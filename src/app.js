@@ -10,6 +10,7 @@ import testRutas from './Mock/Mock.routes'
 // import productosRutas from './Routes/products.routes'
 // import userRutas from './Routes/user.routes'
 // import authRutas from './Routes/auth.routes'
+import infoRutas from './Routes/info.routes'
 
 // CONFIG
 import config from './config'
@@ -26,16 +27,29 @@ app.use(cors());
 
 // RUTA DEFAULT
 app.get('/', (req, res) => {
-    res.json("Oh, encontraste la api! Bueno, bienvenido, no toques nada porfi :) || SENT FROM NEW API")
-})
-app.get('/info', (req, res) => {
     res.json({
-        name: app.get('pkg').name,
-        autor: app.get('pkg').author,
-        description: app.get('pkg').description,
-        version: app.get('pkg').version
+        message: "Oh, encontraste la api! Bueno, bienvenido, no toques nada porfi :)",
+        rutas: {
+            "/mock/auth": [
+                "/login",
+                "/login.contrainvalida",
+                "/login.usuarioinvalido",
+                "/register",
+                "/register.emailyausado"
+            ],
+            "/info": [
+                "/",
+                "/package.json",
+                "/:especifico"
+            ],
+            "/generar_error":[
+                "/:codigo"
+            ]
+        } 
     })
 })
+
+app.use("/info", infoRutas)
 
 // APLICANDO RUTAS
 // app.use('/productos', productosRutas)

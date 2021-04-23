@@ -9,9 +9,9 @@ export const verifyToken = async (req, res, next) => {
         if (!token) return res.status(403).json({ message: 'No token provided' });
         const decoded = jwt.verify(token, secret)
         req.userId = decoded.id
-        const user = await Usuario.findById(req.userId, { password: 0 })
-        req.userData = user;
-        if (!user) return res.status(404).json({ message: 'Usuario no encontrado' })
+        const userEnDb = await Usuario.findById(req.userId, { password: 0 })
+        req.userData = userEnDb;
+        if (!userEnDb) return res.status(404).json({ message: 'Usuario no encontrado' })
 
         next()
 

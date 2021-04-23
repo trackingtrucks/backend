@@ -1,10 +1,11 @@
-import Usuario from '../Models/User'
+import Usuario from '../Models/Usuario'
 import Role from '../Models/Role'
 import jwt from 'jsonwebtoken'
 import config from '../config'
 const secret = config.SECRET;
 
 export const register = async (req, res) => {
+    /*
     const { username, email, password, roles } = req.body;
     // Se crea el objecto con el nuevo usuario
     const newUser = new Usuario({
@@ -30,10 +31,13 @@ export const register = async (req, res) => {
         expiresIn: 86400 // 24 horas
     })
     res.status(200).json({ token }) //envio como respuesta el token, que va a durar 24hs
+    */
+   res.json('register json')
 }
 
 export const login = async (req, res) => {
-    const { email, password } = req.body;
+     /*
+     const { email, password } = req.body;
     //busco si el usuario existe, y le concateno los roles, que los saco de la otra tabla
     const userEnDB = await Usuario.findOne({ email }).populate("roles");
 
@@ -53,4 +57,7 @@ export const login = async (req, res) => {
     })
     
     res.json({token})//envio como respuesta el token, que va a durar 24hs
+
+    */
+   res.json('login')
 }

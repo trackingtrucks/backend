@@ -1,22 +1,28 @@
-import {Schema, model} from 'mongoose';
+import { Schema, model } from 'mongoose';
 import bcrypt from 'bcryptjs'
 const usuarioSchema = new Schema({
-    username:{
+    nombre: String,
+    apellido: String,
+    email: {
         type: String,
-        unique: true
+        unique: true,
+        required: true
     },
-    email:{
-        type: String,
-        unique: true
-    },
-    password:{
+    password: {
         type: String,
         required: true
     },
     roles: [{
         ref: "Role",
-        type: Schema.Types.ObjectId
-    }]
+        type: Schema.Types.ObjectId,
+        default: "conductor"
+    }],
+    companyId: {
+        type: String,
+        required: true
+    },
+    
+
 }, {
     timestamps: true,
     versionKey: false
@@ -29,6 +35,5 @@ usuarioSchema.statics.encriptarPassword = async (password) => {
 usuarioSchema.statics.verificarPassword = async (password, passwordRecibida) => {
     return await bcrypt.compare(password, passwordRecibida)
 }
-
 
 export default model('Usuario', usuarioSchema)

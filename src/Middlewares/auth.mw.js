@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import Usuario from '../Models/User'
+import Usuario from '../Models/Usuario'
 import Role from '../Models/Role'
 import config from '../config'
 const secret = config.SECRET;
@@ -20,12 +20,12 @@ export const verifyToken = async (req, res, next) => {
     }
 }
 
-export const isMod = async (req, res, next) => {
+export const isGestor = async (req, res, next) => {
     const user = req.userData
     const roles = await Role.find({_id: {$in: user.roles}});
     for (let i = 0; i < roles.length; i++) {
         const rol = roles[i];
-        if (rol.nombre === 'moderador' || rol.nombre === 'admin'){
+        if (rol.nombre === 'gestor' || rol.nombre === 'admin'){
             next();
             return;
         }

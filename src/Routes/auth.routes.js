@@ -1,9 +1,20 @@
 import { Router } from "express";
 const rutas = Router();
 import * as Auth from '../Controllers/auth.controller.js'
-import {verify} from '../Middlewares/index'
+import {auth, verify} from '../Middlewares/index'
 
 rutas.post('/login', Auth.login)
-rutas.post('/register', [verify.existeUsuarioOEmail, verify.Roles], Auth.register)
+
+rutas.post('/register/gestor', 
+[auth.verifyToken, auth.isAdmin, verify.existeUsuarioOEmail],
+Auth.registrarGestor)
+
+rutas.post('/register/conductor', 
+[auth.verifyToken, auth.isGestor, verify.existeUsuarioOEmail], 
+Auth.registrarConductor)
+
+rutas.post('/register/admin', 
+[auth.verifyToken, auth.isAdmin, verify.existeUsuarioOEmail],
+Auth.registrarAdmin)
 
 export default rutas

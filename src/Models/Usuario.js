@@ -21,6 +21,12 @@ const usuarioSchema = new Schema({
         type: String,
         required: true
     },
+    agregadoPor:{
+        type: Object
+    }
+    // refreshTokens: [{
+
+    // }]
     
 
 }, {

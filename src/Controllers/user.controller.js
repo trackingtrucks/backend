@@ -11,5 +11,17 @@ export const eliminar = async (req, res) => {
 
     await Usuario.findByIdAndRemove(_id);
 
-    res.json({message: 'Usuario eliminado con éxito!'})
+    res.json({ message: 'Usuario eliminado con éxito!' })
+}
+
+export const getByCompanyId = async (req, res) => {
+    try {
+        const companyId = req.body.companyId
+        const usuarios = await Usuario.find({ companyId })
+        // const gestores = usuarios.filter((user) => user.roles.map((rol) => console.log(rol)))
+        return res.json(usuarios)
+    } catch (error) {
+        res.status(500).json({ message: error })
+    }
+
 }

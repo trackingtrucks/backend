@@ -8,7 +8,9 @@ rutas.post('/login',
 Auth.login)
 
 rutas.post('/register/gestor', 
-[limit.l60s5r, auth.verifyToken, auth.isAdmin, verify.existeUsuarioOEmail],
+[
+    // limit.l60s5r, 
+    auth.verifyToken, auth.isAdmin, verify.existeUsuarioOEmail],
 Auth.registrarGestor)
 
 rutas.post('/register/conductor', 

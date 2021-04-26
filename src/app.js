@@ -28,24 +28,7 @@ app.use(cors());
 // RUTA DEFAULT
 app.get('/', (req, res) => {
     res.json({
-        message: "Oh, encontraste la api! Bueno, bienvenido, no toques nada porfi :)",
-        rutas: {
-            "/mock/auth": [
-                "/login",
-                "/login.contrainvalida",
-                "/login.usuarioinvalido",
-                "/register",
-                "/register.emailyausado"
-            ],
-            "/info": [
-                "/",
-                "/package.json",
-                "/:especifico"
-            ],
-            "/generar_error":[
-                "/:codigo"
-            ]
-        } 
+        message: "Oh, encontraste la api! Bueno, bienvenido, no toques nada porfi :)"
     })
 })
 

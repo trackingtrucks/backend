@@ -29,8 +29,9 @@ export const registrarGestor = async (req, res) => {
 }
 
 export const registrarConductor = async (req, res) => {
-    // return res.json(req.userData)
-    const { nombre, apellido, email, password, companyId, registerToken } = req.body;
+    // return res.json(req.userData.companyId)
+    const {companyId} = req.userData;
+    const { nombre, apellido, email, password, registerToken } = req.body;
     if (!nombre || !email || !password || !companyId) return res.status(401).json({ message: "Faltan 1 o mas campos requeridos" })
     // Se crea el objecto con el nuevo usuario
     const nuevoUsuario = new Usuario({

@@ -6,5 +6,7 @@ import { auth, verify, limit } from '../Middlewares/index'
 rutas.delete('/account',
     [auth.verifyToken, auth.isAdmin, limit.l5m5r],
     Users.eliminar)
-
+rutas.get('/getByCID', 
+[auth.verifyToken, auth.isGestor],
+Users.getByCompanyId)
 export default rutas

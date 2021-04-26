@@ -11,7 +11,6 @@ import testRutas from './Mock/Mock.routes'
 import userRutas from './Routes/user.routes'
 import authRutas from './Routes/auth.routes'
 import infoRutas from './Routes/info.routes'
-import debugRutas from './debug/debug.routes'
 
 // CONFIG
 import config from './config'
@@ -57,7 +56,6 @@ app.use("/info", infoRutas)
 app.use('/auth', authRutas)
 app.use('/user', userRutas)
 app.use("/mock", testRutas)
-app.use("/debug", debugRutas)
 
 app.all('*', function (req, res) {
     res.status(404).json({

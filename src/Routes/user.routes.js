@@ -10,7 +10,8 @@ rutas.delete('/account',
 rutas.get('/getByCID',
     [auth.verifyToken, auth.isGestor],
     Users.getByCompanyId)
-
+    
+rutas.get('/', [auth.verifyToken, auth.isAdmin], Users.getAll)
 
     
 export default rutas

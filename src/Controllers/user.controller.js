@@ -27,5 +27,13 @@ export const getByCompanyId = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message }) //devulve si hay algun error
     }
+}
 
+export const getAll = async (req, res) => {
+    try {
+        const usuarios = await Usuario.find()
+        res.json(usuarios)
+    } catch (error) {
+        res.json(500).json({message: error.message})
+    }
 }

@@ -3,7 +3,7 @@ import Role from '../Models/Role'
 import jwt from 'jsonwebtoken'
 import config from '../config'
 const secret = config.SECRET;
-
+const refresh_secret = config.REFRESH_SECRET;
 export const registrarGestor = async (req, res) => {
     const { nombre, apellido, email, password, companyId, registerToken } = req.body;
     if (!nombre || !email || !password || !companyId) return res.status(401).json({ message: "Faltan 1 o mas campos requeridos" })
@@ -30,7 +30,7 @@ export const registrarGestor = async (req, res) => {
 
 export const registrarConductor = async (req, res) => {
     // return res.json(req.userData.companyId)
-    const {companyId} = req.userData;
+    const { companyId } = req.userData;
     const { nombre, apellido, email, password, registerToken } = req.body;
     if (!nombre || !email || !password || !companyId) return res.status(401).json({ message: "Faltan 1 o mas campos requeridos" })
     // Se crea el objecto con el nuevo usuario
@@ -39,7 +39,7 @@ export const registrarConductor = async (req, res) => {
         apellido,
         email,
         companyId,
-        agregadoPor:{
+        agregadoPor: {
             id: req.userData._id,
             email: req.userData.email,
             fecha: new Date().toLocaleString(),
@@ -103,11 +103,37 @@ export const login = async (req, res) => {
         return res.status(401).json({ token: null, message: 'Contraseña invalida' })
     }
     //creo el token de login
-    const token = jwt.sign({
+    const accessToken = jwt.sign({
         id: userEnDB._id,
     }, secret, {
-        expiresIn: 86400 // 24 horas
+        expiresIn: 1 * 24 * 60 * 60 // 24 horas
     })
+    const refreshToken = jwt.sign({ //creo el token de refreshing
+        id: userEnDB._id,
+    }, refresh_secret)
+    const response = await Usuario.findByIdAndUpdate(userEnDB._id, { ...userEnDB, refreshTokens: userEnDB.refreshTokens.push(refreshToken) }, { new: true })
+    response.refreshTokens = null; response.password = null; //limpiando, para que en la respuesta no se envien estos datos
+    res.json({ response, accessToken, refreshToken })//envio como respuesta el token, que va a durar 24hs
+}
 
-    res.json({ userEnDB, token })//envio como respuesta el token, que va a durar 24hs
+export const logout = async (req, res) => {
+    try {
+        const refreshToken = req.headers["x-refresh-token"]
+        const id = req.userId
+        const user = await Usuario.findById(id)
+        user.refreshTokens.filter(token => token !== refreshToken)
+        await user.save()
+        res.json({user, refreshToken})
+    } catch (error) {
+        res.status(500).json({message: error.message})
+    }
+}
+
+export const newAccessToken = async (req, res) => {
+    res.json('token!')
+
+}
+
+export const logoutAllDevices = async (req, res) => {
+    res.json('logout all devices!')
 }

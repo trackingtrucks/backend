@@ -16,3 +16,9 @@ export const l5m5r = rateLimit({
     max: 5,
     message: "Demasiadas requests en un lapso corto de tiempo",
 })
+
+export const l1h3r = rateLimit({
+    windowMs: 1 * 60 * 60 * 1000, //1 hora minutos
+    max: 3,
+    message: "Demasiadas requests en un lapso corto de tiempo",
+})

@@ -8,6 +8,7 @@ rutas.post('/login',
     Auth.login);
 
 rutas.get('/token',
+    [limit.l1h3r],
     Auth.newAccessToken);
 
 rutas.delete('/token',

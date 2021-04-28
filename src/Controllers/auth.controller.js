@@ -4,6 +4,8 @@ import jwt from 'jsonwebtoken'
 import config from '../config'
 const secret = config.SECRET;
 const refresh_secret = config.REFRESH_SECRET;
+const token_expires = config.ACCESS_TOKEN_EXPIRES;
+const refresh_expires = config.REFRESH_TOKEN_EXPIRES;
 export const registrarGestor = async (req, res) => {
     const { nombre, apellido, email, password, companyId, registerToken } = req.body;
     if (!nombre || !email || !password || !companyId) return res.status(401).json({ message: "Faltan 1 o mas campos requeridos" })
@@ -23,7 +25,7 @@ export const registrarGestor = async (req, res) => {
     const token = jwt.sign({
         id: userNuevo._id
     }, secret, {
-        expiresIn: 86400 // 24 horas
+        expiresIn: token_expires
     })
     res.status(200).json({ userNuevo, token })
 }
@@ -54,7 +56,7 @@ export const registrarConductor = async (req, res) => {
     const token = jwt.sign({
         id: userNuevo._id,
     }, secret, {
-        expiresIn: 86400 // 24 horas
+        expiresIn: token_expires // 24 horas
     })
 
     res.status(200).json({ userNuevo, token }) //envio como respuesta el token, que va a durar 24hs
@@ -80,7 +82,7 @@ export const registrarAdmin = async (req, res) => {
     const token = jwt.sign({
         id: userNuevo._id
     }, secret, {
-        expiresIn: 86400 // 24 horas
+        expiresIn: token_expires // 24 horas
     })
     res.status(200).json({ userNuevo, token }) //envio como respuesta el token, que va a durar 24hs
 
@@ -106,12 +108,15 @@ export const login = async (req, res) => {
     const accessToken = jwt.sign({
         id: userEnDB._id,
     }, secret, {
-        expiresIn: 1 * 24 * 60 * 60 // 24 horas
+        expiresIn: token_expires // 24 horas
     })
     const refreshToken = jwt.sign({ //creo el token de refreshing
         id: userEnDB._id,
-    }, refresh_secret)
-    const response = await Usuario.findByIdAndUpdate(userEnDB._id, { ...userEnDB, refreshTokens: userEnDB.refreshTokens.push(refreshToken) }, { new: true })
+    }, refresh_secret, {
+        expiresIn: refresh_expires
+    })
+    const response = await Usuario.findByIdAndUpdate(userEnDB._id, { $push: { refreshTokens: [refreshToken] } }, { new: true })
+    // const response = await Usuario.findByIdAndUpdate(userEnDB._id, { ...userEnDB, refreshTokens: userEnDB.refreshTokens.push(refreshToken) }, { new: true })
     response.refreshTokens = null; response.password = null; //limpiando, para que en la respuesta no se envien estos datos
     res.json({ response, accessToken, refreshToken })//envio como respuesta el token, que va a durar 24hs
 }
@@ -120,20 +125,34 @@ export const logout = async (req, res) => {
     try {
         const refreshToken = req.headers["x-refresh-token"]
         const id = req.userId
-        const user = await Usuario.findById(id)
-        user.refreshTokens.filter(token => token !== refreshToken)
-        await user.save()
-        res.json({user, refreshToken})
+        const debugResponse = await Usuario.findByIdAndUpdate(id, { $pullAll: { refreshTokens: [refreshToken] } }, { new: true })
+        res.json({ message: 'Sesion cerrada con exito', debug: debugResponse }).status(204)
     } catch (error) {
-        res.status(500).json({message: error.message})
+        res.status(500).json({ message: error.message })
     }
 }
 
 export const newAccessToken = async (req, res) => {
-    res.json('token!')
-
+    try {
+        const refreshToken = req.headers["x-refresh-token"]
+        const {id} = jwt.verify(refreshToken, refresh_secret)
+        const accessToken = jwt.sign({
+            id
+        }, secret, {
+            expiresIn: token_expires // 24 horas
+        })
+        res.json({accessToken})
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
 }
 
 export const logoutAllDevices = async (req, res) => {
-    res.json('logout all devices!')
+    try {
+        const id = req.userId
+        const debugResponse = await Usuario.findByIdAndUpdate(id, { refreshTokens: [] }, { new: true })
+        res.json({debugResponse})
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
 }

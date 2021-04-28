@@ -21,13 +21,13 @@ export const registrarGestor = async (req, res) => {
     nuevoUsuario.roles = [gestorRole._id]
     const userNuevo = await nuevoUsuario.save();
 
-    //creo el token de login
-    const token = jwt.sign({
+    //creo el access token de login
+    const accessToken = jwt.sign({
         id: userNuevo._id
     }, secret, {
         expiresIn: token_expires
     })
-    res.status(200).json({ userNuevo, token })
+    res.status(200).json({ userNuevo, accessToken })
 }
 
 export const registrarConductor = async (req, res) => {
@@ -53,13 +53,13 @@ export const registrarConductor = async (req, res) => {
     nuevoUsuario.roles = [roleVacio._id]
     const userNuevo = await nuevoUsuario.save();
 
-    const token = jwt.sign({
+    const accessToken = jwt.sign({
         id: userNuevo._id,
     }, secret, {
         expiresIn: token_expires // 24 horas
     })
 
-    res.status(200).json({ userNuevo, token }) //envio como respuesta el token, que va a durar 24hs
+    res.status(200).json({ userNuevo, accessToken }) //envio como respuesta el token, que va a durar 24hs
 }
 
 
@@ -78,13 +78,13 @@ export const registrarAdmin = async (req, res) => {
     nuevoUsuario.roles = [adminRole._id]
     const userNuevo = await nuevoUsuario.save();
 
-    //creo el token de login
-    const token = jwt.sign({
+    //creo el access token de login
+    const accessToken = jwt.sign({
         id: userNuevo._id
     }, secret, {
         expiresIn: token_expires // 24 horas
     })
-    res.status(200).json({ userNuevo, token }) //envio como respuesta el token, que va a durar 24hs
+    res.status(200).json({ userNuevo, accessToken }) //envio como respuesta el access token, que va a durar 24hs
 
 
 }
@@ -102,7 +102,7 @@ export const login = async (req, res) => {
     const contraseñasCoinciden = await Usuario.verificarPassword(password, userEnDB.password)     //chequeo de contraseña
 
     if (!contraseñasCoinciden) {
-        return res.status(401).json({ token: null, message: 'Contraseña invalida' })
+        return res.status(401).json({ accessToken: null, message: 'Contraseña invalida' })
     }
     //creo el token de login
     const accessToken = jwt.sign({

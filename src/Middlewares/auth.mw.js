@@ -5,9 +5,9 @@ import config from '../config'
 const secret = config.SECRET;
 export const verifyToken = async (req, res, next) => {
     try {
-        const token = req.headers["x-access-token"]
-        if (!token) return res.status(403).json({ message: 'No token provided' });
-        const decoded = jwt.verify(token, secret)
+        const accessToken = req.headers["x-access-token"]
+        if (!accessToken) return res.status(403).json({ message: 'No token provided' });
+        const decoded = jwt.verify(accessToken, secret)
         req.userId = decoded.id
         const userEnDb = await Usuario.findById(req.userId, { password: 0 })
         req.userData = userEnDb;

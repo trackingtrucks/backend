@@ -9,7 +9,9 @@ export const verifyToken = async (req, res, next) => {
         if (!accessToken) return res.status(403).json({ message: 'No token provided' });
         const decoded = jwt.verify(accessToken, secret)
         req.userId = decoded.id
+        const gen = decoded.gen
         const userEnDb = await Usuario.findById(req.userId, { password: 0 })
+        if (!userEnDb.refreshTokens.includes(gen)) return res.status(401).json({ message: 'Token revoked' }); 
         req.userData = userEnDb;
         if (!userEnDb) return res.status(404).json({ message: 'Usuario no encontrado' })
 

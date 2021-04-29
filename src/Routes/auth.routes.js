@@ -4,11 +4,11 @@ import * as Auth from '../Controllers/auth.controller.js'
 import { auth, verify, limit } from '../Middlewares/index'
 
 rutas.post('/login',
-    [limit.l60s5r],
+    // [limit.l60s5r],
     Auth.login);
 
 rutas.get('/token',
-    [limit.l1h3r],
+    // [limit.l1h3r],
     Auth.newAccessToken);
 
 rutas.delete('/token',
@@ -26,11 +26,15 @@ rutas.post('/register/gestor',
     Auth.registrarGestor);
 
 rutas.post('/register/conductor',
-    [limit.l60s5r, auth.verifyToken, auth.isGestor, verify.existeUsuarioOEmail],
+    [
+        // limit.l60s5r, 
+        auth.verifyToken, auth.isGestor, verify.existeUsuarioOEmail],
     Auth.registrarConductor);
 
 rutas.post('/register/admin',
-    [limit.l60s5r, auth.verifyToken, auth.isAdmin, verify.existeUsuarioOEmail],
+    [
+        // limit.l60s5r, 
+        auth.verifyToken, auth.isAdmin, verify.existeUsuarioOEmail],
     Auth.registrarAdmin);
 
 export default rutas

@@ -93,6 +93,7 @@ export const registrarAdmin = async (req, res) => {
 
 export const login = async (req, res) => {
     const { email, password } = req.body;
+    if (!password) return res.status(401).json({message: 'Contraseña invalida'})
     //busco si el usuario existe, y le concateno los roles, que los saco de la otra tabla
     const userEnDB = await Usuario.findOne({ email }).populate("roles");
 
@@ -130,6 +131,8 @@ export const newAccessToken = async (req, res) => {
     try {
         const refreshToken = req.headers["x-refresh-token"]
         const decoded = verifyRefreshToken(refreshToken)
+        const usuarioEnDb = await Usuario.findById(decoded.id, { password: 0 })
+        if (!usuarioEnDb.refreshTokens.includes(refreshToken)) return res.status(403).json({message: 'Refresh token revoked'})
         const accessToken = generateAccessToken(decoded.id, refreshToken)
         res.json({ accessToken })
     } catch (error) {
@@ -139,8 +142,10 @@ export const newAccessToken = async (req, res) => {
 
 export const logoutAllDevices = async (req, res) => {
     try {
-        const id = req.userId
-        const debugResponse = await Usuario.findByIdAndUpdate(id, { refreshTokens: [] }, { new: true })
+        if (!req.body.password) return res.status(401).json({message: 'Contraseña invalida'})
+        const contraseñasCoinciden = await Usuario.verificarPassword(req.body.password, req.userData.password)
+        if (!contraseñasCoinciden) return res.status(403).json({message: 'Contraseña invalida'}) 
+        const debugResponse = await Usuario.findByIdAndUpdate(req.userId, { refreshTokens: [] }, { new: true })
         res.json({ debugResponse })
     } catch (error) {
         res.status(500).json({ message: error.message })

@@ -34,6 +34,10 @@ export const getAll = async (req, res) => {
         const usuarios = await Usuario.find()
         res.json(usuarios)
     } catch (error) {
-        res.json(500).json({message: error.message})
+        res.status(500).json({message: error.message})
     }
+}
+
+export const returnData = async (req, res) => {
+    res.json(req.userData)
 }

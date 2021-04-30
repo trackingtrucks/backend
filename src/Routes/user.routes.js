@@ -13,5 +13,6 @@ rutas.get('/getByCID',
     
 rutas.get('/', [auth.verifyToken, auth.isAdmin], Users.getAll)
 
+rutas.get('/debug', [auth.verifyToken], Users.returnData)
     
 export default rutas

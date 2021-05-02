@@ -60,3 +60,29 @@ export const isAdmin = async (req, res, next) => {
     }
     return res.status(403).json('No tienes los suficientes permisos para realizar esta accion.')
 }
+
+export const isConductor = async (req, res, next) => {
+    const user = req.userData
+    const roles = await Role.find({ _id: { $in: user.roles } });
+    for (let i = 0; i < roles.length; i++) {
+        const rol = roles[i];
+        if (rol.nombre === 'conductor' || rol.nombre === 'gestor' || rol.nombre === 'admin') {
+            next();
+            return;
+        }
+    }
+    return res.status(403).json('No tienes los suficientes permisos para realizar esta accion.')
+}
+
+export const onlyConductor = async (req, res, next) => {
+    const user = req.userData
+    const roles = await Role.find({ _id: { $in: user.roles } });
+    for (let i = 0; i < roles.length; i++) {
+        const rol = roles[i];
+        if (rol.nombre === 'conductor') {
+            next();
+            return;
+        }
+    }
+    return res.status(403).json('No tienes los suficientes permisos para realizar esta accion.')
+}

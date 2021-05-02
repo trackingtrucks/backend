@@ -29,21 +29,18 @@ app.use(cors());
 app.get('/', (req, res) => {
     res.json({
         message: "Oh, encontraste la api! Bueno, bienvenido, no toques nada porfi :)"
-    })
+    }).status(200)
 })
 
 app.use("/info", infoRutas)
 
-// APLICANDO RUTAS
+// APLICANDO RUTAS  
 // app.use('/productos', productosRutas)
 app.use('/auth', authRutas)
 app.use('/user', userRutas)
 app.use("/mock", testRutas)
 
 app.all('*', function (req, res) {
-    res.status(404).json({
-        message: 'No se pudo obtener la ruta ' + req.url,
-        status: 404
-    });
+    res.status(404).send('No se pudo obtener la ruta ' + req.url);
 });
 export default app;

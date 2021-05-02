@@ -75,10 +75,10 @@ export const registrarAdmin = async (req, res) => {
         nuevoUsuario.roles = [adminRole._id]
         nuevoUsuario.refreshTokens = [refreshToken]
         const userNuevo = await nuevoUsuario.save();
-        res.status(200).json({ 
-            userNuevo, 
-            accessToken: generateAccessToken(nuevoUsuario._id, refreshToken), 
-            refreshToken 
+        res.status(200).json({
+            userNuevo,
+            accessToken: generateAccessToken(nuevoUsuario._id, refreshToken),
+            refreshToken
         }) //envio como respuesta el access token, que va a durar 24hs, y el refresh token, que dura 7 dias.
     } catch (error) {
         res.status(500).json({ message: error.message })

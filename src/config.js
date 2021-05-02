@@ -7,6 +7,6 @@ export default {
     SECRET: process.env.SECRET,
     REFRESH_SECRET: process.env.REFRESH_SECRET,
     DEFAULT_ADMIN_PASSWORD: process.env.DEFAULT_ADMIN_PASSWORD,
-    ACCESS_TOKEN_EXPIRES: 1 * 24 * 60 * 60, //1 dia
+    ACCESS_TOKEN_EXPIRES: 1/2 * 24 * 60 * 60, //12 horas
     REFRESH_TOKEN_EXPIRES: 30 * 24 * 60 * 60 //30 dias
 }

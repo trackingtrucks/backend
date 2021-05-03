@@ -1,8 +1,9 @@
-import Usuario from '../Models/Usuario'
-import Role from '../Models/Role'
-import jwt from 'jsonwebtoken'
-import config from '../config'
+import Usuario from '../Models/Usuario';
+import Role from '../Models/Role';
+import jwt from 'jsonwebtoken';
+import config from '../config';
 import Token from '../Models/Token';
+
 const secret = config.SECRET;
 const refresh_secret = config.REFRESH_SECRET;
 const token_expires = config.ACCESS_TOKEN_EXPIRES;
@@ -15,11 +16,11 @@ const refresh_expires = config.REFRESH_TOKEN_EXPIRES;
 */
 
 export const registrarGestor = async (req, res) => {
-    const { nombre, apellido, email, password } = req.body;
-    if (req.isAdmin && !req.body.companyId) { return res.status(401).json({ message: 'Faltan 1 o mas campos requeridos' }) }
-    if (req.isAdmin && req.body.companyId) { req.companyIdValido = req.body.companyId }
-    if (req.rolValido !== "gestor" && !req.isAdmin) return res.status(401).json({ message: 'Su codigo no es valido para realizar esta accion' })
-    if (!nombre || !email || !password) return res.status(401).json({ message: "Faltan 1 o mas campos requeridos" })
+    const { nombre, apellido, email, password } = req.body; //agarro lo que envia el usuario en el body del request
+    if (req.isAdmin && !req.body.companyId) { return res.status(401).json({ message: 'Faltan 1 o mas campos requeridos' }) }; //En caso de que sea admin, chequeo que haya suministrado un companyId
+    if (req.isAdmin && req.body.companyId) { req.companyIdValido = req.body.companyId }; //en caso que sea admin, pone el companyId en el suminstrado
+    if (req.rolValido !== "gestor" && !req.isAdmin) return res.status(401).json({ message: 'Su codigo no es valido para realizar esta accion' }); //chequea que el codigo pueda crear gestores
+    if (!nombre || !email || !password) return res.status(401).json({ message: "Faltan 1 o mas campos requeridos" }); //pregunta si falta algun campo suminstrado por el usuario
     // Se crea el objecto con el nuevo usuario
     const nuevoUsuario = new Usuario({
         nombre,
@@ -31,34 +32,35 @@ export const registrarGestor = async (req, res) => {
     const gestorRole = await Role.findOne({ nombre: "gestor" }) //busca la id del rol de "gestor"
     nuevoUsuario.roles = [gestorRole._id] //le asigna el rol de gestor al objeto del nuevo usuario (puedo hacer esto ya que todavia no lo envie a la db)
     const userNuevo = await nuevoUsuario.save(); //enviando el nuevo usuario a la base de datos, a partir de ahora no lo puedo modificar sin hacer un request a la db
-    await Token.findByIdAndDelete(req.codigoValido)
+    await Token.findByIdAndDelete(req.codigoValido) //elmino el token de registro, para q no se puedan crear mas cuentas de las permitidas
     res.status(200).json({ userNuevo })
 }
 
 export const registrarConductor = async (req, res) => {
     //ver comentarios en registrarGestor()
-    const { companyId } = req.userData;
-    const { nombre, apellido, email, password, registerToken } = req.body;
-    if (!nombre || !email || !password || !companyId) return res.status(401).json({ message: "Faltan 1 o mas campos requeridos" })
+    const { nombre, apellido, email, password } = req.body;
+    if (req.isAdmin && !req.body.companyId) { return res.status(401).json({ message: 'Faltan 1 o mas campos requeridos' }) }
+    if (req.isAdmin && req.body.companyId) { req.companyIdValido = req.body.companyId; req.gestorData = {id: req.userId, email: req.userData.email}}
+    if (req.rolValido !== "conductor" && !req.isAdmin) return res.status(401).json({ message: 'Su codigo no es valido para realizar esta accion' })
+    if (!nombre || !email || !password) return res.status(401).json({ message: "Faltan 1 o mas campos requeridos" })
     // Se crea el objecto con el nuevo usuario
     const nuevoUsuario = new Usuario({
         nombre,
         apellido,
         email,
-        companyId,
-        //el agregadoPor es para tener un registro de quien fue la persona que añadió al conductor, en caso de que sea una compania con muchos gestores / un equipo grande
+        companyId: req.companyIdValido,
         agregadoPor: {
-            id: req.userData._id,
-            email: req.userData.email,
+            id: req.gestorData.id,
+            email: req.gestorData.email,
             fecha: new Date().toLocaleString(),
             date: new Date()
         },
-        password: await Usuario.encriptarPassword(password)
+        password: await Usuario.encriptarPassword(password) //llamo a la funcion de encriptarPassword, guardada en el modelo de Usuario
     })
-    const roleVacio = await Role.findOne({ nombre: "conductor" })
-    nuevoUsuario.roles = [roleVacio._id]
-    const userNuevo = await nuevoUsuario.save();
-
+    const gestorRole = await Role.findOne({ nombre: "conductor" }) //busca la id del rol de "gestor"
+    nuevoUsuario.roles = [gestorRole._id] //le asigna el rol de gestor al objeto del nuevo usuario (puedo hacer esto ya que todavia no lo envie a la db)
+    const userNuevo = await nuevoUsuario.save(); //enviando el nuevo usuario a la base de datos, a partir de ahora no lo puedo modificar sin hacer un request a la db
+    await Token.findByIdAndDelete(req.codigoValido)
     res.status(200).json({ userNuevo })
 }
 
@@ -110,7 +112,7 @@ export const login = async (req, res) => {
     const response = await Usuario.findByIdAndUpdate(userEnDB._id, { $push: { refreshTokens: [refreshToken] } }, { new: true })
 
     response.refreshTokens = null; response.password = null; //limpiando, para que en la respuesta no se envien estos datos
-    res.json({ response, accessToken, refreshToken })//envio como respuesta el token, que va a durar 24hs
+    res.json({ response, accessToken, refreshToken })//envio como respuesta el token, que va a durar 12hs
 }
 
 

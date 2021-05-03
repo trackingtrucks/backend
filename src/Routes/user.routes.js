@@ -16,6 +16,7 @@ rutas.get('/', [auth.verifyToken, auth.isAdmin], Users.getAll)
 rutas.get('/debug', [auth.verifyToken], Users.returnData)
 
 rutas.get('/codigo/gestor', [auth.verifyToken, auth.isAdmin], Users.codigoGestor)
+rutas.get('/codigo/conductor', [auth.verifyToken, auth.isGestor], Users.codigoConductor)
 
 rutas.get('/codigo/check', Users.codigoCheck)
 

@@ -8,6 +8,11 @@ const tokenSchema = new Schema({
     rol: {
         type: String,
         required: true
+    },
+    gestorData: {
+        type: Object,
+        required: false,
+        default: null
     }
 },{
     versionKey: false

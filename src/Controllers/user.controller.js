@@ -55,6 +55,22 @@ export const codigoGestor = async (req, res) => {
         res.status(500).json({ message: error.message }) 
     }
 }
+export const codigoConductor = async (req, res) => {
+    try {
+        const newToken = new Token({
+            companyId: req.userData.companyId,
+            rol: "conductor",
+            gestorData: {
+                id: req.userId,
+                email: req.userData.email
+            }
+        })
+        const nuevoToken = await newToken.save()
+        res.json({codigo: nuevoToken._id}) //ver de enviar por mail una url
+    } catch (error) {
+        res.status(500).json({ message: error.message }) 
+    }
+}
 
 export const codigoCheck  = async (req, res) => {
     try {

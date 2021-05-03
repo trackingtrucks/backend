@@ -13,6 +13,12 @@ export const verifyCodigoRegistro = async (req, res, next) => {
         req.codigoValido = response._id
         req.rolValido = response.rol
         req.companyIdValido = response.companyId
+        console.log(response);
+        req.gestorData = {
+            email: response.gestorData.email,
+            id: response.gestorData.id
+        }
+        console.log(req.gestorData);
         next()
 
     } catch (error) {
@@ -23,20 +29,7 @@ export const verifyCodigoRegistro = async (req, res, next) => {
 export const verifyToken = async (req, res, next) => {
     try {
         const accessToken = req.headers["x-access-token"]
-        // const refreshToken = req.headers["x-refresh-token"]
         if (!accessToken) return res.status(403).json({ message: 'No token provided' });
-        // const info = jwt.decode(accessToken, secret)
-        // console.log(info);
-        // console.log(new Date() > info.exp * 1000);
-        // if (new Date() > info.exp * 1000){
-        //     console.log("expiró");
-        //     newAccessToken = jwt.sign({
-        //         id: info.id,
-        //         gen: refreshToken
-        //     }, secret, {
-        //         expiresIn: token_expires // 24 horas
-        //     })
-        // }
         const decoded = jwt.verify(accessToken, secret)
         req.userId = decoded.id
         const gen = decoded.gen

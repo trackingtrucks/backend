@@ -1,5 +1,6 @@
 import Usuario from '../Models/Usuario'
 import Role from '../Models/Role'
+import Token from '../Models/Token'
 // import jwt from 'jsonwebtoken'
 import mongoose from 'mongoose'
 // import config from '../config'
@@ -38,4 +39,31 @@ export const getAll = async (req, res) => {
 
 export const returnData = async (req, res) => {
     res.json(req.userData)
+}
+
+export const codigoGestor = async (req, res) => {
+    try {
+        const {companyId} = req.body
+        if (!companyId) return res.status(404).json({message: 'No se especificó ninguna compania'})
+        const newToken = new Token({
+            companyId,
+            rol: "gestor"
+        })
+        const nuevoToken = await newToken.save()
+        res.json({codigo: nuevoToken._id}) //ver de enviar por mail una url
+    } catch (error) {
+        res.status(500).json({ message: error.message }) 
+    }
+}
+
+export const codigoCheck  = async (req, res) => {
+    try {
+        const {codigo} = req.body
+        if (!codigo) return res.status(404).json({message: 'No se especificó ningun codigo'})
+        const response = await Token.findById(codigo)
+        if (!response) return res.status(401).json({valid: false})
+        res.json({valid: true})
+    } catch (error) {
+        res.status(500).json({ message: error.message, valid: false }) 
+    }
 }

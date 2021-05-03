@@ -2,6 +2,7 @@ import Usuario from '../Models/Usuario'
 import Role from '../Models/Role'
 import jwt from 'jsonwebtoken'
 import config from '../config'
+import Token from '../Models/Token';
 const secret = config.SECRET;
 const refresh_secret = config.REFRESH_SECRET;
 const token_expires = config.ACCESS_TOKEN_EXPIRES;
@@ -14,20 +15,23 @@ const refresh_expires = config.REFRESH_TOKEN_EXPIRES;
 */
 
 export const registrarGestor = async (req, res) => {
-    const { nombre, apellido, email, password, companyId, registerToken } = req.body;
-    if (!nombre || !email || !password || !companyId) return res.status(401).json({ message: "Faltan 1 o mas campos requeridos" })
+    const { nombre, apellido, email, password } = req.body;
+    if (req.isAdmin && !req.body.companyId) { return res.status(401).json({ message: 'Faltan 1 o mas campos requeridos' }) }
+    if (req.isAdmin && req.body.companyId) { req.companyIdValido = req.body.companyId }
+    if (req.rolValido !== "gestor" && !req.isAdmin) return res.status(401).json({ message: 'Su codigo no es valido para realizar esta accion' })
+    if (!nombre || !email || !password) return res.status(401).json({ message: "Faltan 1 o mas campos requeridos" })
     // Se crea el objecto con el nuevo usuario
     const nuevoUsuario = new Usuario({
         nombre,
         apellido,
         email,
-        companyId,
+        companyId: req.companyIdValido,
         password: await Usuario.encriptarPassword(password) //llamo a la funcion de encriptarPassword, guardada en el modelo de Usuario
     })
     const gestorRole = await Role.findOne({ nombre: "gestor" }) //busca la id del rol de "gestor"
     nuevoUsuario.roles = [gestorRole._id] //le asigna el rol de gestor al objeto del nuevo usuario (puedo hacer esto ya que todavia no lo envie a la db)
     const userNuevo = await nuevoUsuario.save(); //enviando el nuevo usuario a la base de datos, a partir de ahora no lo puedo modificar sin hacer un request a la db
-
+    await Token.findByIdAndDelete(req.codigoValido)
     res.status(200).json({ userNuevo })
 }
 

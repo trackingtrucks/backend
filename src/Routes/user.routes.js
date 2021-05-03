@@ -14,5 +14,9 @@ rutas.get('/getByCID',
 rutas.get('/', [auth.verifyToken, auth.isAdmin], Users.getAll)
 
 rutas.get('/debug', [auth.verifyToken], Users.returnData)
-    
+
+rutas.get('/codigo/gestor', [auth.verifyToken, auth.isAdmin], Users.codigoGestor)
+
+rutas.get('/codigo/check', Users.codigoCheck)
+
 export default rutas

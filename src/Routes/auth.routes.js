@@ -8,8 +8,9 @@ rutas.post('/login',
     Auth.login);
 
 rutas.post('/register/gestor',
-    [limit.l60s5r, auth.verifyToken, auth.isAdmin, verify.existeUsuarioOEmail],
+    [auth.verifyCodigoRegistro, verify.existeUsuarioOEmail],
     Auth.registrarGestor);
+
 
 rutas.post('/register/conductor',
     [limit.l60s5r, auth.verifyToken, auth.isGestor, verify.existeUsuarioOEmail],
@@ -30,5 +31,9 @@ rutas.delete('/token',
 rutas.delete('/tokens',
     [auth.verifyToken],
     Auth.logoutAllDevices)
+
+rutas.post('/admin/register/gestor',
+    [limit.l60s5r, auth.verifyToken, auth.isAdmin, verify.existeUsuarioOEmail],
+    Auth.registrarGestor);
 
 export default rutas

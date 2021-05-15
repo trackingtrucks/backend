@@ -112,7 +112,7 @@ export const login = async (req, res) => {
     const response = await Usuario.findByIdAndUpdate(userEnDB._id, { $push: { refreshTokens: [refreshToken] } }, { new: true })
 
     response.refreshTokens = null; response.password = null; //limpiando, para que en la respuesta no se envien estos datos
-    res.json({ response, accessToken, refreshToken })//envio como respuesta el token, que va a durar 12hs
+    res.json({ response, accessToken, refreshToken, ATExpiresIn: Date.now() + token_expires * 1000, RTExpiresIn: Date.now() + refresh_expires * 1000})//envio como respuesta el token, que va a durar 12hs
 }
 
 

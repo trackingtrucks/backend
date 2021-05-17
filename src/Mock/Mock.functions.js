@@ -13,6 +13,8 @@ export const generarError = (req, res) => {
         res.status(code).json({
             status: parseInt(code, 10),
             message: `Codigo ${code} generado con exito!`
+        }).catch(err =>{
+            res.json("Haz tratado de crear un codigo que no existe/no es posible, por favor, chequea que este correcto!")
         })
     } catch (error) {
         res.json("Haz tratado de crear un codigo que no existe/no es posible, por favor, chequea que este correcto!")

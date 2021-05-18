@@ -27,6 +27,12 @@ export const crear = async (req, res) => {
     }
 }
 
+export const asignarConductor = async (req, res) => {
+    const vehiculoEditado = await Vehiculo.findByIdAndUpdate(req.vehiculoId, {conductorActual: {id: req.userId, fechaDesde: new Date()}}, {new: true})
+    const usuarioEditado = await Usuario.findByIdAndUpdate(req.userId, {vehiculoActual: {id: req.vehiculoId, fechaDesde: new Date()}}, {new: true})
+    return res.json({vehiculoEditado, usuarioEditado})
+}
+
 export const formatPatente = (patente) => {
     return patente.split(' ').join('').split('-').join('').trim().toUpperCase();
 }

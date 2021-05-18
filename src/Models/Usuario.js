@@ -24,6 +24,27 @@ const usuarioSchema = new Schema({
     agregadoPor:{
         type: Object
     },
+    vehiculoActual: {
+        id: {
+            ref: "Vehiculo",
+            type: Schema.Types.ObjectId
+        },
+        fechaDesde: {
+            type: Date,
+        }
+    },
+    vehiculosPasados: [{
+        id: {
+            ref: "Vehiculo",
+            type: Schema.Types.ObjectId
+        },
+        fechaDesde: {
+            type: Date,
+        },
+        fechaHasta: {
+            type: Date,
+        }
+    }],
     refreshTokens: [String]
 }, {
     timestamps: true,

@@ -48,3 +48,22 @@ export const vehiculoYaAsignado = async (req, res, next) => {
     console.log('vehiculo no asignado')
     next();
 }
+
+export const usuarioNoAsignado = async (req, res, next) => {
+    const {patente} = req.body
+    if(!patente) return res.status(400).json({ message: 'Patente no especificada'})
+    const usuario = await Vehiculo.findOne({"conductorActual.id": req.userId})
+    const vehiculo = req.userData?.vehiculoActual?.id;
+    if(!vehiculo || !usuario) return res.status(400).json({ message: 'Este usuario no esta asignado a ningun vehiculo'})
+    console.log('usuario asignado')
+    next();
+}
+
+export const vehiculoNoAsignado = async (req, res, next) => {
+    const patente = req.body?.patente;
+    const vehiculo = await Vehiculo.findOne({patente: formatPatente(patente)})
+    if(!vehiculo) return res.status(400).json({ message: 'No se encontraron vehiculos con esa patente'})
+    if(!vehiculo?.conductorActual?.id) return res.status(400).json({ message: 'Este vehiculo no esta asignado a ningun usuario'})
+    console.log('vehiculo asignado')
+    next();
+}

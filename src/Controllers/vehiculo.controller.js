@@ -33,6 +33,14 @@ export const asignarConductor = async (req, res) => {
     return res.json({vehiculoEditado, usuarioEditado})
 }
 
+export const desasignarConductor = async (req, res) => {
+    const conductorActual = await Vehiculo.findById(req.vehiculoId)
+    const vehiculoActual = await Usuario.findById(req.userId)
+    const vehiculoEditado = await Vehiculo.findByIdAndUpdate(req.vehiculoId, {conductorActual: {id: null, fechaDesde: null}, conductoresPasados: {id: conductorActual?.id, fechaDesde: conductorActual?.fechaDesde, fechaHasta: new Date()}}, {new: true})
+    const usuarioEditado = await Usuario.findByIdAndUpdate(req.userId, {vehiculoActual: {id: null, fechaDesde: null}, vehiculosPasados: {id: vehiculoActual?.id, fechaDesde: vehiculoActual?.fechaDesde, fechaHasta: new Date()}}, {new: true})
+    return res.json({vehiculoEditado, usuarioEditado})
+}
+
 export const formatPatente = (patente) => {
     return patente.split(' ').join('').split('-').join('').trim().toUpperCase();
 }

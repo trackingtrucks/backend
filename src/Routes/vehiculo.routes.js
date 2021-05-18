@@ -7,5 +7,6 @@ rutas.post('/',
     [auth.verifyToken, verify.existePatenteRegistrada, auth.isGestor],
     Vehiculo.crear)
 rutas.put('/', [auth.verifyToken, auth.onlyConductor, verify.usuarioYaAsignado, verify.vehiculoYaAsignado], Vehiculo.asignarConductor)
+rutas.put('/desasignar', [auth.verifyToken, auth.onlyConductor, verify.usuarioNoAsignado, verify.vehiculoNoAsignado], Vehiculo.desasignarConductor)
 
 export default rutas

@@ -1,7 +1,7 @@
 import Role from '../Models/Role'
 import Usuario from '../Models/Usuario'
 import CONFIG from '../config'
-export const crearRoles = async () => {
+export const initSetup = async () => {
     const count = await Role.estimatedDocumentCount()
     const usuarioCount = await Usuario.estimatedDocumentCount()
     if (count > 0) {

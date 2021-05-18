@@ -16,8 +16,8 @@ import vehiculoRutas from './Routes/vehiculo.routes'
 
 // CONFIG
 import config from './config'
-import {crearRoles} from './Libs/initSetup'
-crearRoles()
+import {initSetup} from './Libs/initSetup'
+initSetup()
 const app = express();
 import cors from 'cors'
 

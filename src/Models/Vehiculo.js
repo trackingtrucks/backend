@@ -5,6 +5,10 @@ const vehiculoSchema = new Schema({
         required: true,
         unique: true
     },
+    patenteFormato: {
+        type: Number,
+        required: true
+    },
     companyId: {
         type: String,
         required: true
@@ -22,8 +26,13 @@ const vehiculoSchema = new Schema({
         required: true
     },
     conductorActual: {
-        ref: "Usuario",
-        type: Schema.Types.ObjectId
+        id: {
+            ref: "Usuario",
+            type: Schema.Types.ObjectId
+        },
+        fechaDesde: {
+            type: Date,
+        }
     },
     conductoresPasados: [{
         id: {
@@ -32,14 +41,12 @@ const vehiculoSchema = new Schema({
         },
         fechaDesde: {
             type: Date,
-            default: new Date()
         },
         fechaHasta: {
             type: Date,
-            default: new Date()
         }
     }],
-    notaGestor: String 
+    notaGestor: String
 }, {
     timestamps: true,
     versionKey: false

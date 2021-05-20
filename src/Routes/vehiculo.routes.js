@@ -1,6 +1,6 @@
 import { Router } from "express";
 const rutas = Router();
-import * as Vehiculo from '../Controllers/Vehiculo.controller.js'
+import * as Vehiculo from '../Controllers/vehiculo.controller.js'
 import { auth, verify, limit } from '../Middlewares/index'
 
 rutas.post('/',

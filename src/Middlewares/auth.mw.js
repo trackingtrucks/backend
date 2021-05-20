@@ -13,7 +13,6 @@ export const verifyCodigoRegistro = async (req, res, next) => {
         req.codigoValido = response._id
         req.rolValido = response.rol
         req.companyIdValido = response.companyId
-        console.log(response);
         req.gestorData = {
             email: response?.gestorData?.email,
             id: response?.gestorData?.id

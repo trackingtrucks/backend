@@ -1,5 +1,4 @@
 import Usuario from '../Models/Usuario'
-import Role from '../Models/Role'
 import Token from '../Models/Token'
 import Vehiculo from '../Models/Vehiculo'
 // import jwt from 'jsonwebtoken'
@@ -17,10 +16,9 @@ export const getByCompanyId = async (req, res) => {
     try {
         const companyId = req.userData.companyId // Agarra la id de la compania pedida.
             if (!companyId) return res.status(400).json({ message: 'No se especificó una ID' })   //Chequea que se haya mandado una companyid en al request (seria bastante raro ya que la persona en si esta registrada)
-        const gestorRole = await Role.findOne({ nombre: 'gestor' });        //Setea los roles de gestor
-        const conductorRole = await Role.findOne({ nombre: 'conductor' });  //y de conductor.
-        const gestores = await Usuario.find({ companyId, roles: gestorRole._id }, { password: 0, refreshTokens: 0 });      // Hace el requests pidiendo solo los gestores
-        const conductores = await Usuario.find({ companyId, roles: conductorRole._id }, { password: 0, refreshTokens: 0 });// Hace el requests pidiendo solo los conductores
+        //ESTO SE PUDE OPTIMIZAR MAS, HACER UNA SOLA REQUEST Y PARSEAR
+        const gestores = await Usuario.find({ companyId, rol: 'gestor' }, { password: 0, refreshTokens: 0 });      // Hace el requests pidiendo solo los gestores
+        const conductores = await Usuario.find({ companyId, rol: 'conductor' }, { password: 0, refreshTokens: 0 });// Hace el requests pidiendo solo los conductores
         const vehiculos = await Vehiculo.find({companyId})
             if (gestores.length === 0 && conductores.length === 0) return res.status(404).json({ message: "No se encontraron usuarios en esa companía" }); // Chequea si hay resultados en la busqueda
                 return res.json({ gestores, conductores, vehiculos });                                     // Devuelve los 2 objetos

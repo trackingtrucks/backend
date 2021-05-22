@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken";
 import Usuario from '../Models/Usuario'
-import Role from '../Models/Role'
 import Token from '../Models/Token'
 import config from '../config'
 const secret = config.SECRET;
@@ -44,53 +43,37 @@ export const verifyToken = async (req, res, next) => {
 
 export const isGestor = async (req, res, next) => {
     const user = req.userData
-    const roles = await Role.find({ _id: { $in: user.roles } });
-    for (let i = 0; i < roles.length; i++) {
-        const rol = roles[i];
-        if (rol.nombre === 'gestor' || rol.nombre === 'admin') {
-            next();
-            return;
-        }
+    if (user.rol === 'gestor' || user.rol === 'admin'){
+        next();
+        return;
     }
     return res.status(403).json('No tienes los suficientes permisos para realizar esta accion.')
 }
 
 export const isAdmin = async (req, res, next) => {
     const user = req.userData
-    const roles = await Role.find({ _id: { $in: user.roles } });
-    req.isAdmin = true;
-    for (let i = 0; i < roles.length; i++) {
-        const rol = roles[i];
-        if (rol.nombre === 'admin') {
-            next();
-            return;
-        }
+    if (user.rol === 'admin'){
+        req.isAdmin = true;
+        next();
+        return;
     }
     return res.status(403).json('No tienes los suficientes permisos para realizar esta accion.')
 }
 
 export const isConductor = async (req, res, next) => {
     const user = req.userData
-    const roles = await Role.find({ _id: { $in: user.roles } });
-    for (let i = 0; i < roles.length; i++) {
-        const rol = roles[i];
-        if (rol.nombre === 'conductor' || rol.nombre === 'gestor' || rol.nombre === 'admin') {
-            next();
-            return;
-        }
+    if (user.rol === 'conductor'|| user.rol === 'gestor' || user.rol === 'admin'){
+        next();
+        return;
     }
     return res.status(403).json('No tienes los suficientes permisos para realizar esta accion.')
 }
 
 export const onlyConductor = async (req, res, next) => {
     const user = req.userData
-    const roles = await Role.find({ _id: { $in: user.roles } });
-    for (let i = 0; i < roles.length; i++) {
-        const rol = roles[i];
-        if (rol.nombre === 'conductor') {
-            next();
-            return;
-        }
+    if (user.rol === 'conductor'){
+        next();
+        return;
     }
     return res.status(403).json('No tienes los suficientes permisos para realizar esta accion.')
 }

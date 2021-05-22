@@ -1,20 +1,7 @@
-import { ROLES } from '../Models/Role'
 import Usuario from '../Models/Usuario'
 import Vehiculo from '../Models/Vehiculo';
 import { formatPatente } from '../Controllers/vehiculo.controller'
-export const Roles = async (req, res, next) => {
-    const roles = req.body.roles
-    if (roles) {
-        for (let i = 0; i < roles.length; i++) {
-            if (!ROLES.includes(roles[i])) {
-                return res.status(400).json({
-                    message: `El rol ${roles[i]} no existe.`
-                })
-            }
-        }
-    }
-    next();
-}
+
 export const emailIsValid = async (req, res, next) => {
     const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     const valid =  re.test(req?.body?.email);

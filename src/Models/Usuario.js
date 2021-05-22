@@ -12,11 +12,10 @@ const usuarioSchema = new Schema({
         type: String,
         required: true
     },
-    roles: [{
-        ref: "Role",
-        type: Schema.Types.ObjectId,
-        default: "conductor"
-    }],
+    rol: {
+        type: String,
+        required: true
+    },
     companyId: {
         type: String,
         required: true

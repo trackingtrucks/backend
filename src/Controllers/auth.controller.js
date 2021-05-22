@@ -1,5 +1,4 @@
 import Usuario from '../Models/Usuario';
-import Role from '../Models/Role';
 import jwt from 'jsonwebtoken';
 import config from '../config';
 import Token from '../Models/Token';
@@ -27,10 +26,9 @@ export const registrarGestor = async (req, res) => {
         apellido,
         email,
         companyId: req.companyIdValido,
+        rol: 'gestor',
         password: await Usuario.encriptarPassword(password) //llamo a la funcion de encriptarPassword, guardada en el modelo de Usuario
     })
-    const gestorRole = await Role.findOne({ nombre: "gestor" }) //busca la id del rol de "gestor"
-    nuevoUsuario.roles = [gestorRole._id] //le asigna el rol de gestor al objeto del nuevo usuario (puedo hacer esto ya que todavia no lo envie a la db)
     const userNuevo = await nuevoUsuario.save(); //enviando el nuevo usuario a la base de datos, a partir de ahora no lo puedo modificar sin hacer un request a la db
     await Token.findByIdAndDelete(req.codigoValido) //elmino el token de registro, para q no se puedan crear mas cuentas de las permitidas
     res.status(200).json({ userNuevo })
@@ -55,10 +53,9 @@ export const registrarConductor = async (req, res) => {
             fecha: new Date().toLocaleString(),
             date: new Date()
         },
+        rol: 'conductor',
         password: await Usuario.encriptarPassword(password) //llamo a la funcion de encriptarPassword, guardada en el modelo de Usuario
     })
-    const gestorRole = await Role.findOne({ nombre: "conductor" }) //busca la id del rol de "gestor"
-    nuevoUsuario.roles = [gestorRole._id] //le asigna el rol de gestor al objeto del nuevo usuario (puedo hacer esto ya que todavia no lo envie a la db)
     const userNuevo = await nuevoUsuario.save(); //enviando el nuevo usuario a la base de datos, a partir de ahora no lo puedo modificar sin hacer un request a la db
     await Token.findByIdAndDelete(req.codigoValido)
     res.status(200).json({ userNuevo })
@@ -74,11 +71,10 @@ export const registrarAdmin = async (req, res) => {
             apellido,
             email,
             companyId: 'admins',
+            rol: 'admin',
             password: await Usuario.encriptarPassword(password)
         })
-        const adminRole = await Role.findOne({ nombre: "admin" })
         const refreshToken = generateRefreshToken(nuevoUsuario._id)
-        nuevoUsuario.roles = [adminRole._id]
         nuevoUsuario.refreshTokens = [refreshToken]
         const userNuevo = await nuevoUsuario.save();
         res.status(200).json({
@@ -97,8 +93,8 @@ export const registrarAdmin = async (req, res) => {
 export const login = async (req, res) => {
     const { email, password } = req.body;
     if (!password) return res.status(401).json({ message: 'Contraseña invalida' })
-    //busco si el usuario existe, y le concateno los roles, que los saco de la otra tabla (ya que relacione los parametros)
-    const userEnDB = await Usuario.findOne({ email }).populate("roles");
+    //busco si el usuario existe
+    const userEnDB = await Usuario.findOne({ email })
 
     if (!userEnDB) { return res.status(400).json({ message: 'Usuario no encontrado' }) }//si el mail no se encontró
 

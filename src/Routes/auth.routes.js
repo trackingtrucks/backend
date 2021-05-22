@@ -4,19 +4,19 @@ import * as Auth from '../Controllers/auth.controller.js'
 import { auth, verify, limit } from '../Middlewares/index'
 
 rutas.post('/login',
-    [limit.l60s5r],
+    [limit.l60s5r, verify.emailIsValid],
     Auth.login);
 
 rutas.post('/register/gestor',
-    [auth.verifyCodigoRegistro, verify.existeUsuarioOEmail],
+    [verify.emailIsValid, auth.verifyCodigoRegistro, verify.existeUsuarioOEmail],
     Auth.registrarGestor);
 
 rutas.post('/register/conductor',
-    [auth.verifyCodigoRegistro, verify.existeUsuarioOEmail],
+    [verify.emailIsValid, auth.verifyCodigoRegistro, verify.existeUsuarioOEmail],
     Auth.registrarConductor);
 
 rutas.post('/register/admin',
-    [limit.l60s5r, auth.verifyToken, auth.isAdmin, verify.existeUsuarioOEmail],
+    [verify.emailIsValid, limit.l60s5r, auth.verifyToken, auth.isAdmin, verify.existeUsuarioOEmail],
     Auth.registrarAdmin);
 
 rutas.get('/token',
@@ -32,11 +32,11 @@ rutas.delete('/tokens',
     Auth.logoutAllDevices)
 
 rutas.post('/admin/register/gestor',
-    [limit.l60s5r, auth.verifyToken, auth.isAdmin, verify.existeUsuarioOEmail],
+    [limit.l60s5r, verify.emailIsValid, auth.verifyToken, auth.isAdmin, verify.existeUsuarioOEmail],
     Auth.registrarGestor);
 
 rutas.post('/admin/register/conductor',
-    [auth.verifyToken, auth.isAdmin, verify.existeUsuarioOEmail],
+    [verify.emailIsValid, auth.verifyToken, auth.isAdmin, verify.existeUsuarioOEmail],
     Auth.registrarConductor);
 
 export default rutas

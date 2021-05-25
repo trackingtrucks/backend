@@ -92,14 +92,14 @@ export const registrarAdmin = async (req, res) => {
 
 export const login = async (req, res) => {
     const { email, password } = req.body;
-    if (!password) return res.status(401).json({ message: 'Contraseña invalida' })
+    if (!password) return res.status(401).json({ message: 'Usuario o contraseña invalidos.' })
     //busco si el usuario existe
     const userEnDB = await Usuario.findOne({ email })
 
-    if (!userEnDB) { return res.status(400).json({ message: 'Usuario no encontrado' }) }//si el mail no se encontró
+    if (!userEnDB) { return res.status(400).json({ message: 'Usuario o contraseña invalidos.' }) }//si el mail no se encontró
 
     const contraseñasCoinciden = await Usuario.verificarPassword(password, userEnDB.password)//chequeo de contraseña
-    if (!contraseñasCoinciden) { return res.status(401).json({ accessToken: null, message: 'Contraseña invalida' }) }
+    if (!contraseñasCoinciden) { return res.status(401).json({ accessToken: null, message: 'Usuario o contraseña invalidos.' }) }
 
     //creo el token de login y de refresh
     const refreshToken = generateRefreshToken(userEnDB._id)

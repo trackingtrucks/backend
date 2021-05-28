@@ -20,4 +20,6 @@ rutas.get('/codigo/conductor', [auth.verifyToken, auth.isGestor], Users.codigoCo
 
 rutas.get('/codigo/check', Users.codigoCheck)
 
+rutas.post("/socketTest", [auth.verifyToken], Users.socketTest)
+
 export default rutas

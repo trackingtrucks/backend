@@ -29,16 +29,22 @@ export const registrarGestor = async (req, res) => {
         rol: 'gestor',
         password: await Usuario.encriptarPassword(password) //llamo a la funcion de encriptarPassword, guardada en el modelo de Usuario
     })
-    const userNuevo = await nuevoUsuario.save(); //enviando el nuevo usuario a la base de datos, a partir de ahora no lo puedo modificar sin hacer un request a la db
+    const refreshToken = generateRefreshToken(nuevoUsuario._id)
+    nuevoUsuario.refreshTokens = [refreshToken]
     await Token.findByIdAndDelete(req.codigoValido) //elmino el token de registro, para q no se puedan crear mas cuentas de las permitidas
-    res.status(200).json({ userNuevo })
+    const userNuevo = await nuevoUsuario.save(); //enviando el nuevo usuario a la base de datos, a partir de ahora no lo puedo modificar sin hacer un request a la db
+    res.status(200).json({
+        response: userNuevo,
+        accessToken: generateAccessToken(nuevoUsuario._id, refreshToken),
+        refreshToken
+    }) //envio como respuesta el access token, que va a durar 24hs, y el refresh token, que dura 7 dias.
 }
 
 export const registrarConductor = async (req, res) => {
     //ver comentarios en registrarGestor()
     const { nombre, apellido, email, password } = req.body;
     if (req.isAdmin && !req.body.companyId) { return res.status(401).json({ message: 'Faltan 1 o mas campos requeridos' }) }
-    if (req.isAdmin && req.body.companyId) { req.companyIdValido = req.body.companyId; req.gestorData = {id: req.userId, email: req.userData.email}}
+    if (req.isAdmin && req.body.companyId) { req.companyIdValido = req.body.companyId; req.gestorData = { id: req.userId, email: req.userData.email } }
     if (req.rolValido !== "conductor" && !req.isAdmin) return res.status(401).json({ message: 'Su codigo no es valido para realizar esta accion' })
     if (!nombre || !email || !password) return res.status(401).json({ message: "Faltan 1 o mas campos requeridos" })
     // Se crea el objecto con el nuevo usuario
@@ -58,7 +64,7 @@ export const registrarConductor = async (req, res) => {
     })
     const userNuevo = await nuevoUsuario.save(); //enviando el nuevo usuario a la base de datos, a partir de ahora no lo puedo modificar sin hacer un request a la db
     await Token.findByIdAndDelete(req.codigoValido)
-    res.status(200).json({ userNuevo })
+    res.status(200).json({ response: userNuevo, })
 }
 
 
@@ -108,7 +114,7 @@ export const login = async (req, res) => {
     const response = await Usuario.findByIdAndUpdate(userEnDB._id, { $push: { refreshTokens: [refreshToken] } }, { new: true })
 
     response.refreshTokens = null; response.password = null; //limpiando, para que en la respuesta no se envien estos datos
-    res.json({ response, accessToken, refreshToken, ATExpiresIn: Date.now() + token_expires * 1000, RTExpiresIn: Date.now() + refresh_expires * 1000})//envio como respuesta el token, que va a durar 12hs
+    res.json({ response, accessToken, refreshToken, ATExpiresIn: Date.now() + token_expires * 1000, RTExpiresIn: Date.now() + refresh_expires * 1000 })//envio como respuesta el token, que va a durar 12hs
 }
 
 

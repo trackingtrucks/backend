@@ -2,17 +2,61 @@ import Usuario from '../Models/Usuario';
 import jwt from 'jsonwebtoken';
 import config from '../config';
 import Token from '../Models/Token';
+import sha256 from 'js-sha256';
 
 const secret = config.SECRET;
 const refresh_secret = config.REFRESH_SECRET;
 const token_expires = config.ACCESS_TOKEN_EXPIRES;
 const refresh_expires = config.REFRESH_TOKEN_EXPIRES;
+const salt = config.SALT;
 
 /*
 ############
 # ACCIONES #
 ############
 */
+
+export const registrarUnificadou = async (req, res) => {
+    try {
+        const { nombre, apellido, email, password } = req.body; //agarro lo que envia el usuario en el body del request
+        if (!nombre || !email || !password) return res.status(401).json({ message: "Faltan 1 o mas campos requeridos" }); //pregunta si falta algun campo suminstrado por el usuario
+        // Se crea el objecto con el nuevo usuario
+        const nuevoUsuario = new Usuario({
+            nombre,
+            apellido,
+            email,
+            companyId: req.companyIdValido,
+            rol: req.rolValido,
+            password: await Usuario.encriptarPassword(password) //llamo a la funcion de encriptarPassword, guardada en el modelo de Usuario
+        })
+        await Token.findByIdAndDelete(req.codigoValido) //elmino el token de registro, para q no se puedan crear mas cuentas de las permitidas
+        if (req.rolValido === 'gestor') {
+            const refreshToken = generateRefreshToken(nuevoUsuario._id)
+            nuevoUsuario.refreshTokens = [refreshToken]
+            const userNuevo = await nuevoUsuario.save(); //enviando el nuevo usuario a la base de datos, a partir de ahora no lo puedo modificar sin hacer un request a la db
+            return res.status(200).json({
+                response: userNuevo,
+                accessToken: generateAccessToken(nuevoUsuario._id, refreshToken),
+                refreshToken
+            }) //envio como respuesta el access token, que va a durar 24hs, y el refresh token, que dura 7 dias.
+
+        }
+        if (req.rolValido === 'conductor') {
+            nuevoUsuario.agregadoPor = {
+                id: req.gestorData.id,
+                email: req.gestorData.email,
+                fecha: new Date().toLocaleString(),
+                date: new Date()
+            }
+            const userNuevo = await nuevoUsuario.save(); //enviando el nuevo usuario a la base de datos, a partir de ahora no lo puedo modificar sin hacer un request a la db
+            return res.status(200).json({ response: userNuevo, message: "Usuario creado con éxito!" })
+        }
+        return res.status(500).json({ message: "how did we get here?" })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
 
 export const registrarGestor = async (req, res) => {
     const { nombre, apellido, email, password } = req.body; //agarro lo que envia el usuario en el body del request
@@ -36,7 +80,8 @@ export const registrarGestor = async (req, res) => {
     res.status(200).json({
         response: userNuevo,
         accessToken: generateAccessToken(nuevoUsuario._id, refreshToken),
-        refreshToken
+        refreshToken,
+        message: 'Esta ruta va a dejar de ser valida pronto, asegurate de cambiarla a /auth/register solo!'
     }) //envio como respuesta el access token, que va a durar 24hs, y el refresh token, que dura 7 dias.
 }
 
@@ -64,7 +109,10 @@ export const registrarConductor = async (req, res) => {
     })
     const userNuevo = await nuevoUsuario.save(); //enviando el nuevo usuario a la base de datos, a partir de ahora no lo puedo modificar sin hacer un request a la db
     await Token.findByIdAndDelete(req.codigoValido)
-    res.status(200).json({ response: userNuevo, })
+    res.status(200).json({
+        response: userNuevo, 
+        message: 'Esta ruta va a dejar de ser valida pronto, asegurate de cambiarla a /auth/register solo!'
+    })
 }
 
 
@@ -162,7 +210,7 @@ export const logoutAllDevices = async (req, res) => {
 function generateAccessToken(id, refreshToken) {
     const accessToken = jwt.sign({
         id,
-        gen: refreshToken
+        gen: sha256(refreshToken + salt)
     }, secret, {
         expiresIn: token_expires // 24 horas
     })

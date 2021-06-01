@@ -2,7 +2,11 @@ import jwt from "jsonwebtoken";
 import Usuario from '../Models/Usuario'
 import Token from '../Models/Token'
 import config from '../config'
+import sha256 from 'js-sha256';
+
 const secret = config.SECRET;
+const salt = config.SALT;
+
 // const token_expires = config.ACCESS_TOKEN_EXPIRES;
 
 export const verifyCodigoRegistro = async (req, res, next) => {
@@ -31,8 +35,12 @@ export const verifyToken = async (req, res, next) => {
         req.userId = decoded.id
         const gen = decoded.gen
         const userEnDb = await Usuario.findById(req.userId)
-        if (!userEnDb.refreshTokens.includes(gen)) return res.status(401).json({ message: 'Token revoked' });
         req.userData = userEnDb;
+        const clone = userEnDb; 
+        clone.refreshTokens.forEach((token, i) =>{
+            clone.refreshTokens[i] = sha256(token + salt)
+        })
+        if (!clone.refreshTokens.includes(gen)) return res.status(401).json({ message: 'Token revoked' });
         if (!userEnDb) return res.status(404).json({ message: 'Usuario no encontrado' })
         next()
 

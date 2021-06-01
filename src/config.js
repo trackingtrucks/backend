@@ -6,6 +6,7 @@ export default {
     PORT: process.env.PORT || 5000,
     SECRET: process.env.SECRET,
     REFRESH_SECRET: process.env.REFRESH_SECRET,
+    SALT: process.env.SALT,
     DEFAULT_ADMIN_PASSWORD: process.env.DEFAULT_ADMIN_PASSWORD,
     // NOTA: CAMBIAR DE 12 HORAS A 3 MINUTOS, ESTO ES DE DEBUG
     ACCESS_TOKEN_EXPIRES: 1/2 * 24 * 60 * 60, //12 horas

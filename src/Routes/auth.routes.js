@@ -7,6 +7,10 @@ rutas.post('/login',
     [limit.l60s5r, verify.emailIsValid],
     Auth.login);
 
+rutas.post('/register',
+    [verify.emailIsValid, auth.verifyCodigoRegistro, verify.existeUsuarioOEmail],
+    Auth.registrarUnificadou);
+
 rutas.post('/register/gestor',
     [verify.emailIsValid, auth.verifyCodigoRegistro, verify.existeUsuarioOEmail],
     Auth.registrarGestor);

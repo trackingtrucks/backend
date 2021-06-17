@@ -44,6 +44,28 @@ const usuarioSchema = new Schema({
             type: Date,
         }
     }],
+    turnoActual:{
+        id: {
+            ref: "Turno",
+            type: Schema.Types.ObjectId
+        },
+        fechaAsignado: {
+            type: Date,
+            default: new Date()
+        }
+    },
+    turnosPasados: [{
+        id: {
+            ref: "Turno",
+            type: Schema.Types.ObjectId
+        },
+        fechaAsignado: {
+            type: Date
+        },
+        fechaTerminado: {
+            type: Date
+        }
+    }],
     refreshTokens: [String]
 }, {
     timestamps: true,

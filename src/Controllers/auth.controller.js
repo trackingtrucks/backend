@@ -35,7 +35,7 @@ export const registrarUnificadou = async (req, res) => {
             nuevoUsuario.refreshTokens = [refreshToken]
             const userNuevo = await nuevoUsuario.save(); //enviando el nuevo usuario a la base de datos, a partir de ahora no lo puedo modificar sin hacer un request a la db
             return res.status(200).json({
-                response: userNuevo,
+                perfil: userNuevo,
                 accessToken: generateAccessToken(nuevoUsuario._id, refreshToken),
                 refreshToken
             }) //envio como respuesta el access token, que va a durar 24hs, y el refresh token, que dura 7 dias.
@@ -49,7 +49,7 @@ export const registrarUnificadou = async (req, res) => {
                 date: new Date()
             }
             const userNuevo = await nuevoUsuario.save(); //enviando el nuevo usuario a la base de datos, a partir de ahora no lo puedo modificar sin hacer un request a la db
-            return res.status(200).json({ response: userNuevo, message: "Usuario creado con éxito!" })
+            return res.status(200).json({ perfil: userNuevo, message: "Usuario creado con éxito!" })
         }
         return res.status(500).json({ message: "how did we get here?" })
     } catch (error) {
@@ -78,7 +78,7 @@ export const registrarGestor = async (req, res) => {
     await Token.findByIdAndDelete(req.codigoValido) //elmino el token de registro, para q no se puedan crear mas cuentas de las permitidas
     const userNuevo = await nuevoUsuario.save(); //enviando el nuevo usuario a la base de datos, a partir de ahora no lo puedo modificar sin hacer un request a la db
     res.status(200).json({
-        response: userNuevo,
+        perfil: userNuevo,
         accessToken: generateAccessToken(nuevoUsuario._id, refreshToken),
         refreshToken,
         message: 'Esta ruta va a dejar de ser valida pronto, asegurate de cambiarla a /auth/register solo!'
@@ -110,7 +110,7 @@ export const registrarConductor = async (req, res) => {
     const userNuevo = await nuevoUsuario.save(); //enviando el nuevo usuario a la base de datos, a partir de ahora no lo puedo modificar sin hacer un request a la db
     await Token.findByIdAndDelete(req.codigoValido)
     res.status(200).json({
-        response: userNuevo, 
+        perfil: userNuevo, 
         message: 'Esta ruta va a dejar de ser valida pronto, asegurate de cambiarla a /auth/register solo!'
     })
 }
@@ -162,7 +162,7 @@ export const login = async (req, res) => {
     const response = await Usuario.findByIdAndUpdate(userEnDB._id, { $push: { refreshTokens: [refreshToken] } }, { new: true })
 
     response.refreshTokens = null; response.password = null; //limpiando, para que en la respuesta no se envien estos datos
-    res.json({ response, accessToken, refreshToken, ATExpiresIn: Date.now() + token_expires * 1000, RTExpiresIn: Date.now() + refresh_expires * 1000 })//envio como respuesta el token, que va a durar 12hs
+    res.json({ perfil: response, accessToken, refreshToken, ATExpiresIn: Date.now() + token_expires * 1000, RTExpiresIn: Date.now() + refresh_expires * 1000 })//envio como respuesta el token, que va a durar 12hs
 }
 
 

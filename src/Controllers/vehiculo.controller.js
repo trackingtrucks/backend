@@ -21,7 +21,7 @@ export const crear = async (req, res) => {
         });
         const vehiculoEnDB = await nuevoVehiculo.save();
         //Guardar el documento
-        res.json({ vehiculoEnDB, success: true })
+        res.json({ vehiculo: vehiculoEnDB, success: true })
     } catch (error) {
         res.status(500).json({ message: error.message, success: false })
     }

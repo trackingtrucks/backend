@@ -13,6 +13,7 @@ import authRutas from './Routes/auth.routes'
 import infoRutas from './Routes/info.routes'
 import dataRutas from './Routes/data.routes'
 import vehiculoRutas from './Routes/vehiculo.routes'
+import companyRutas from './Routes/company.routes'
 
 // CONFIG
 import config from './config'
@@ -43,6 +44,7 @@ app.use('/user', userRutas)
 app.use("/mock", testRutas)
 app.use("/vehiculo", vehiculoRutas)
 app.use("/data", dataRutas)
+app.use("/company", companyRutas)
 
 app.all('*', function (req, res) {
     res.status(404).send('No se pudo obtener la ruta ' + req.url);

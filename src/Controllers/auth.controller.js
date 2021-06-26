@@ -51,7 +51,7 @@ export const registrarUnificadou = async (req, res) => {
             const userNuevo = await nuevoUsuario.save(); //enviando el nuevo usuario a la base de datos, a partir de ahora no lo puedo modificar sin hacer un request a la db
             return res.status(200).json({ perfil: userNuevo, message: "Usuario creado con éxito!" })
         }
-        return res.status(500).json({ message: "how did we get here?" })
+        return res.status(500).json({ message: "how did we get here?" }) //esto no se deveria activar nunca pero buenos 
     } catch (error) {
         res.status(500).json({ message: error.message })
     }

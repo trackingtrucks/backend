@@ -21,7 +21,8 @@ Usado para crear un vehiculo dentro de la compania
     "patente": "[patente del vehiculo]",
 	"marca": "[marca del vehiculo]",
 	"modelo": "[modelo del vehiculo]",
-	"año": "[año del vehiculo]"
+	"año": "[año del vehiculo]",
+    "kmactual": "[kmactual del vehiculo]"
 }
 ```
 

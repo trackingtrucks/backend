@@ -21,6 +21,10 @@ const vehiculoSchema = new Schema({
         type: String,
         required: true
     },
+    kmactual:{
+        type: Number,
+        required: true
+    },
     año: {
         type: Number,
         required: true

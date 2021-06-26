@@ -1,7 +1,9 @@
 # **Compania**
 ## **Indice**
 1. [Devolver info de la compania](#Devolver-datos-de-la-compania)
-2. [Codigos de registro](#codigos-de-registro)
+2. [Devolver un vehiculo en especifico](#devolver-un-vehiculo-en-especifico)
+3. [Devolver un usuario en especifico](#devolver-un-usuario-en-especifico)
+4. [Codigos de registro](#codigos-de-registro)
    1. [Gestor](#de-gestor)
    2. [Conductor](#de-conductor)
    3. [Verificar](#verificar)
@@ -10,7 +12,7 @@
 # Devolver datos de la compania
 Usado para que el gestor reciba toda la informacion de su compania.
 
-**URL** : `/user/getbycid`
+**URL** : `/company`
 
 **Metodo** : `GET`
 
@@ -38,6 +40,78 @@ x-access-token: <accessToken de usuario>
     "vehiculos":[
         "Array con todos los vehiculos de la compañia"
     ],
+}
+```
+---
+# Devolver un vehiculo en especifico
+Usado para obtener la informacion de un vehiculo en especifico (dentor de la companía).
+
+**URL** : `/company/vehiculo`
+
+**Metodo** : `GET`
+
+**Autenticacion requerida**: SI
+
+**Rol minimo requerido**: CONDUCTOR
+
+**Parametros de la solicitud (body)**
+
+```json
+{
+    "id": "[id del vehiculo a solicitar]",
+}
+```
+
+**Parametros de la solicitud (headers)**
+
+```txt
+Content-Type: application/json
+x-access-token: <accessToken del usuario>
+```
+
+### Respuesta del servidor
+
+```json
+{
+    "vehiculo": {
+        ["OBJETO DEL VEHICULO"]
+    }
+}
+```
+---
+# Devolver un usuario en especifico
+Usado para obtener la informacion de un usuario en especifico (dentro de la compania).
+
+**URL** : `/company/usuario`
+
+**Metodo** : `GET`
+
+**Autenticacion requerida**: SI
+
+**Rol requerido**: GESTOR
+
+**Parametros de la solicitud (body)**
+
+```json
+{
+    "id": "[id del usuario a solicitar]",
+}
+```
+
+**Parametros de la solicitud (headers)**
+
+```txt
+Content-Type: application/json
+x-access-token: <accessToken del usuario>
+```
+
+### Respuesta del servidor
+
+```json
+{
+    "usuario": {
+        ["OBJETO DEL USUARIO"]
+    }
 }
 ```
 ---

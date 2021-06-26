@@ -3,13 +3,13 @@ import Vehiculo from '../Models/Vehiculo';
 
 export const crear = async (req, res) => {
     try {
-        const { marca, modelo, año } = req.body;
+        const { marca, modelo, año, kmactual } = req.body;
         let { patente } = req.body;
         const companyId = req.userData.companyId;
         patente = formatPatente(patente);
         const patenteFormato = getFormato(patente);
         //Regex de año
-        if (!patente || !marca || !modelo || !año) { return res.status(400).json({ message: 'Faltan 1 o mas campos requeridos' }) }
+        if (!patente || !marca || !modelo || !año || !kmactual) { return res.status(400).json({ message: 'Faltan 1 o mas campos requeridos' }) }
         const nuevoVehiculo = new Vehiculo({
             patente,
             patenteFormato,
@@ -17,6 +17,7 @@ export const crear = async (req, res) => {
             marca,
             modelo,
             año,
+            kmactual,
             notaGestor: ""
         });
         const vehiculoEnDB = await nuevoVehiculo.save();

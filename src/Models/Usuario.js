@@ -51,7 +51,6 @@ const usuarioSchema = new Schema({
         },
         fechaAsignado: {
             type: Date,
-            default: new Date()
         }
     },
     turnosPasados: [{

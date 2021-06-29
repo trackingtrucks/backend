@@ -32,4 +32,6 @@ io.on('connection', (socket) => {
     })
 })
 
-export const sendMessage = (roomId, key, message) => io.to(roomId).emit(key, message);;
+export default function socketSend(roomId, key, message) {
+    io.to(roomId).emit(key, message);
+}

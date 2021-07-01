@@ -24,7 +24,6 @@ export const registrarUnificadou = async (req, res) => {
         const nuevoUsuario = new Usuario({
             nombre,
             apellido,
-            email,
             companyId: req.companyIdValido,
             rol: req.rolValido,
             password: await Usuario.encriptarPassword(password) //llamo a la funcion de encriptarPassword, guardada en el modelo de Usuario
@@ -68,7 +67,7 @@ export const registrarGestor = async (req, res) => {
     const nuevoUsuario = new Usuario({
         nombre,
         apellido,
-        email,
+        email: email.toLowerCase(),
         companyId: req.companyIdValido,
         rol: 'gestor',
         password: await Usuario.encriptarPassword(password) //llamo a la funcion de encriptarPassword, guardada en el modelo de Usuario
@@ -96,7 +95,7 @@ export const registrarConductor = async (req, res) => {
     const nuevoUsuario = new Usuario({
         nombre,
         apellido,
-        email,
+        email: email.toLowerCase(),
         companyId: req.companyIdValido,
         agregadoPor: {
             id: req.gestorData.id,
@@ -123,7 +122,7 @@ export const registrarAdmin = async (req, res) => {
         const nuevoUsuario = new Usuario({
             nombre,
             apellido,
-            email,
+            email: email.toLowerCase(),
             companyId: 'admins',
             rol: 'admin',
             password: await Usuario.encriptarPassword(password)
@@ -148,7 +147,7 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
     if (!password) return res.status(401).json({ message: 'Usuario o contraseña invalidos.' })
     //busco si el usuario existe
-    const userEnDB = await Usuario.findOne({ email })
+    const userEnDB = await Usuario.findOne({ email: email.toLowerCase() })
 
     if (!userEnDB) { return res.status(400).json({ message: 'Usuario o contraseña invalidos.' }) }//si el mail no se encontró
 

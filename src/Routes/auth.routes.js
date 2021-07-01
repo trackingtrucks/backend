@@ -4,7 +4,9 @@ import * as Auth from '../Controllers/auth.controller.js'
 import { auth, verify, limit } from '../Middlewares/index'
 
 rutas.post('/login',
-    [limit.l60s5r, verify.emailIsValid],
+    [
+        // limit.l60s5r, 
+        verify.emailIsValid],
     Auth.login);
 
 rutas.post('/register',
@@ -24,7 +26,7 @@ rutas.post('/register/admin',
     Auth.registrarAdmin);
 
 rutas.get('/token',
-    [limit.l1h3r],
+    // [limit.l1h3r],
     Auth.newAccessToken);
 
 rutas.delete('/token',
@@ -35,12 +37,12 @@ rutas.delete('/tokens',
     [auth.verifyToken],
     Auth.logoutAllDevices)
 
-rutas.post('/admin/register/gestor',
-    [limit.l60s5r, verify.emailIsValid, auth.verifyToken, auth.isAdmin, verify.existeUsuarioOEmail],
-    Auth.registrarGestor);
+// rutas.post('/admin/register/gestor',
+    // [limit.l60s5r, verify.emailIsValid, auth.verifyToken, auth.isAdmin, verify.existeUsuarioOEmail],
+    // Auth.registrarGestor);
 
-rutas.post('/admin/register/conductor',
-    [verify.emailIsValid, auth.verifyToken, auth.isAdmin, verify.existeUsuarioOEmail],
-    Auth.registrarConductor);
+// rutas.post('/admin/register/conductor',
+    // [verify.emailIsValid, auth.verifyToken, auth.isAdmin, verify.existeUsuarioOEmail],
+    // Auth.registrarConductor);
 
 export default rutas

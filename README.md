@@ -9,5 +9,5 @@
 ### **To-do de la documentacion**
 - [x] Terminar autenticacion
 - [x] Terminar compania
-- [ ] Terminar vehiculos
+- [x] Terminar vehiculos
 

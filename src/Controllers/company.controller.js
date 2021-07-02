@@ -1,6 +1,7 @@
 import Vehiculo from '../Models/Vehiculo';
 import config from '../config';
 import Usuario from '../Models/Usuario'
+import Turno from '../Models/Turno'
 /*
 ############
 # ACCIONES #
@@ -14,6 +15,7 @@ export const getAllData = async (req, res) => {
         //ESTO SE PUDE OPTIMIZAR MAS, HACER UNA SOLA REQUEST Y PARSEAR
         let gestores = [];
         let conductores = [];
+        let turnos = [];
         const usuarios = await Usuario.find({ companyId }, { password: 0, refreshTokens: 0 });      // Hace el requests pidiendo solo los gestores
         await usuarios.forEach(element => {
             switch (element.rol) {
@@ -28,8 +30,9 @@ export const getAllData = async (req, res) => {
             }
         });
         const vehiculos = await Vehiculo.find({ companyId })
+        turnos = await Turno.find({ companyId })
         if (gestores.length === 0 && conductores.length === 0) return res.status(404).json({ message: "No se encontraron usuarios en esa companía" }); // Chequea si hay resultados en la busqueda
-        return res.json({ gestores, conductores, vehiculos });
+        return res.json({ gestores, conductores, vehiculos, turnos });
 
     } catch (error) {
         res.status(500).json({ message: error.message }) //devulve si hay algun error

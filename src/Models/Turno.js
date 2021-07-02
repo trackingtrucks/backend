@@ -16,6 +16,10 @@ const turnoSchema = new Schema({
     codigoOrdenDeCompra: {
         type: String,
         required: true
+    },
+    companyId: {
+        type: String,
+        required: true
     }
 }, {
     timestamps: false,

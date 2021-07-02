@@ -84,13 +84,15 @@ export const socketTest = async (req, res) => {
 
 export const crearTurno = async (req, res) => {
     try {
+        const companyId = req.userData.companyId;
         const { codigoDeTurno,  fechaYhora, nombreVendedor, codigoOrdenDeCompra} = req.body;
         if(!nombreVendedor || !codigoOrdenDeCompra) return res.status(400).json({ message: 'Faltan 1 o mas campos requeridos'});
         const nuevoTurno = new Turno({
             codigoDeTurno,
             fechaYhora: fechaYhora.toLocaleString(),
             nombreVendedor,
-            codigoOrdenDeCompra
+            codigoOrdenDeCompra,
+            companyId
         });
         const turnoNuevo = await nuevoTurno.save();
         return res.status(200).json({

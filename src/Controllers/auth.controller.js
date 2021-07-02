@@ -24,6 +24,7 @@ export const registrarUnificadou = async (req, res) => {
         const nuevoUsuario = new Usuario({
             nombre,
             apellido,
+            email: email.toLowerCase(),
             companyId: req.companyIdValido,
             rol: req.rolValido,
             password: await Usuario.encriptarPassword(password) //llamo a la funcion de encriptarPassword, guardada en el modelo de Usuario

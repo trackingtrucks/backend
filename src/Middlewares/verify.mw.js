@@ -1,5 +1,6 @@
 import Usuario from '../Models/Usuario'
 import Vehiculo from '../Models/Vehiculo';
+import Turno from '../Models/Turno'
 import { formatPatente } from '../Controllers/vehiculo.controller'
 
 export const emailIsValid = async (req, res, next) => {
@@ -56,5 +57,24 @@ export const vehiculoNoAsignado = async (req, res, next) => {
     if (!vehiculo?.conductorActual?.id) return res.status(400).json({ message: 'Este vehiculo no esta asignado a ningun usuario' })
     req.vehiculoData = vehiculo;
     req.vehiculoId = vehiculo._id;
+    next();
+}
+
+export const turnoYaCreado = async (req, res, next) => {
+    const codigoDeTurno = req.body?.codigoDeTurno;
+    if(!codigoDeTurno) return res.status(400).json({ message: 'Hay campos necesarios vacios'});
+    const turno = await Turno.findOne({ codigoDeTurno });
+    if(turno) return res.status(400).json({ message: 'Este turno ya esta creado'});
+    req.codigoDeTurno = codigoDeTurno;
+    next();
+}
+
+export const fechaValida = async (req, res, next) => {
+    var currentDate = new Date(); // creo la fecha actual
+    var response = req.body?.fechaYhora; // guardo la fecha que me pasan
+    if(!response) return res.status(400).json({ message: 'Hay campos necesarios vacios'}); // verifico si en el campo de fechaYhora me pasaron algo
+    var fecha = new Date(response); // guardo la fecha que me pasaron como Date
+    if(fecha.getTime() <= currentDate.getTime()) return res.status(400).json({ message: 'La fecha no es valida'}); // verifico que la fecha que me pasaron no sea anterior a la fecha actual
+    req.fecha = fecha;
     next();
 }

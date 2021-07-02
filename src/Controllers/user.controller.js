@@ -1,5 +1,6 @@
 import Usuario from '../Models/Usuario'
 import Token from '../Models/Token'
+import Turno from '../Models/Turno'
 import Vehiculo from '../Models/Vehiculo'
 // import jwt from 'jsonwebtoken'
 import mongoose from 'mongoose'
@@ -79,4 +80,24 @@ export const socketTest = async (req, res) => {
         res.status(500).json({ message: error.message, stack: error.stack })
     }
 
+}
+
+export const crearTurno = async (req, res) => {
+    try {
+        const { codigoDeTurno,  fechaYhora, nombreVendedor, codigoOrdenDeCompra} = req.body;
+        if(!nombreVendedor || !codigoOrdenDeCompra) return res.status(400).json({ message: 'Faltan 1 o mas campos requeridos'});
+        const nuevoTurno = new Turno({
+            codigoDeTurno,
+            fechaYhora: fechaYhora.toLocaleString(),
+            nombreVendedor,
+            codigoOrdenDeCompra
+        });
+        const turnoNuevo = await nuevoTurno.save();
+        return res.status(200).json({
+            turno: turnoNuevo,
+            message: 'Turno creado con exito'
+        })
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
 }

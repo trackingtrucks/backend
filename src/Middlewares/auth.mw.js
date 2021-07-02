@@ -85,3 +85,12 @@ export const onlyConductor = async (req, res, next) => {
     }
     return res.status(403).json('No tienes los suficientes permisos para realizar esta accion.')
 }
+
+export const onlyGestor = async (req, res, next) => {
+    const user = req.userData
+    if (user.rol === 'gestor'){
+        next();
+        return;
+    }
+    return res.status(403).json('No tienes los suficientes permisos para realizar esta accion.')
+}

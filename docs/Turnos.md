@@ -7,7 +7,7 @@
 # Crear Turno
 Usado para crear turnos dentro de la compania
 
-**URL** : `/crearTurno`
+**URL** : `/user/crearTurno`
 
 **Metodo** : `POST`
 

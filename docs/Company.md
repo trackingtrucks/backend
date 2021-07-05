@@ -40,6 +40,9 @@ x-access-token: <accessToken de usuario>
     "vehiculos":[
         "Array con todos los vehiculos de la compañia"
     ],
+    "turnos":[
+        "Array con todos los turnos de la compañia"
+    ]
 }
 ```
 ---

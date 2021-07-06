@@ -26,10 +26,10 @@ x-access-token: <accessToken de usuario>
 
 ```json
 {
-  "codigoDeTurno": "[codigo del turno que le pasan al gestor]",
-	"fechaYhora": "[fecha y hora del turno] formato: [YY-MM-DD HH:mm:ss]",
-	"nombreVendedor": "[nombre del vendedor]",
-	"codigoOrdenDeCompra": "[codigo de la orden de compra]"
+    "codigoDeTurno": "[codigo del turno que le pasan al gestor]",
+    "fechaYhora": "[fecha y hora del turno] formato: [YY-MM-DD HH:mm:ss]",
+    "nombreVendedor": "[nombre del vendedor]",
+    "codigoOrdenDeCompra": "[codigo de la orden de compra]"
 }
 ```
 

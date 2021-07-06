@@ -12,31 +12,29 @@ import Turno from '../Models/Turno'
 export const getAllData = async (req, res) => {
     try {
         const companyId = req.userData.companyId // Agarra la id de la compania pedida.
-        if (!companyId) return res.status(400).json({ message: 'No se especificó una ID' })   //Chequea que se haya mandado una companyid en al request (seria bastante raro ya que la persona en si esta registrada)
-        //ESTO SE PUDE OPTIMIZAR MAS, HACER UNA SOLA REQUEST Y PARSEAR
-        let gestores = [];
-        let conductores = [];
-        let vehiculos = [];
-        let turnos = [];
-        let tareas = await Tarea.find();
-        const usuarios = await Usuario.find({ companyId }).select("+agregadoPor");      // Hace el requests pidiendo solo los gestores
-        await usuarios.forEach(element => {
-            switch (element.rol) {
-                case "gestor":
-                    gestores.push(element)
-                    break;
-                case "conductor":
-                    conductores.push(element)
-                    break;
-                default:
-                    break;
-            }
-        });
-        vehiculos = await Vehiculo.find({ companyId }).populate("tareas");
-        turnos = await Turno.find({ companyId })
-        if (gestores.length === 0 && conductores.length === 0) return res.status(404).json({ message: "No se encontraron usuarios en esa companía" }); // Chequea si hay resultados en la busqueda
-        return res.json({ gestores, conductores, vehiculos, turnos });
-        // return res.json({ vehiculos, tareas });
+        if (!companyId) return res.status(400).json({ message: 'No se especificó una ID' })   //Chequea que se haya mandado una companyid en al request (seria bastante raro ya que la persona en si esta registrada)    
+        Promise.all([
+            Vehiculo.find({ companyId }).populate("tareas"),
+            Turno.find({ companyId }),
+            Usuario.find({ companyId }).select("+agregadoPor")
+        ]).then(([vehiculos, turnos, usuarios]) => {
+            let gestores = [];
+            let conductores = [];
+            usuarios.forEach(element => {
+                switch (element.rol) {
+                    case "gestor":
+                        gestores.push(element)
+                        break;
+                    case "conductor":
+                        conductores.push(element)
+                        break;
+                    default:
+                        break;
+                }
+            });
+            if (gestores.length === 0 && conductores.length === 0) return res.status(404).json({ message: "No se encontraron usuarios en esa companía" }); // Chequea si hay resultados en la busqueda
+            return res.json({ gestores, conductores, vehiculos, turnos });
+        })
 
     } catch (error) {
         res.status(500).json({ message: error.message }) //devulve si hay algun error
@@ -73,7 +71,7 @@ export const crearTarea = async (req, res) => {
         if (!vehiculo || !tipo || !cantidadCada || !cantidadUltima) { return res.status(400).json({ message: 'Faltan 1 o mas campos necesarios' }) }
         const vehiculoEnDB = await Vehiculo.findById(vehiculo);
         console.log(vehiculoEnDB);
-        if (!vehiculoEnDB || vehiculoEnDB.companyId !== req.userData.companyId){return res.status(400).json({ message: 'Vehiculo no encontrado' })}
+        if (!vehiculoEnDB || vehiculoEnDB.companyId !== req.userData.companyId) { return res.status(400).json({ message: 'Vehiculo no encontrado' }) }
         const nuevaTarea = new Tarea({
             vehiculo,
             tipo,
@@ -84,7 +82,7 @@ export const crearTarea = async (req, res) => {
             nuevaTarea.save(),
             Vehiculo.findByIdAndUpdate(vehiculo, { $push: { tareas: [nuevaTarea._id] } }, { new: true })
         ])
-        res.json({nuevaTarea})
+        res.json({ nuevaTarea })
     } catch (error) {
         const msg = error.errors['tipo'].message ? error?.errors['tipo']?.message : error.message
         res.status(400).json({ message: msg }) //devulve si hay algun error

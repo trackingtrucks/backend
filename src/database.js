@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import config from "./config";
 
+mongoose.Promise = Promise;
 
 mongoose.connect(config.DATABASE_URL, {
     useNewUrlParser: true,

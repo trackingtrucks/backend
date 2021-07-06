@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-const tarasSchema = new Schema({
+const tareasSchema = new Schema({
     vehiculo: {
         ref: "Vehiculo",
         type: Schema.Types.ObjectId,
@@ -8,7 +8,7 @@ const tarasSchema = new Schema({
     tipo: {
         type: String,
         enum: {
-            values: ['Aceite', 'Neumaticos'],
+            values: ['aceite', 'neumaticos'],
             message: "Tipo de tarea '{VALUE}' inválido"
         },
     },
@@ -19,4 +19,4 @@ const tarasSchema = new Schema({
     versionKey: false
 })
 
-export default model('Tarea', tarasSchema)
+export default model("Tarea", tareasSchema)

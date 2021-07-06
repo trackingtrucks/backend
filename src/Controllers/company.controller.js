@@ -2,6 +2,7 @@ import Vehiculo from '../Models/Vehiculo';
 import config from '../config';
 import Usuario from '../Models/Usuario'
 import Tarea from '../Models/Tarea'
+import Turno from '../Models/Turno'
 /*
 ############
 # ACCIONES #
@@ -15,7 +16,9 @@ export const getAllData = async (req, res) => {
         //ESTO SE PUDE OPTIMIZAR MAS, HACER UNA SOLA REQUEST Y PARSEAR
         let gestores = [];
         let conductores = [];
+        let vehiculos = [];
         let turnos = [];
+        let tareas = await Tarea.find();
         const usuarios = await Usuario.find({ companyId }).select("+agregadoPor");      // Hace el requests pidiendo solo los gestores
         await usuarios.forEach(element => {
             switch (element.rol) {
@@ -29,10 +32,11 @@ export const getAllData = async (req, res) => {
                     break;
             }
         });
-        const vehiculos = await Vehiculo.find({ companyId }).populate("Tareas");
+        vehiculos = await Vehiculo.find({ companyId }).populate("tareas");
         turnos = await Turno.find({ companyId })
         if (gestores.length === 0 && conductores.length === 0) return res.status(404).json({ message: "No se encontraron usuarios en esa companía" }); // Chequea si hay resultados en la busqueda
         return res.json({ gestores, conductores, vehiculos, turnos });
+        // return res.json({ vehiculos, tareas });
 
     } catch (error) {
         res.status(500).json({ message: error.message }) //devulve si hay algun error
@@ -69,13 +73,17 @@ export const crearTarea = async (req, res) => {
         if (!vehiculo || !tipo || !cantidadCada || !cantidadUltima) { return res.status(400).json({ message: 'Faltan 1 o mas campos necesarios' }) }
         const vehiculoEnDB = await Vehiculo.findById(vehiculo);
         console.log(vehiculoEnDB);
+        if (!vehiculoEnDB || vehiculoEnDB.companyId !== req.userData.companyId){return res.status(400).json({ message: 'Vehiculo no encontrado' })}
         const nuevaTarea = new Tarea({
             vehiculo,
             tipo,
             cantidadCada,
             cantidadUltima
         })
-        await nuevaTarea.save();
+        await Promise.all([
+            nuevaTarea.save(),
+            Vehiculo.findByIdAndUpdate(vehiculo, { $push: { tareas: [nuevaTarea._id] } }, { new: true })
+        ])
         res.json({nuevaTarea})
     } catch (error) {
         const msg = error.errors['tipo'].message ? error?.errors['tipo']?.message : error.message

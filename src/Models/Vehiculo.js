@@ -51,8 +51,8 @@ const vehiculoSchema = new Schema({
         }
     }],
     notaGestor: String,
-    tareas:[{
-        ref: "Tareas",
+    tareas: [{
+        ref: "Tarea",
         type: Schema.Types.ObjectId
     }],
     createdAt:{

@@ -16,7 +16,7 @@ export const getAllData = async (req, res) => {
         let gestores = [];
         let conductores = [];
         let turnos = [];
-        const usuarios = await Usuario.find({ companyId }, { password: 0, refreshTokens: 0 });      // Hace el requests pidiendo solo los gestores
+        const usuarios = await Usuario.find({ companyId }).select("+agregadoPor");      // Hace el requests pidiendo solo los gestores
         await usuarios.forEach(element => {
             switch (element.rol) {
                 case "gestor":
@@ -42,7 +42,7 @@ export const getAllData = async (req, res) => {
 export const getUserByIdInsideCompany = async (req, res) => {
     try {
         if (!req.body.id) {return res.status(400).json({ message: 'No se especificó una ID' })}
-        const userEnDb = await Usuario.findById(req.body.id, { password: 0, refreshTokens: 0 } );
+        const userEnDb = await Usuario.findById(req.body.id).select("+agregadoPor");
         if (!userEnDb) return res.status(404).json({ message: 'No se encontró un usuario' })
         if (userEnDb.companyId !== req.userData.companyId){return res.status(401).json({ message: "El usuario que estas solicitando no se encuentra en su empresa."})}
         return res.json({usuario: userEnDb})

@@ -34,7 +34,8 @@ export const verifyToken = async (req, res, next) => {
         const decoded = jwt.verify(accessToken, secret)
         req.userId = decoded.id
         const gen = decoded.gen
-        const userEnDb = await Usuario.findById(req.userId)
+        const userEnDb = await Usuario.findById(req.userId).select("+refreshTokens");
+        console.log(userEnDb);
         req.userData = userEnDb;
         const clone = userEnDb; 
         clone.refreshTokens.forEach((token, i) =>{

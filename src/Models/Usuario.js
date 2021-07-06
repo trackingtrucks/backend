@@ -10,7 +10,8 @@ const usuarioSchema = new Schema({
     },
     password: {
         type: String,
-        required: true
+        required: true,
+        select: false
     },
     rol: {
         type: String,
@@ -21,7 +22,8 @@ const usuarioSchema = new Schema({
         required: true
     },
     agregadoPor:{
-        type: Object
+        type: Object,
+        select: false
     },
     vehiculoActual: {
         id: {
@@ -65,7 +67,12 @@ const usuarioSchema = new Schema({
             type: Date
         }
     }],
-    refreshTokens: [String]
+    refreshTokens:{
+        type: [String],
+        select: false
+    } 
+    ,
+    
 }, {
     timestamps: true,
     versionKey: false

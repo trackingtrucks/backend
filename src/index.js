@@ -33,5 +33,6 @@ io.on('connection', (socket) => {
 })
 
 export default function socketSend(roomId, key, message) {
+    console.log("enviando '" + key + "' a la sala '" + roomId + "' con el contenido '" + message + "'");
     io.to(roomId).emit(key, message);
 }

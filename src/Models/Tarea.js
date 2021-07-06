@@ -7,13 +7,16 @@ const tarasSchema = new Schema({
     },
     tipo: {
         type: String,
-        
+        enum: {
+            values: ['Aceite', 'Neumaticos'],
+            message: "Tipo de tarea '{VALUE}' inválido"
+        },
     },
     cantidadCada: Number,
-    cantidadActual: Number
+    cantidadUltima: Number
 }, {
-    timestamps: true,
+    timestamps: false,
     versionKey: false
 })
 
-export default model('Data', tarasSchema)
+export default model('Tarea', tarasSchema)

@@ -15,7 +15,8 @@ const tokenSchema = new Schema({
         default: null
     }
 },{
-    versionKey: false
+    versionKey: false,
+    timestamps: false
 })
 
 

@@ -15,7 +15,9 @@ const usuarioSchema = new Schema({
     },
     rol: {
         type: String,
-        required: true
+        required: true,
+        enum: ['gestor', 'admin', 'conductor']
+
     },
     companyId: {
         type: String,
@@ -44,7 +46,8 @@ const usuarioSchema = new Schema({
         },
         fechaHasta: {
             type: Date,
-        }
+        },
+        type: [String]
     }],
     turnoActual:{
         id: {
@@ -65,16 +68,20 @@ const usuarioSchema = new Schema({
         },
         fechaTerminado: {
             type: Date
-        }
+        },
+        type: [String]
     }],
     refreshTokens:{
         type: [String],
         select: false
-    } 
-    ,
-    
+    },
+    createdAt:{
+        type: Date,
+        default: new Date(),
+        immutable: true
+    }
 }, {
-    timestamps: true,
+    timestamps: false,
     versionKey: false
 })
 

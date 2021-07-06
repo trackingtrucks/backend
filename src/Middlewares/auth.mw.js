@@ -35,7 +35,6 @@ export const verifyToken = async (req, res, next) => {
         req.userId = decoded.id
         const gen = decoded.gen
         const userEnDb = await Usuario.findById(req.userId).select("+refreshTokens");
-        console.log(userEnDb);
         req.userData = userEnDb;
         const clone = userEnDb; 
         clone.refreshTokens.forEach((token, i) =>{

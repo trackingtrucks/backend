@@ -50,9 +50,18 @@ const vehiculoSchema = new Schema({
             type: Date,
         }
     }],
-    notaGestor: String
+    notaGestor: String,
+    tareas:[{
+        ref: "Tareas",
+        type: Schema.Types.ObjectId
+    }],
+    createdAt:{
+        type: Date,
+        default: new Date(),
+        immutable: true
+    }
 }, {
-    timestamps: true,
+    timestamps: false,
     versionKey: false
 })
 

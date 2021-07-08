@@ -58,6 +58,16 @@ const usuarioSchema = new Schema({
             type: Date,
         }
     },
+    turnosPendientes: [{
+        id: {
+            ref: "Turno",
+            type: Schema.Types.ObjectId
+        },
+        fechaAsignado: {
+            type: Date
+        },
+        type: {type: String}
+    }],
     turnosPasados: [{
         id: {
             ref: "Turno",
@@ -69,7 +79,7 @@ const usuarioSchema = new Schema({
         fechaTerminado: {
             type: Date
         },
-        type: [String]
+        type: {type: String}
     }],
     refreshTokens:{
         type: [String],
@@ -82,7 +92,7 @@ const usuarioSchema = new Schema({
     }
 }, {
     timestamps: false,
-    versionKey: false
+    versionKey: false,
 })
 
 usuarioSchema.statics.encriptarPassword = async (password) => {

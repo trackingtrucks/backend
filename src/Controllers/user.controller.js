@@ -4,8 +4,10 @@ import Turno from '../Models/Turno'
 import Vehiculo from '../Models/Vehiculo'
 // import jwt from 'jsonwebtoken'
 import mongoose from 'mongoose'
-// import config from '../config'
-// const secret = config.SECRET;
+import { Agenda } from 'agenda/es'
+import config from '../config'
+const database_url = config.DATABASE_URL;
+const agenda = new Agenda({ db: { address: database_url } });
 
 export const eliminar = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.body.id)) return res.status(404).json("No se encontraron usuarios con esa ID");
@@ -99,6 +101,24 @@ export const crearTurno = async (req, res) => {
             turno: turnoNuevo,
             message: 'Turno creado con exito'
         })
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const asignarTurno = async (req, res) => {
+    try {
+        const turno = req.turno;
+        await Promise.all([
+            Usuario.findByIdAndUpdate(req.conductor._id, { $push: { turnosPendientes: { id: turno._id, fechaAsignado: new Date() } } }, { new: true }),
+            Turno.findByIdAndDelete(turno._id)
+        ])
+        //agenda.define("mandar notificacion", async (job) => {
+        //    console.log("alo")
+        //})                    ***ARREGLAR***
+        //await agenda.start();
+        //await agenda.schedule("in 5 minutes", "mandar notificacion");
+        return res.json({ message: 'Turno asignado con exito'});
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

@@ -18,6 +18,8 @@ rutas.get('/codigo/check', Users.codigoCheck)
 
 rutas.post("/socketTest", [auth.verifyToken], Users.socketTest)
 
-rutas.post("/crearTurno", [auth.verifyToken, auth.onlyGestor ,verify.turnoYaCreado, verify.fechaValida], Users.crearTurno)
+rutas.post("/crearTurno", [auth.verifyToken, auth.onlyGestor, verify.turnoYaCreado, verify.fechaValida], Users.crearTurno)
+
+//rutas.put('/asignarTurno', [auth.verifyToken, auth.onlyGestor, verify.conductorNoEncontrado, verify.turnoNoCreado], Users.asignarTurno)
 
 export default rutas

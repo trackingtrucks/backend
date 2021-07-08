@@ -78,3 +78,21 @@ export const fechaValida = async (req, res, next) => {
     req.fecha = fecha;
     next();
 }
+
+export const conductorNoEncontrado = async (req, res, next) => {
+    const nombreConductor = req.body?.nombreConductor;
+    if(!nombreConductor) return res.status(400).json({ message: 'Hay campos necesarios vacios'});
+    const conductorEncontrado = await Usuario.findOne({ nombre: nombreConductor, rol: 'conductor' });
+    if(!conductorEncontrado) return res.status(400).json({ message: 'No se encontró ningun conductor con ese nombre'});
+    req.conductor = conductorEncontrado;
+    next();
+}
+
+export const turnoNoCreado = async (req, res, next) => {
+    const codigoDeTurno = req.body?.codigoDeTurno;
+    if(!codigoDeTurno) return res.status(400).json({ message: 'Hay campos necesarios vacios'});
+    const turno = await Turno.findOne({ codigoDeTurno });
+    if(!turno) return res.status(400).json({ message: 'No se encontró ningun turno con ese código'});
+    req.turno = turno;
+    next();
+}

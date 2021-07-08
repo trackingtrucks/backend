@@ -29,18 +29,23 @@ export const crear = async (req, res) => {
 }
 
 export const asignarConductor = async (req, res) => {
-    const msg = req.userData.nombre + " " + req.userData.apellido + " se ha subido al vehiculo " + req.body.patente.toUpperCase();
-    console.log(msg);
-    socketSend(req.userData.companyId, "notificacion", msg);
-    await Promise.all([
-        Vehiculo.findByIdAndUpdate(req.vehiculoId, { conductorActual: { id: req.userId, fechaDesde: new Date() } }, { new: true }),
-        Usuario.findByIdAndUpdate(req.userId, { vehiculoActual: { id: req.vehiculoId, fechaDesde: new Date() } }, { new: true })
-    ])
-    // return res.json({vehiculoEditado, usuarioEditado})
-    return res.json({ message: "Asignado con éxito!" })
+    try{
+        const msg = req.userData.nombre + " " + req.userData.apellido + " se ha subido al vehiculo " + req.body.patente.toUpperCase();
+        console.log(msg);
+        socketSend(req.userData.companyId, "notificacion", msg);
+        await Promise.all([
+            Vehiculo.findByIdAndUpdate(req.vehiculoId, { conductorActual: { id: req.userId, fechaDesde: new Date() } }, { new: true }),
+            Usuario.findByIdAndUpdate(req.userId, { vehiculoActual: { id: req.vehiculoId, fechaDesde: new Date() } }, { new: true })
+        ])
+        // return res.json({vehiculoEditado, usuarioEditado})
+        return res.json({ message: "Asignado con éxito!" })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
 }
 
 export const desasignarConductor = async (req, res) => {
+    try{
     const msg = req.userData.nombre + " " + req.userData.apellido + " se ha bajado del vehiculo " + req.body.patente.toUpperCase();
     console.log(msg);
     socketSend(req.userData.companyId, "notificacion", msg);
@@ -51,6 +56,9 @@ export const desasignarConductor = async (req, res) => {
         Usuario.findByIdAndUpdate(req.userId, { vehiculoActual: { id: null, fechaDesde: null }, $push: { vehiculosPasados: { id: req.vehiculoId, fechaDesde: conductorActual.vehiculoActual.fechaDesde, fechaHasta: new Date() } } }, { new: true })
     ])
     return res.json({ message: "Desasignado con éxito!" })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
 }
 
 export const formatPatente = (patente) => {

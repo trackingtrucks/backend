@@ -48,7 +48,8 @@ const vehiculoSchema = new Schema({
         },
         fechaHasta: {
             type: Date,
-        }
+        },
+        type: {type: String}
     }],
     notaGestor: String,
     tareas: [{

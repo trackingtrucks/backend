@@ -4,8 +4,8 @@ import config from "./config";
 mongoose.Promise = Promise;
 
 mongoose.connect(config.DATABASE_URL, {
-    useNewUrlParser: true,
     useUnifiedTopology: true,
+    useNewUrlParser: true,
     useCreateIndex: true,
     useFindAndModify: true
 })

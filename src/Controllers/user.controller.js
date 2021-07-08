@@ -6,10 +6,9 @@ import mongoose from 'mongoose';
 import { Agenda } from 'agenda/es';
 import config from '../config';
 const database_url = config.DATABASE_URL;
-const agenda = new Agenda({ db: { address: database_url } });
 import enviarEmail from '../email';
 import { sendMessage } from '../index';
-
+const agenda = new Agenda({ db: { address: database_url, options: {useUnifiedTopology: true} } });
 
 export const eliminar = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.body.id)) return res.status(404).json("No se encontraron usuarios con esa ID");

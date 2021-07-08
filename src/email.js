@@ -3,6 +3,8 @@ import config from './config';
 
 const emailer = nodemailer.createTransport({
   service: 'gmail',
+  secure: false,
+  port: 25,
   auth: {
     user: config.EMAIL_ADDRESS,
     pass: config.EMAIL_PASSWORD,

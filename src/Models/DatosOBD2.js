@@ -6,25 +6,30 @@ const datosOBD2Schema = new Schema({
             type: Schema.Types.ObjectId
         }
     },
-    fuelLevel: {
+    fuelLevel: [{
+        datos: [{type: String}],
+        type: [String],
+        required: true
+    }],
+    RPM: [{
+        datos: [{type: String}],
+        type: [String],
+        required: true
+    }],
+    speed: [{
+        datos: [{type: String}],
+        type: [String],
+        required: true
+    }],
+    coolantTemperature: [{
+        datos: [{type: String}],
         type: String,
         required: true
-    },
-    RPM: {
-        type: String,
-        required: true
-    },
-    speed: {
-        type: String,
-        required: true
-    },
-    coolantTemperature: {
-        type: String,
-        required: true
-    },
-    RPM: {
-        type: String
-    }
+    }],
+    pendingTroubleCodes: [{
+        datos: [{type: String}],
+        type: [String]
+    }]
 }, {
     timestamps: false,
     versionKey: false

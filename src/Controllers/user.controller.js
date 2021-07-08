@@ -141,6 +141,9 @@ export const asignarTurno = async (req, res) => {
             Usuario.findByIdAndUpdate(req.conductor._id, { $push: { turnosPendientes: { id: turno._id, fechaAsignado: new Date() } } }, { new: true }),
             Turno.findByIdAndDelete(turno._id)
         ])
+        var fecha = turno.fechaYhora;
+        fecha.setDate( fecha.getDate() - 2 );
+        var fechaUsada = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate(), 09, 0, 0);
         //agenda.define("mandar notificacion", async (job) => {
         //    console.log("alo")
         //})                    ***ARREGLAR***

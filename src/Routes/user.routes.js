@@ -12,11 +12,10 @@ rutas.get('/', [auth.verifyToken, auth.isAdmin], Users.getAll)
 rutas.get('/debug', [auth.verifyToken], Users.returnData)
 
 rutas.get('/codigo/gestor', [auth.verifyToken, auth.isAdmin], Users.codigoGestor)
-rutas.get('/codigo/conductor', [auth.verifyToken, auth.isGestor], Users.codigoConductor)
+rutas.get('/codigo/conductor', [verify.emailIsValid, verify.existeUsuarioOEmail, auth.verifyToken, auth.isGestor], Users.codigoConductor)
 
 rutas.get('/codigo/check', Users.codigoCheck)
 
-rutas.post("/socketTest", [auth.verifyToken], Users.socketTest)
 
 rutas.post("/crearTurno", [auth.verifyToken, auth.onlyGestor, verify.turnoYaCreado, verify.fechaValida], Users.crearTurno)
 

@@ -154,7 +154,7 @@ x-access-token: <accessToken de administrador>
 ```
 ---
 ## De conductor
-Usado para generar un codigo de registro para una cuenta de conductor de una compania.
+Usado para generar un codigo de registro para una cuenta de conductor de una compania, se enviara por email a la direccion especificada.
 
 **URL** : `/user/codigo/conductor`
 
@@ -168,13 +168,23 @@ Usado para generar un codigo de registro para una cuenta de conductor de una com
 
 ```txt
 x-access-token: <accessToken de gestor>
+Content-Type: application/json
+```
+
+**Parametros de la solicitud (body)**
+
+```json
+{
+    "email": "[direccion de correo del conductor a registrar]",
+}
 ```
 
 ### Respuesta del servidor
 
 ```json
 {
-    "codigo": "[String con el codigo que se debera ingresar en el registro]"
+    "codigo": "[String con el codigo que se debera ingresar en el registro]",
+    "message": "Email enviado con exito!"
 }
 ```
 ---

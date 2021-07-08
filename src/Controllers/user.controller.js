@@ -1,13 +1,15 @@
-import Usuario from '../Models/Usuario'
-import Token from '../Models/Token'
-import Turno from '../Models/Turno'
-import Vehiculo from '../Models/Vehiculo'
-// import jwt from 'jsonwebtoken'
-import mongoose from 'mongoose'
-import { Agenda } from 'agenda/es'
-import config from '../config'
+import Usuario from '../Models/Usuario';
+import Token from '../Models/Token';
+import Turno from '../Models/Turno';
+import Vehiculo from '../Models/Vehiculo';
+import mongoose from 'mongoose';
+import { Agenda } from 'agenda/es';
+import config from '../config';
 const database_url = config.DATABASE_URL;
 const agenda = new Agenda({ db: { address: database_url } });
+import enviarEmail from '../email';
+import { sendMessage } from '../index';
+
 
 export const eliminar = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.body.id)) return res.status(404).json("No se encontraron usuarios con esa ID");
@@ -43,6 +45,34 @@ export const codigoGestor = async (req, res) => {
     }
 }
 export const codigoConductor = async (req, res) => {
+    const {email} = req.body;
+    if (!email) return res.status(400).json({ message: 'No se ha especificado un email para recibir el codigo'});
+    try {
+        const newToken = new Token({
+            companyId: req.userData.companyId,
+            rol: "conductor",
+            gestorData: {
+                id: req.userId,
+                email: req.userData.email
+            }
+        })
+        const nuevoToken = await newToken.save();
+        await enviarEmail({
+            para: email,
+            subject: `${req.userData.nombre} te ha invitado a unirse a su compania! - Tracking Trucks`,
+            html: `
+            <h1>Bienvenido!</h1>
+            <p>Presiona el link para crear tu cuenta</p>
+            <a href="https://trackingtrucks.netlify.app/registro?codigo=${nuevoToken._id}&email=${email}">Click aqui!</a>
+            `
+        });
+        res.json({ codigo: nuevoToken._id, message: "Email enviado con exito!" })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
+export const codigoConductorSinEmail = async (req, res) => {
     try {
         const newToken = new Token({
             companyId: req.userData.companyId,
@@ -72,7 +102,6 @@ export const codigoCheck = async (req, res) => {
 }
 
 
-import { sendMessage } from '../index'
 
 export const socketTest = async (req, res) => {
     try {

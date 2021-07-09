@@ -80,10 +80,10 @@ export const fechaValida = async (req, res, next) => {
 }
 
 export const conductorNoEncontrado = async (req, res, next) => {
-    const nombreConductor = req.body?.nombreConductor;
-    if(!nombreConductor) return res.status(400).json({ message: 'Hay campos necesarios vacios'});
-    const conductorEncontrado = await Usuario.findOne({ nombre: nombreConductor, rol: 'conductor' });
-    if(!conductorEncontrado) return res.status(400).json({ message: 'No se encontró ningun conductor con ese nombre'});
+    const conductor = req.body?.idConductor;
+    if(!conductor) return res.status(400).json({ message: 'Hay campos necesarios vacios'});
+    const conductorEncontrado = await Usuario.findOne({ _id: conductor });
+    if(!conductorEncontrado) return res.status(400).json({ message: 'No se encontró ningun conductor con ese id'});
     req.conductor = conductorEncontrado;
     next();
 }

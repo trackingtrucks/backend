@@ -50,7 +50,7 @@ Content-Type: application/json
 ## De administradores
 Usado para crear una nueva cuenta con permisos de administrador.
 
-**URL** : `/auth/register/admin/`
+**URL** : `/admin/register`
 
 **Metodo** : `POST`
 

@@ -6,7 +6,6 @@
 4. [Codigos de registro](#codigos-de-registro)
    1. [Gestor](#de-gestor)
    2. [Conductor](#de-conductor)
-   3. [Verificar](#verificar)
 
 ---
 # Devolver datos de la compania
@@ -47,7 +46,7 @@ x-access-token: <accessToken de usuario>
 ```
 ---
 # Devolver un vehiculo en especifico
-Usado para obtener la informacion de un vehiculo en especifico (dentor de la companía).
+Usado para obtener la informacion de un vehiculo en especifico (dentro de la companía).
 
 **URL** : `/company/vehiculo`
 
@@ -120,7 +119,7 @@ x-access-token: <accessToken del usuario>
 ---
 # Codigos de registro
 ## De gestor
-Usado para generar un codigo de registro para una cuenta de gestor de una compania.
+Usado para generar un codigo de registro para una cuenta de gestor de una compania, se enviara por email a la direccion especificada.
 
 **URL** : `/user/codigo/gestor`
 
@@ -128,13 +127,13 @@ Usado para generar un codigo de registro para una cuenta de gestor de una compan
 
 **Autenticacion requerida**: SI
 
-**Rol requerido**: ADMIN
+**Rol requerido**: GESTOR
 
 **Parametros de la solicitud (body)**
 
 ```json
 {
-    "companyId": "[id unico de cada compania]",
+    "email": "[direccion de correo del gestor a agregar]",
 }
 ```
 
@@ -142,15 +141,15 @@ Usado para generar un codigo de registro para una cuenta de gestor de una compan
 
 ```txt
 Content-Type: application/json
-x-access-token: <accessToken de administrador>
+x-access-token: <accessToken de gestor>
 ```
 
 ### Respuesta del servidor
 
 ```json
 {
-    "codigo": "[String con el codigo que se debera ingresar en el registro]"
-}
+    "codigo": "[String con el codigo que se debera ingresar en el registro]",
+    "message": "Email enviado con exito!"}
 ```
 ---
 ## De conductor
@@ -185,36 +184,5 @@ Content-Type: application/json
 {
     "codigo": "[String con el codigo que se debera ingresar en el registro]",
     "message": "Email enviado con exito!"
-}
-```
----
-## Verificar
-Verifica si el codigo ingresado es valido
-
-**URL** : `/user/codigo/check`
-
-**Metodo** : `GET`
-
-**Autenticacion requerida**: NO
-
-**Parametros de la solicitud (body)**
-
-```json
-{
-    "codigo": "[codigo de registro]",
-}
-```
-
-**Parametros de la solicitud (headers)**
-
-```txt
-Content-Type: application/json
-```
-
-### Respuesta del servidor
-
-```json
-{
-    "valid": true/false
 }
 ```

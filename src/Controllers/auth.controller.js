@@ -16,7 +16,7 @@ const salt = config.SALT;
 ############
 */
 
-export const registrarUnificadou = async (req, res) => {
+export const registrar = async (req, res) => {
     try {
         const { nombre, apellido, email, password } = req.body; //agarro lo que envia el usuario en el body del request
         if (!nombre || !email || !password) return res.status(401).json({ message: "Faltan 1 o mas campos requeridos" }); //pregunta si falta algun campo suminstrado por el usuario
@@ -56,93 +56,6 @@ export const registrarUnificadou = async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 }
-
-
-export const registrarGestor = async (req, res) => {
-    const { nombre, apellido, email, password } = req.body; //agarro lo que envia el usuario en el body del request
-    if (req.isAdmin && !req.body.companyId) { return res.status(401).json({ message: 'Faltan 1 o mas campos requeridos' }) }; //En caso de que sea admin, chequeo que haya suministrado un companyId
-    if (req.isAdmin && req.body.companyId) { req.companyIdValido = req.body.companyId }; //en caso que sea admin, pone el companyId en el suminstrado
-    if (req.rolValido !== "gestor" && !req.isAdmin) return res.status(401).json({ message: 'Su codigo no es valido para realizar esta accion' }); //chequea que el codigo pueda crear gestores
-    if (!nombre || !email || !password) return res.status(401).json({ message: "Faltan 1 o mas campos requeridos" }); //pregunta si falta algun campo suminstrado por el usuario
-    // Se crea el objecto con el nuevo usuario
-    const nuevoUsuario = new Usuario({
-        nombre,
-        apellido,
-        email: email.toLowerCase(),
-        companyId: req.companyIdValido,
-        rol: 'gestor',
-        password: await Usuario.encriptarPassword(password) //llamo a la funcion de encriptarPassword, guardada en el modelo de Usuario
-    })
-    const refreshToken = generateRefreshToken(nuevoUsuario._id)
-    nuevoUsuario.refreshTokens = [refreshToken]
-    await Token.findByIdAndDelete(req.codigoValido) //elmino el token de registro, para q no se puedan crear mas cuentas de las permitidas
-    const userNuevo = await nuevoUsuario.save(); //enviando el nuevo usuario a la base de datos, a partir de ahora no lo puedo modificar sin hacer un request a la db
-    res.status(200).json({
-        perfil: userNuevo,
-        accessToken: generateAccessToken(nuevoUsuario._id, refreshToken),
-        refreshToken,
-        message: 'Esta ruta va a dejar de ser valida pronto, asegurate de cambiarla a /auth/register solo!'
-    }) //envio como respuesta el access token, que va a durar 24hs, y el refresh token, que dura 7 dias.
-}
-
-export const registrarConductor = async (req, res) => {
-    //ver comentarios en registrarGestor()
-    const { nombre, apellido, email, password } = req.body;
-    if (req.isAdmin && !req.body.companyId) { return res.status(401).json({ message: 'Faltan 1 o mas campos requeridos' }) }
-    if (req.isAdmin && req.body.companyId) { req.companyIdValido = req.body.companyId; req.gestorData = { id: req.userId, email: req.userData.email } }
-    if (req.rolValido !== "conductor" && !req.isAdmin) return res.status(401).json({ message: 'Su codigo no es valido para realizar esta accion' })
-    if (!nombre || !email || !password) return res.status(401).json({ message: "Faltan 1 o mas campos requeridos" })
-    // Se crea el objecto con el nuevo usuario
-    const nuevoUsuario = new Usuario({
-        nombre,
-        apellido,
-        email: email.toLowerCase(),
-        companyId: req.companyIdValido,
-        agregadoPor: {
-            id: req.gestorData.id,
-            email: req.gestorData.email,
-            fecha: new Date().toLocaleString(),
-            date: new Date()
-        },
-        rol: 'conductor',
-        password: await Usuario.encriptarPassword(password) //llamo a la funcion de encriptarPassword, guardada en el modelo de Usuario
-    })
-    const userNuevo = await nuevoUsuario.save(); //enviando el nuevo usuario a la base de datos, a partir de ahora no lo puedo modificar sin hacer un request a la db
-    await Token.findByIdAndDelete(req.codigoValido)
-    res.status(200).json({
-        perfil: userNuevo, 
-        message: 'Esta ruta va a dejar de ser valida pronto, asegurate de cambiarla a /auth/register solo!'
-    })
-}
-
-
-export const registrarAdmin = async (req, res) => {
-    try {
-        const { nombre, apellido, email, password } = req.body;
-        if (!nombre || !email || !password) return res.status(401).json({ message: "Faltan 1 o mas campos requeridos" })
-        const nuevoUsuario = new Usuario({
-            nombre,
-            apellido,
-            email: email.toLowerCase(),
-            companyId: 'admins',
-            rol: 'admin',
-            password: await Usuario.encriptarPassword(password)
-        })
-        const refreshToken = generateRefreshToken(nuevoUsuario._id)
-        nuevoUsuario.refreshTokens = [refreshToken]
-        const userNuevo = await nuevoUsuario.save();
-        res.status(200).json({
-            userNuevo,
-            accessToken: generateAccessToken(nuevoUsuario._id, refreshToken),
-            refreshToken
-        }) //envio como respuesta el access token, que va a durar 24hs, y el refresh token, que dura 7 dias.
-    } catch (error) {
-        res.status(500).json({ message: error.message })
-    }
-
-}
-
-
 
 export const login = async (req, res) => {
     const { email, password } = req.body;

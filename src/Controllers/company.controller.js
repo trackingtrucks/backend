@@ -1,8 +1,10 @@
 import Vehiculo from '../Models/Vehiculo';
 import config from '../config';
-import Usuario from '../Models/Usuario'
-import Tarea from '../Models/Tarea'
-import Turno from '../Models/Turno'
+import Usuario from '../Models/Usuario';
+import Formulario from '../Models/Formulario';
+import Tarea from '../Models/Tarea';
+import Turno from '../Models/Turno';
+import {emailEnvioFormulario} from '../email';
 /*
 ############
 # ACCIONES #
@@ -88,7 +90,25 @@ export const crearTarea = async (req, res) => {
         res.status(400).json({ message: msg }) //devulve si hay algun error
     }
 }
-
+export const nuevoForm = async (req, res) => {
+    try {
+        const {nombreEmpresa, email, descripcionUso, genteCompania} = req.body;
+        if (!nombreEmpresa || !email || !descripcionUso || !genteCompania){ return res.status(400).json({ message: 'Faltan 1 o mas campos necesarios' }) }
+        const form = new Formulario({
+            nombreEmpresa,
+            email,
+            descripcionUso, 
+            genteCompania
+        })
+        const formEnDB = await form.save();
+        await emailEnvioFormulario({
+            destino: email
+        })
+        return res.json({message: "Gracias por comunicarse con nosotros, estaremos en contacto con usted", form: formEnDB})
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
 /*
 #############
 # FUNCIONES #

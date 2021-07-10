@@ -3,17 +3,14 @@ import express from 'express';
 import morgan from 'morgan'
 import pkg from '../package.json'
 
-// MOCK IMPORTS
-import testRutas from './Mock/Mock.routes'
-
 // RUTAS
 // import productosRutas from './Routes/products.routes'
 import userRutas from './Routes/user.routes'
 import authRutas from './Routes/auth.routes'
-import infoRutas from './Routes/info.routes'
 import dataRutas from './Routes/data.routes'
 import vehiculoRutas from './Routes/vehiculo.routes'
 import companyRutas from './Routes/company.routes'
+import adminRutas from './Routes/admin.routes'
 
 // CONFIG
 import config from './config'
@@ -35,16 +32,15 @@ app.get('/', (req, res) => {
     }).status(200)
 })
 
-app.use("/info", infoRutas)
 
 // APLICANDO RUTAS  
 // app.use('/productos', productosRutas)
 app.use('/auth', authRutas)
 app.use('/user', userRutas)
-app.use("/mock", testRutas)
 app.use("/vehiculo", vehiculoRutas)
 app.use("/data", dataRutas)
 app.use("/company", companyRutas)
+app.use("/admin", adminRutas)
 
 app.all('*', function (req, res) {
     res.status(404).send('No se pudo obtener la ruta ' + req.url);

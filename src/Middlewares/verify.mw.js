@@ -82,7 +82,7 @@ export const fechaValida = async (req, res, next) => {
 export const conductorNoEncontrado = async (req, res, next) => {
     const conductor = req.body?.idConductor;
     if(!conductor) return res.status(400).json({ message: 'Hay campos necesarios vacios'});
-    const conductorEncontrado = await Usuario.findOne({ _id: conductor });
+    const conductorEncontrado = await Usuario.findById({ conductor });
     if(!conductorEncontrado) return res.status(400).json({ message: 'No se encontró ningun conductor con ese id'});
     req.conductor = conductorEncontrado;
     next();

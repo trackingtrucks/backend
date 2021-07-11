@@ -22,7 +22,7 @@ rutas.delete('/token',
     Auth.logout)
 
 rutas.delete('/tokens',
-    [auth.verifyToken],
+    [auth.verifyTokenWithPassword],
     Auth.logoutAllDevices)
 
 

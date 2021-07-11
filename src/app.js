@@ -24,7 +24,6 @@ app.set("port", config.PORT);
 app.use(express.json())
 app.use(morgan('dev'));
 app.use(cors());
-
 // RUTA DEFAULT
 app.get('/', (req, res) => {
     res.json({

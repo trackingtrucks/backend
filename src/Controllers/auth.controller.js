@@ -108,7 +108,7 @@ export const logoutAllDevices = async (req, res) => {
         const contraseñasCoinciden = await Usuario.verificarPassword(req.body.password, req.userData.password) // chequeo si la contraseña es valida
         if (!contraseñasCoinciden) return res.status(403).json({ message: 'Contraseña invalida' }) //si no es valida, devuelvo un error
         await Usuario.findByIdAndUpdate(req.userId, { refreshTokens: [] }, { new: true }) //elimino todos los refresh tokens del usuario
-        res.status(204).json({ message: 'Sesiones cerradas', success: true }) //envio una confirmacion
+        res.status(200).json({ message: 'Sesiones cerradas', success: true }) //envio una confirmacion
     } catch (error) {
         res.status(500).json({ message: error.message })
     }

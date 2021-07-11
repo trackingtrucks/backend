@@ -47,7 +47,7 @@ const usuarioSchema = new Schema({
         fechaHasta: {
             type: Date,
         },
-        type: [String]
+        type: {type: String}
     }],
     turnoActual:{
         id: {

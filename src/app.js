@@ -2,7 +2,6 @@
 import express from 'express';
 import morgan from 'morgan'
 import pkg from '../package.json'
-
 // RUTAS
 // import productosRutas from './Routes/products.routes'
 import userRutas from './Routes/user.routes'
@@ -13,6 +12,7 @@ import companyRutas from './Routes/company.routes'
 import adminRutas from './Routes/admin.routes'
 
 // CONFIG
+// import {logPID} from './Libs/logPID'
 import config from './config'
 import {initSetup} from './Libs/initSetup'
 initSetup()
@@ -24,6 +24,7 @@ app.set("port", config.PORT);
 app.use(express.json())
 app.use(morgan('dev'));
 app.use(cors());
+// app.use(logPID)
 // RUTA DEFAULT
 app.get('/', (req, res) => {
     res.json({

@@ -1,5 +1,5 @@
 import cron from 'cron';
-import sendMessage from '../index'
+import {sendMessage} from '../index'
 // import Tarea from '../Models/Tarea'
 
 var actualCronJobs = {}

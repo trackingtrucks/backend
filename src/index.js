@@ -4,25 +4,25 @@ import config from './config'
 import jwt from 'jsonwebtoken'
 import Usuario from './Models/Usuario'
 import cluster from 'cluster';
-import os from 'os';
-let io;
-const numCPUs = os.cpus().length;
+// let io;
 
-if (cluster.isMaster) {
-    console.info("Cantidad de cores: " + numCPUs);
-    console.log(`Server corriendo en el puerto ${app.get('port')}`)
-    console.log(`Maestro ${process.pid} corriendo!`);
-    for (let i = 0; i < numCPUs; i++) {
-        cluster.fork();
-    }
-    cluster.on('exit', (worker) => {
-        console.error(`Worker ${worker.process.pid} fucking died :(`);
-        cluster.fork();
-    });
-} else {
-    console.log(`Worker ${cluster.worker.process.pid} levantado`);
-    const server = app.listen(app.get('port'));
-    io = require('socket.io')(server);
+// if (cluster.isMaster) {
+//     console.info("Cantidad de cores: " + require('os').cpus().length);
+//     console.log(`Server corriendo en el puerto ${app.get('port')}`)
+//     console.log(`Maestro ${process.pid} corriendo!`);
+//     for (let i = 0; i < require('os').cpus().length; i++) {
+//         cluster.fork();
+//     }
+//     cluster.on('exit', (worker) => {
+//         console.error(`Worker ${worker.process.pid} fucking died :(`);
+//         cluster.fork();
+//     });
+// } else {
+//     console.log(`Worker ${cluster.worker.process.pid} levantado`);
+
+    // const server = app.listen(app.get('port'));
+    const server = app.listen(app.get('port'), () => console.log(`Servidor iniciado en el puerto ${app.get('port')}`));
+    const io = require('socket.io')(server);
 
     //SOCKET
     io.use(async (socket, next) => {
@@ -48,7 +48,7 @@ if (cluster.isMaster) {
         })
     })
 
-}
+// }
 
 
 

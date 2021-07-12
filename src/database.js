@@ -5,7 +5,7 @@ mongoose.connect(config.DATABASE_URL, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
     useCreateIndex: true,
-    useFindAndModify: true
+    useFindAndModify: false
 })
 .then(() => {console.log("Base de datos conectada con éxito!");})
 .catch((err) => {console.error(err)});

@@ -11,7 +11,7 @@ export const emailIsValid = async (req, res, next) => {
 }
 
 export const existeUsuarioOEmail = async (req, res, next) => {
-    const email = await Usuario.findOne({ email: req.body.email })
+    const email = await Usuario.findOne({ email: req.body.email }).select("email");
     if (email) return res.status(400).json({ message: 'Email ya existe' })
     next();
 }

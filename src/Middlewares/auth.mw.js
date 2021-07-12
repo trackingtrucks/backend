@@ -76,7 +76,7 @@ export const isGestor = async (req, res, next) => {
         next();
         return;
     }
-    return res.status(403).json('No tienes los suficientes permisos para realizar esta accion.')
+    return res.status(403).json({message: 'No tienes los suficientes permisos para realizar esta accion.'})
 }
 
 export const isAdmin = async (req, res, next) => {
@@ -86,7 +86,7 @@ export const isAdmin = async (req, res, next) => {
         next();
         return;
     }
-    return res.status(403).json('No tienes los suficientes permisos para realizar esta accion.')
+    return res.status(403).json({message: 'No tienes los suficientes permisos para realizar esta accion.'})
 }
 
 export const isConductor = async (req, res, next) => {
@@ -95,7 +95,7 @@ export const isConductor = async (req, res, next) => {
         next();
         return;
     }
-    return res.status(403).json('No tienes los suficientes permisos para realizar esta accion.')
+    return res.status(403).json({message: 'No tienes los suficientes permisos para realizar esta accion.'})
 }
 
 export const onlyConductor = async (req, res, next) => {
@@ -104,7 +104,7 @@ export const onlyConductor = async (req, res, next) => {
         next();
         return;
     }
-    return res.status(403).json('No tienes los suficientes permisos para realizar esta accion.')
+    return res.status(403).json({message: 'No tienes los suficientes permisos para realizar esta accion.'})
 }
 
 export const onlyGestor = async (req, res, next) => {
@@ -113,5 +113,5 @@ export const onlyGestor = async (req, res, next) => {
         next();
         return;
     }
-    return res.status(403).json('No tienes los suficientes permisos para realizar esta accion.')
+    return res.status(403).json({message: 'No tienes los suficientes permisos para realizar esta accion.'})
 }

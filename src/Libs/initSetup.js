@@ -7,7 +7,7 @@ export const initSetup = async () => {
     if (usuarioCount > 0) {
     } else {
         try {
-            const values = await Promise.all([
+            await Promise.all([
                 new Usuario({
                     nombre: "Eze",
                     apellido: "Gatica",
@@ -17,7 +17,7 @@ export const initSetup = async () => {
                     rol: 'admin'
                 }).save(),
             ])
-            console.log(values);
+            console.info("Cuentas predeterminadas creadas");
         } catch (error) {
             console.error(error)
         }

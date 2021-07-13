@@ -7,5 +7,5 @@ mongoose.connect(config.DATABASE_URL, {
     useCreateIndex: true,
     useFindAndModify: false
 })
-.then(() => {console.log("Base de datos conectada con éxito!");})
+.then(() => {console.info("Base de datos conectada con éxito!");})
 .catch((err) => {console.error(err)});

@@ -21,7 +21,7 @@ async function enviarMail({ para, subject, html }) {
       html
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }
 export async function emailAceptarCompania({ destino, gestor, token}) {
@@ -36,7 +36,7 @@ export async function emailAceptarCompania({ destino, gestor, token}) {
       `
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }
 export async function emailEnvioFormulario({ destino}) {
@@ -50,7 +50,7 @@ export async function emailEnvioFormulario({ destino}) {
       `
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }
 export async function emailAceptarFormulario({destino, token}){
@@ -64,6 +64,6 @@ export async function emailAceptarFormulario({destino, token}){
       `
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }

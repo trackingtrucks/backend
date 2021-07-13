@@ -3,7 +3,7 @@ import './database.js'
 import config from './config'
 import jwt from 'jsonwebtoken'
 import Usuario from './Models/Usuario'
-import cluster from 'cluster';
+// import cluster from 'cluster';
 // let io;
 
 // if (cluster.isMaster) {
@@ -21,7 +21,7 @@ import cluster from 'cluster';
 //     console.log(`Worker ${cluster.worker.process.pid} levantado`);
 
     // const server = app.listen(app.get('port'));
-    const server = app.listen(app.get('port'), () => console.log(`Servidor iniciado en el puerto ${app.get('port')}`));
+    const server = app.listen(app.get('port'), () => console.info(`Servidor iniciado en el puerto ${app.get('port')}`));
     const io = require('socket.io')(server);
 
     //SOCKET
@@ -41,10 +41,10 @@ import cluster from 'cluster';
     })
 
     io.on('connection', (socket) => {
-        console.log("Conexion establecida: " + socket.userId);
+        console.info("Conexion establecida: " + socket.userId);
         socket.join(socket.userData.companyId)
         socket.on("disconnect", () => {
-            console.log("Conexion perdida: " + socket.userId);
+            console.info("Conexion perdida: " + socket.userId);
         })
     })
 
@@ -54,6 +54,6 @@ import cluster from 'cluster';
 
 
 export default function socketSend(roomId, key, message) {
-    console.log("enviando '" + key + "' a la sala '" + roomId + "' con el contenido '" + message + "'");
+    console.info("enviando '" + key + "' a la sala '" + roomId + "' con el contenido '" + message + "'");
     io.to(roomId).emit(key, message);
 }

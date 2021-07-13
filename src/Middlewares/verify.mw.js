@@ -17,7 +17,7 @@ export const existeUsuarioOEmail = async (req, res, next) => {
 }
 
 export const existePatenteRegistrada = async (req, res, next) => {
-    const patente = await Vehiculo.findOne({ patente: formatPatente(req.body.patente) })
+    const patente = await Vehiculo.findOne({ patente: formatPatente(req.body.patente) }).select("patente");
     if (patente) return res.status(400).json({ message: 'Patente ya registrada' })
     next();
 }

@@ -31,7 +31,6 @@ export const crear = async (req, res) => {
 export const asignarConductor = async (req, res) => {
     try{
         const msg = req.userData.nombre + " " + req.userData.apellido + " se ha subido al vehiculo " + req.body.patente.toUpperCase();
-        console.log(msg);
         socketSend(req.userData.companyId, "notificacion", msg);
         await Promise.all([
             Vehiculo.findByIdAndUpdate(req.vehiculoId, { conductorActual: { id: req.userId, fechaDesde: new Date() } }, { new: true }),
@@ -47,7 +46,6 @@ export const asignarConductor = async (req, res) => {
 export const desasignarConductor = async (req, res) => {
     try{
     const msg = req.userData.nombre + " " + req.userData.apellido + " se ha bajado del vehiculo " + req.body.patente.toUpperCase();
-    console.log(msg);
     socketSend(req.userData.companyId, "notificacion", msg);
     const kilometrajeActual = req.body?.kilometrajeActual;
     if(!kilometrajeActual) return res.status(400).json({ message: 'No se llenó el campo del kilometraje actual'});

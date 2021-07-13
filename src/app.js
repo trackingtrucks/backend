@@ -14,7 +14,7 @@ import adminRutas from './Routes/admin.routes'
 // CONFIG
 // import {logPID} from './Libs/logPID'
 import config from './config'
-import {initSetup} from './Libs/initSetup'
+import { initSetup } from './Libs/initSetup'
 initSetup()
 const app = express();
 import cors from 'cors'
@@ -22,8 +22,21 @@ import cors from 'cors'
 app.set('pkg', pkg)
 app.set("port", config.PORT);
 app.use(express.json())
-app.use(morgan('dev'));
 app.use(cors());
+switch (config.NODE_ENV) {
+    case 'development':
+        app.use(morgan('dev'));
+        console.info("Iniciando servidor en modo 'development'");
+        break;
+    case 'production':
+        app.use(morgan('tiny'));
+        console.info("Iniciando servidor en modo 'production'");
+        break;
+
+    default:
+        console.info("Iniciando servidor en modo 'desconocido', no se como llegaste aca pero no está bien");
+        throw new Error("No se especificó modo de funcionamiento");
+}
 // app.use(logPID)
 // RUTA DEFAULT
 app.get('/', (req, res) => {

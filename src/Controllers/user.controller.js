@@ -86,7 +86,6 @@ export const asignarTurno = async (req, res) => {
         fecha.setDate( fecha.getDate() - 2 );
         var fechaUsada = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate(), 9, 0, 0);*/
         //agenda.define("mandar notificacion", async (job) => {
-        //    console.log("alo")
         //})                    ***ARREGLAR***
         //await agenda.start();
         //await agenda.schedule("in 5 minutes", "mandar notificacion");

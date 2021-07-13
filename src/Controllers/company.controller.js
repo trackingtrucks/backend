@@ -72,7 +72,6 @@ export const crearTarea = async (req, res) => {
         const { vehiculo, tipo, cantidadCada, cantidadUltima } = req.body;
         if (!vehiculo || !tipo || !cantidadCada || !cantidadUltima) { return res.status(400).json({ message: 'Faltan 1 o mas campos necesarios' }) }
         const vehiculoEnDB = await Vehiculo.findById(vehiculo);
-        console.log(vehiculoEnDB);
         if (!vehiculoEnDB || vehiculoEnDB.companyId !== req.userData.companyId) { return res.status(400).json({ message: 'Vehiculo no encontrado' }) }
         const nuevaTarea = new Tarea({
             vehiculo,

@@ -100,7 +100,7 @@ export const nuevoForm = async (req, res) => {
             genteCompania
         })
         const formEnDB = await form.save();
-        await emailEnvioFormulario({
+        emailEnvioFormulario({
             destino: email
         })
         return res.json({message: "Gracias por comunicarse con nosotros, estaremos en contacto con usted", form: formEnDB})

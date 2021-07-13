@@ -23,7 +23,7 @@ export const codigoConductor = async (req, res) => {
         })
         
         const nuevoToken = await newToken.save();
-        await emailAceptarCompania({
+        emailAceptarCompania({
             destino: email, 
             token: nuevoToken._id,
             gestor: req.userData
@@ -42,7 +42,7 @@ export const codigoGestor = async (req, res) => {
             rol: "gestor"
         })
         const nuevoToken = await newToken.save();
-        await emailAceptarCompania({
+        emailAceptarCompania({
             destino: email, 
             token: nuevoToken._id,
             gestor: req.userData

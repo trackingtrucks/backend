@@ -92,11 +92,12 @@ export const logout = async (req, res) => {
 
 export const newAccessToken = async (req, res) => {
     try {
+        // return res.status(500).json({ message: error.message })
         const refreshToken = req.headers["x-refresh-token"]//agarro el refresh token que se me envio y lo guardo
         const decoded = verifyRefreshToken(refreshToken) //chequeo si es valido y guardo la data
-        const usuarioEnDb = await Usuario.findById(decoded.id).select("+refreshTokens") //busco el usuario en la base de datos mediante la id que decodeé arriba. No lo hice en el middleware ya que no le pido al usuario un accesstoken, asi que no puedo acceder a la req.userData
+        const usuarioEnDb = await Usuario.findById(decoded.id).select("refreshTokens") //busco el usuario en la base de datos mediante la id que decodeé arriba. No lo hice en el middleware ya que no le pido al usuario un accesstoken, asi que no puedo acceder a la req.userData
         if (!usuarioEnDb.refreshTokens.includes(refreshToken)) return res.status(403).json({ message: 'Refresh token revoked' }) //chequea si el refresh token está habilitado por el usuario y no fue revocado (caso que se desloguee)
-        res.json({ accessToken: generateAccessToken(decoded.id, refreshToken) }) //envio el nuevo accessToken
+        res.json({ accessToken: generateAccessToken(decoded.id, refreshToken), ATExpiresIn: Date.now() + token_expires * 1000 }) //envio el nuevo accessToken
     } catch (error) {
         res.status(500).json({ message: error.message })
     }

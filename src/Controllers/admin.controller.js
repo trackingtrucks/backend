@@ -52,8 +52,8 @@ export const aceptarForm = async (req, res) => {
         await Promise.all([
             newToken.save(),
             Formulario.findByIdAndDelete(id),
-            emailAceptarFormulario({destino: formData.email, token: newToken._id, })
         ]).then(([tokenNuevo])=> {
+            emailAceptarFormulario({destino: formData.email, token: newToken._id, })
             res.json({ codigo: tokenNuevo._id, message: "Confirmado con exito!", formData }) 
         })
     } catch (error) {

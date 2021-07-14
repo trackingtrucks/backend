@@ -22,10 +22,10 @@ const datosOBD2Schema = new Schema({
         type: [String]
     },
     kilometrosRecorridos: {
-        type: [Number]
+        type: [String]
     }
 }, {
-    timestamps: false,
+    timestamps: true,
     versionKey: false
 });
 

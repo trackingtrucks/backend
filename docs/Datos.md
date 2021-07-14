@@ -45,7 +45,7 @@ x-access-token: <accessToken de usuario>
 	"RPM": ["1600RPM", "1500RPM"],
 	"speed": "60km/h",
 	"coolantTemperature": "20C",
-	"kilometrosRecorridos": [3, 3.5]
+	"kilometrosRecorridos": ["3", "3.5"]
 }
 }
 ```

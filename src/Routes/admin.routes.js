@@ -13,8 +13,9 @@ rutas.delete('/formulario/:id', [auth.verifyToken, auth.isAdmin], Admin.eliminar
 
 rutas.get('/codigo/gestor', [auth.verifyToken, auth.isAdmin], Admin.codigoGestor)
 rutas.post('/codigo', [verify.emailIsValid, verify.existeUsuarioOEmail, auth.verifyToken, auth.isAdmin], Admin.codigoAdmins)
-
-
+rutas.delete('/codigo', [auth.verifyToken, auth.isAdmin], Admin.elminarToken) 
+rutas.get('/codigos/admin', [auth.verifyToken, auth.isAdmin], Admin.getAdminTokens)
+rutas.get('/cuentas/admins', [auth.verifyToken, auth.isAdmin], Admin.getAllAdmins)
 rutas.delete('/cuenta',
     [auth.verifyToken, auth.isAdmin],
     Admin.eliminarCuenta)

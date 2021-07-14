@@ -102,10 +102,28 @@ export const codigoAdmins = async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 }
+export const getAllAdmins = async (req, res) => {
+    try {
+        const usuarios = await Usuario.find({rol: "admin"})
+        return res.json({admins: usuarios})
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
 export const getAdminTokens = async (req, res) => {
     try {
         const tokens = await Token.find({rol: "admin"})
         res.json({tokens})
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+export const elminarToken = async (req, res) => {
+    try {
+        const {id} = req.body;
+        if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({message: "ID Invalida"});
+        await Token.findByIdAndDelete(id);
+        return res.json({message: "Token eliminado con exito"})
     } catch (error) {
         res.status(500).json({ message: error.message })
     }

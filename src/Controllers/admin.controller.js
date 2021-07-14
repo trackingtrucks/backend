@@ -90,7 +90,8 @@ export const codigoAdmins = async (req, res) => {
         if (!email) return res.status(404).json({ message: 'No se especificó ningun email' })
         const newToken = new Token({
             companyId: "admins",
-            rol: "admin"
+            rol: "admin",
+            email
         })
         const nuevoToken = await newToken.save()
         emailRegistroAdmin({

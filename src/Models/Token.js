@@ -13,6 +13,9 @@ const tokenSchema = new Schema({
         type: Object,
         required: false,
         default: null
+    },
+    email: {
+        type: String
     }
 },{
     versionKey: false,

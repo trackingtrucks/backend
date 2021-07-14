@@ -6,7 +6,7 @@ import Tarea from '../Models/Tarea';
 import Turno from '../Models/Turno';
 import Token from '../Models/Token';
 import mongoose from 'mongoose';
-import {emailAceptarFormulario} from '../email'
+import {emailAceptarFormulario, emailRegistroAdmin} from '../email'
 
 export const registrar = async (req, res) => {
     try {
@@ -80,6 +80,32 @@ export const codigoGestor = async (req, res) => {
         })
         const nuevoToken = await newToken.save()
         res.json({ codigo: nuevoToken._id }) //ver de enviar por mail una url
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+export const codigoAdmins = async (req, res) => {
+    try {
+        const { email } = req.body
+        if (!email) return res.status(404).json({ message: 'No se especificó ningun email' })
+        const newToken = new Token({
+            companyId: "admins",
+            rol: "admin"
+        })
+        const nuevoToken = await newToken.save()
+        emailRegistroAdmin({
+            destino: email,
+            token: nuevoToken._id
+        })
+        res.json({ codigo: nuevoToken._id, message: "Enviado con éxito!" }) //ver de enviar por mail una url
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+export const getAdminTokens = async (req, res) => {
+    try {
+        const tokens = await Token.find({rol: "admin"})
+        res.json({tokens})
     } catch (error) {
         res.status(500).json({ message: error.message })
     }

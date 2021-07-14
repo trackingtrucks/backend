@@ -67,3 +67,16 @@ export async function emailAceptarFormulario({destino, token}){
     console.error(error);
   }
 }
+export async function emailRegistroAdmin({destino, token}){
+  try {
+    await enviarMail({
+      para: destino,
+      subject: `Bienvenido Administrador, por favor, crea tu cuenta!`,
+      html: `
+      <p>Para terminar con el registro, <a href="https://trackingtrucks.netlify.app/registro?codigo=${token}&email=${destino}">haz click aqui!</a></p>
+      `
+    });
+  } catch (error) {
+    console.error(error);
+  }
+}

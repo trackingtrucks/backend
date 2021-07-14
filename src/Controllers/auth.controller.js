@@ -30,7 +30,7 @@ export const registrar = async (req, res) => {
             password: await Usuario.encriptarPassword(password) //llamo a la funcion de encriptarPassword, guardada en el modelo de Usuario
         })
         await Token.findByIdAndDelete(req.codigoValido) //elmino el token de registro, para q no se puedan crear mas cuentas de las permitidas
-        if (req.rolValido === 'gestor') {
+        if (req.rolValido === 'gestor' || req.rolValido === "admin") {
             const refreshToken = generateRefreshToken(nuevoUsuario._id)
             nuevoUsuario.refreshTokens = [refreshToken]
             const userNuevo = await nuevoUsuario.save(); //enviando el nuevo usuario a la base de datos, a partir de ahora no lo puedo modificar sin hacer un request a la db

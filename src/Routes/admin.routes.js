@@ -12,6 +12,7 @@ rutas.post('/formulario/aceptar', [auth.verifyToken, auth.isAdmin], Admin.acepta
 rutas.delete('/formulario/:id', [auth.verifyToken, auth.isAdmin], Admin.eliminarForm)
 
 rutas.get('/codigo/gestor', [auth.verifyToken, auth.isAdmin], Admin.codigoGestor)
+rutas.get('/codigo/admin', [verify.emailIsValid, verify.existeUsuarioOEmail, auth.verifyToken, auth.isAdmin], Admin.codigoAdmins)
 
 
 rutas.delete('/cuenta',

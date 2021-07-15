@@ -28,12 +28,12 @@ x-access-token: <accessToken de usuario>
 
 ```json
 {
-    "fuelLevel": [Array de información de fuel level],
-	"RPM": [Array de información de RPM],
-	"speed": [Array de información de speed],
-	"coolantTemperature": [Array de información de coolant temperature],
+    "fuelLevel": {Objeto de información de fuel level},
+	"RPM": {Objeto de información de RPM},
+	"speed": {Objeto de información de speed},
+	"coolantTemperature": {Objeto de información de coolant temperature},
     "pendingTroubleCodes": [Array de información de pending trouble codes] (Puede no haber),
-	"kilometrosRecorridos": [Array de información de kilometros recorridos]
+	"kilometrosRecorridos": {Objeto de información de kilometros recorridos}
 }
 ```
 

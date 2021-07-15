@@ -19,7 +19,7 @@ const datosOBD2Schema = new Schema({
         type: Object
     },
     pendingTroubleCodes: {
-        type: Object
+        type: [String]
     },
     kilometrosRecorridos: {
         type: Object

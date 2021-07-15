@@ -7,22 +7,22 @@ const datosOBD2Schema = new Schema({
         }
     },
     fuelLevel: {
-        type: Object
+        type: [Object]
     },
     RPM: {
-        type: Object
+        type: [Object]
     },
     speed: {
-        type: Object
+        type: [Object]
     },
     coolantTemperature: {
-        type: Object
+        type: [Object]
     },
     pendingTroubleCodes: {
         type: [String]
     },
     kilometrosRecorridos: {
-        type: Object
+        type: [Object]
     }
 }, {
     timestamps: true,

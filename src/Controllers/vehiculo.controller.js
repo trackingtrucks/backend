@@ -30,6 +30,7 @@ export const crear = async (req, res) => {
 
 export const asignarConductor = async (req, res) => {
     try{
+        if(req.userData.companyId !== req.vehiculoData.companyId) return res.status(400).json({ message: 'El vehiculo al que te estás tratando de asignar no es de tu misma compania'})
         const msg = req.userData.nombre + " " + req.userData.apellido + " se ha subido al vehiculo " + req.body.patente.toUpperCase();
         socketSend(req.userData.companyId, "notificacion", msg);
         await Promise.all([
@@ -45,17 +46,18 @@ export const asignarConductor = async (req, res) => {
 
 export const desasignarConductor = async (req, res) => {
     try{
-    const msg = req.userData.nombre + " " + req.userData.apellido + " se ha bajado del vehiculo " + req.body.patente.toUpperCase();
-    socketSend(req.userData.companyId, "notificacion", msg);
-    const kilometrajeActual = req.body?.kilometrajeActual;
-    if(!kilometrajeActual) return res.status(400).json({ message: 'No se llenó el campo del kilometraje actual'});
-    const vehiculoActual = req.vehiculoData
-    const conductorActual = req.userData;
-    await Promise.all([
-        Vehiculo.findByIdAndUpdate(req.vehiculoId, { kmactual: kilometrajeActual, conductorActual: { id: null, fechaDesde: null }, $push: { conductoresPasados: { id: req.userId, fechaDesde: vehiculoActual.conductorActual.fechaDesde, fechaHasta: new Date() } } }, { new: true }),
-        Usuario.findByIdAndUpdate(req.userId, { vehiculoActual: { id: null, fechaDesde: null }, $push: { vehiculosPasados: { id: req.vehiculoId, fechaDesde: conductorActual.vehiculoActual.fechaDesde, fechaHasta: new Date() } } }, { new: true })
-    ])
-    return res.json({ message: "Desasignado con éxito!" })
+        if(req.userData.companyId !== req.vehiculoData.companyId) return res.status(400).json({ message: 'El vehiculo del que te estás tratando de desasignar no es de tu misma compania'})
+        const msg = req.userData.nombre + " " + req.userData.apellido + " se ha bajado del vehiculo " + req.body.patente.toUpperCase();
+        socketSend(req.userData.companyId, "notificacion", msg);
+        const kilometrajeActual = req.body?.kilometrajeActual;
+        if(!kilometrajeActual) return res.status(400).json({ message: 'No se llenó el campo del kilometraje actual'});
+        const vehiculoActual = req.vehiculoData
+        const conductorActual = req.userData;
+        await Promise.all([
+            Vehiculo.findByIdAndUpdate(req.vehiculoId, { kmactual: kilometrajeActual, conductorActual: { id: null, fechaDesde: null }, $push: { conductoresPasados: { id: req.userId, fechaDesde: vehiculoActual.conductorActual.fechaDesde, fechaHasta: new Date() } } }, { new: true }),
+            Usuario.findByIdAndUpdate(req.userId, { vehiculoActual: { id: null, fechaDesde: null }, $push: { vehiculosPasados: { id: req.vehiculoId, fechaDesde: conductorActual.vehiculoActual.fechaDesde, fechaHasta: new Date() } } }, { new: true })
+        ])
+        return res.json({ message: "Desasignado con éxito!" })
     } catch (error) {
         res.status(500).json({ message: error.message })
     }

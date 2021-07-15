@@ -11,8 +11,10 @@ const salt = config.SALT;
 
 export const verifyCodigoRegistro = async (req, res, next) => {
     try {
-        const {codigo} = req.body
+        const {codigo} = req.body;
+        if (!mongoose.Types.ObjectId.isValid(codigo)) return res.status(400).json({message: 'Codigo de registro no valido'});
         const response = await Token.findById(codigo)
+        if (response.tipo !== "registro"){return res.status(400).json({ message: 'Codigo de registro no valido' })}
         req.codigoValido = response._id
         req.rolValido = response.rol
         req.companyIdValido = response.companyId

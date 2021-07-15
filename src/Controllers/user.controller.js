@@ -5,8 +5,10 @@ import Vehiculo from '../Models/Vehiculo';
 import { Agenda } from 'agenda/es';
 import config from '../config';
 const database_url = config.DATABASE_URL;
-import {emailAceptarCompania} from '../email';
+import {emailAceptarCompania, emailRestablecerContraseña} from '../email';
 import { sendMessage } from '../index';
+import { v4 } from 'uuid';
+
 const agenda = new Agenda({ db: { address: database_url, options: {useUnifiedTopology: true} } });
 
 export const codigoConductor = async (req, res) => {
@@ -16,6 +18,8 @@ export const codigoConductor = async (req, res) => {
         const newToken = new Token({
             companyId: req.userData.companyId,
             rol: "conductor",
+            tipo: 'registro',
+            email,
             gestorData: {
                 id: req.userId,
                 email: req.userData.email
@@ -39,7 +43,9 @@ export const codigoGestor = async (req, res) => {
     try {
         const newToken = new Token({
             companyId: req.userData.companyId,
-            rol: "gestor"
+            rol: "gestor",
+            tipo: 'registro',
+            email
         })
         const nuevoToken = await newToken.save();
         emailAceptarCompania({
@@ -90,6 +96,38 @@ export const asignarTurno = async (req, res) => {
         //await agenda.start();
         //await agenda.schedule("in 5 minutes", "mandar notificacion");
         return res.json({ message: 'Turno asignado con exito'});
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const restablecerContaseña = async (req, res) => {
+    try {
+        const {email} = req.body;
+        if (!email){return res.json({message: 'No se ha especificado un email para recibir el codigo'})}
+        const userDB = await Usuario.findOne({email});
+        if (!userDB){return res.json({message: 'Sigue las instrucciones en el email que vas a recibir. Fijate que hayas escrito bien tu dirección! El codigo expira en 30 minutos.'})}
+        await Token.findOneAndRemove({email, tipo: 'contraseña'}); //Limpia el token anterior
+        const tokenRestablecer = new Token({
+            tipo: 'contraseña',
+            email,
+            secret: v4().split('-').join('') + v4().split('-').join(''),
+            expires: Date.now() + 1000 * 60 * 30
+        })
+        const tokenRes = await tokenRestablecer.save();
+        emailRestablecerContraseña({
+            destino: email,
+            token: tokenRes.secret
+        });
+        return res.json({token: tokenRes.secret, message: 'Sigue las instrucciones en el email que vas a recibir. Fijate que hayas escrito bien tu dirección! El codigo expira en 30 minutos.'})
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const cambiarContraseña = async (req, res) => {
+    try {
+        
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

@@ -47,7 +47,9 @@ export const aceptarForm = async (req, res) => {
         if (!formData) return res.status(404).json({ message: 'ID de formulario de registro no encontrado'});
         const newToken = new Token({
             companyId,
-            rol: "gestor"
+            rol: "gestor",
+            email: formData.email,
+            tipo: 'registro'
         });
         await Promise.all([
             newToken.save(),
@@ -76,7 +78,8 @@ export const codigoGestor = async (req, res) => {
         if (!companyId) return res.status(404).json({ message: 'No se especificó ninguna compania' })
         const newToken = new Token({
             companyId,
-            rol: "gestor"
+            rol: "gestor",
+            tipo: 'registro'
         })
         const nuevoToken = await newToken.save()
         res.json({ codigo: nuevoToken._id }) //ver de enviar por mail una url
@@ -91,7 +94,8 @@ export const codigoAdmins = async (req, res) => {
         const newToken = new Token({
             companyId: "admins",
             rol: "admin",
-            email
+            email,
+            tipo: 'registro'
         })
         const nuevoToken = await newToken.save()
         emailRegistroAdmin({
@@ -113,7 +117,7 @@ export const getAllAdmins = async (req, res) => {
 }
 export const getAdminTokens = async (req, res) => {
     try {
-        const tokens = await Token.find({rol: "admin"})
+        const tokens = await Token.find({rol: "admin", tipo: "registro"})
         res.json({tokens})
     } catch (error) {
         res.status(500).json({ message: error.message })

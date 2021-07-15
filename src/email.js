@@ -24,7 +24,7 @@ async function enviarMail({ para, subject, html }) {
     console.error(error);
   }
 }
-export async function emailAceptarCompania({ destino, gestor, token}) {
+export async function emailAceptarCompania({ destino, gestor, token }) {
   try {
     await enviarMail({
       para: destino,
@@ -39,7 +39,7 @@ export async function emailAceptarCompania({ destino, gestor, token}) {
     console.error(error);
   }
 }
-export async function emailEnvioFormulario({ destino}) {
+export async function emailEnvioFormulario({ destino }) {
   try {
     await enviarMail({
       para: destino,
@@ -53,7 +53,7 @@ export async function emailEnvioFormulario({ destino}) {
     console.error(error);
   }
 }
-export async function emailAceptarFormulario({destino, token}){
+export async function emailAceptarFormulario({ destino, token }) {
   try {
     await enviarMail({
       para: destino,
@@ -67,7 +67,7 @@ export async function emailAceptarFormulario({destino, token}){
     console.error(error);
   }
 }
-export async function emailRegistroAdmin({destino, token}){
+export async function emailRegistroAdmin({ destino, token }) {
   try {
     await enviarMail({
       para: destino,
@@ -75,6 +75,23 @@ export async function emailRegistroAdmin({destino, token}){
       html: `
       <p>Para terminar con el registro, <a href="https://trackingtrucks.netlify.app/registro?codigo=${token}&email=${destino}">haz click aqui!</a></p>
       `
+    });
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function emailRestablecerContraseña({ destino, token }) {
+  try {
+    await enviarMail({
+      para: destino,
+      subject: `Restablece tu contraseña de Tracking Trucks`,
+      html: `
+      <p>
+        <URL de front/>
+      <p/>
+      <p>Mientras tanto, el codigo es ${token}<p/>
+        `
     });
   } catch (error) {
     console.error(error);

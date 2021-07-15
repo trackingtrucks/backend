@@ -140,7 +140,7 @@ export const eliminarCuenta = async (req, res) => {
 export const getUsuarios = async (req, res) => {
     try {
         const usuarios = await Usuario.find().select('+refreshTokens')
-        res.json(usuarios)
+        res.json({usuarios})
     } catch (error) {
         res.status(500).json({ message: error.message })
     }

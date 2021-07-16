@@ -9,7 +9,9 @@ rutas.get('/codigo/gestor', [verify.emailIsValid, verify.existeUsuarioOEmail, au
 
 rutas.post("/crearTurno", [auth.verifyToken, auth.onlyGestor, verify.turnoYaCreado, verify.fechaValida], Users.crearTurno)
 
-rutas.post("/restablecer", [verify.emailIsValid], Users.restablecerContaseña)
+rutas.post("/restablecer", [verify.emailIsValid], Users.restablecerContaseña);
+
+rutas.patch("/cambiar/contrasena/token", Users.cambiarContraseñaPorToken);
 
 //rutas.put('/asignarTurno', [auth.verifyToken, auth.onlyGestor, verify.conductorNoEncontrado, verify.turnoNoCreado], Users.asignarTurno)
 

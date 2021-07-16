@@ -5,15 +5,15 @@ import Vehiculo from '../Models/Vehiculo';
 import { Agenda } from 'agenda/es';
 import config from '../config';
 const database_url = config.DATABASE_URL;
-import {emailAceptarCompania, emailRestablecerContraseña} from '../email';
+import { emailAceptarCompania, emailRestablecerContraseña } from '../email';
 import { sendMessage } from '../index';
 import { v4 } from 'uuid';
 
-const agenda = new Agenda({ db: { address: database_url, options: {useUnifiedTopology: true} } });
+const agenda = new Agenda({ db: { address: database_url, options: { useUnifiedTopology: true } } });
 
 export const codigoConductor = async (req, res) => {
-    const {email} = req.body;
-    if (!email) return res.status(400).json({ message: 'No se ha especificado un email para recibir el codigo'});
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: 'No se ha especificado un email para recibir el codigo' });
     try {
         const newToken = new Token({
             companyId: req.userData.companyId,
@@ -25,10 +25,10 @@ export const codigoConductor = async (req, res) => {
                 email: req.userData.email
             }
         })
-        
+
         const nuevoToken = await newToken.save();
         emailAceptarCompania({
-            destino: email, 
+            destino: email,
             token: nuevoToken._id,
             gestor: req.userData
         })
@@ -38,8 +38,8 @@ export const codigoConductor = async (req, res) => {
     }
 }
 export const codigoGestor = async (req, res) => {
-    const {email} = req.body;
-    if (!email) return res.status(400).json({ message: 'No se ha especificado un email para recibir el codigo'});
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: 'No se ha especificado un email para recibir el codigo' });
     try {
         const newToken = new Token({
             companyId: req.userData.companyId,
@@ -49,7 +49,7 @@ export const codigoGestor = async (req, res) => {
         })
         const nuevoToken = await newToken.save();
         emailAceptarCompania({
-            destino: email, 
+            destino: email,
             token: nuevoToken._id,
             gestor: req.userData
         })
@@ -62,8 +62,8 @@ export const codigoGestor = async (req, res) => {
 export const crearTurno = async (req, res) => {
     try {
         const companyId = req.userData.companyId;
-        const { codigoDeTurno,  fechaYhora, nombreVendedor, codigoOrdenDeCompra} = req.body;
-        if(!nombreVendedor || !codigoOrdenDeCompra) return res.status(400).json({ message: 'Faltan 1 o mas campos requeridos'});
+        const { codigoDeTurno, fechaYhora, nombreVendedor, codigoOrdenDeCompra } = req.body;
+        if (!nombreVendedor || !codigoOrdenDeCompra) return res.status(400).json({ message: 'Faltan 1 o mas campos requeridos' });
         const nuevoTurno = new Turno({
             codigoDeTurno,
             fechaYhora: fechaYhora.toLocaleString(),
@@ -95,7 +95,7 @@ export const asignarTurno = async (req, res) => {
         //})                    ***ARREGLAR***
         //await agenda.start();
         //await agenda.schedule("in 5 minutes", "mandar notificacion");
-        return res.json({ message: 'Turno asignado con exito'});
+        return res.json({ message: 'Turno asignado con exito' });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
@@ -103,11 +103,11 @@ export const asignarTurno = async (req, res) => {
 
 export const restablecerContaseña = async (req, res) => {
     try {
-        const {email} = req.body;
-        if (!email){return res.json({message: 'No se ha especificado un email para recibir el codigo'})}
-        const userDB = await Usuario.findOne({email});
-        if (!userDB){return res.json({message: 'Sigue las instrucciones en el email que vas a recibir. Fijate que hayas escrito bien tu dirección! El codigo expira en 30 minutos.'})}
-        await Token.findOneAndRemove({email, tipo: 'contraseña'}); //Limpia el token anterior
+        const { email } = req.body;
+        if (!email) { return res.status(400).json({ message: 'No se ha especificado un email para recibir el codigo' }) }
+        const userDB = await Usuario.findOne({ email });
+        if (!userDB) { return res.json({ message: 'Sigue las instrucciones en el email que vas a recibir. Fijate que hayas escrito bien tu dirección! El codigo expira en 30 minutos.' }) }
+        await Token.findOneAndRemove({ email, tipo: 'contraseña' }); //Limpia el token anterior
         const tokenRestablecer = new Token({
             tipo: 'contraseña',
             email,
@@ -119,15 +119,33 @@ export const restablecerContaseña = async (req, res) => {
             destino: email,
             token: tokenRes.secret
         });
-        return res.json({token: tokenRes.secret, message: 'Sigue las instrucciones en el email que vas a recibir. Fijate que hayas escrito bien tu dirección! El codigo expira en 30 minutos.'})
+        return res.json({ token: tokenRes.secret, message: 'Sigue las instrucciones en el email que vas a recibir. Fijate que hayas escrito bien tu dirección! El codigo expira en 30 minutos.' })
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
 }
 
-export const cambiarContraseña = async (req, res) => {
+export const cambiarContraseñaPorToken = async (req, res) => {
     try {
-        
+        const { token, password } = req.body;
+        if (!token || !password) { return res.status(400).json({ message: "Faltan 1 o mas campos requeridos" }) }
+        const tkn = await Token.findOne({ secret: token });
+        if (!tkn) { return res.status(400).json({ message: "Token invalido, probablemente haya expirado" }) }
+        if (tkn.expires > Date.now()) {
+            const user = await Usuario.findOne({ email: tkn.email }).select("+password")
+            if (await Usuario.verificarPassword(password, user.password)) { return res.status(400).json({ message: "Las contraseñas no pueden ser iguales" }) }
+            const passwordEncriptada = await Usuario.encriptarPassword(password);
+            await Promise.all([
+                Usuario.findByIdAndUpdate(user._id, {
+                    password: passwordEncriptada
+                }),
+                Token.findByIdAndDelete(tkn._id)
+            ])
+            return res.json({message: "Contraseña cambiada con exito!" });
+        } else {
+            await Token.findByIdAndDelete(tkn._id)
+            return res.status(400).json({ message: "Token invalido, probablemente haya expirado" })
+        }
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

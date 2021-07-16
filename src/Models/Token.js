@@ -1,4 +1,4 @@
-import {Schema, model} from 'mongoose';
+import { Schema, model } from 'mongoose';
 
 const tokenSchema = new Schema({
     companyId: {
@@ -25,7 +25,8 @@ const tokenSchema = new Schema({
     expires: {
         type: Number
     }
-},{
+    // createdAt: { type: Date, expires: 3600, default: Date.now }
+}, {
     versionKey: false,
     timestamps: false
 })

@@ -4,6 +4,7 @@ import Vehiculo from '../Models/Vehiculo';
 export const subirDatosOBD = async (req, res) => {
     try {
         const { fuelLevel, RPM, speed, coolantTemperature, pendingTroubleCodes, kilometrosRecorridos } = req.body;
+        console.log(req.body);
         if(!speed) return res.status(400).json({message: 'No se recibio la speed'});
         const _id = req.userData.vehiculoActual.id;
         const vehiculo = await Vehiculo.findById({ _id });

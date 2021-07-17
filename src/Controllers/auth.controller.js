@@ -61,7 +61,7 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
     if (!password) return res.status(401).json({ message: 'Usuario o contraseña invalidos.' })
     //busco si el usuario existe
-    const userEnDB = await Usuario.findOne({ email: email.toLowerCase() }).select("+password")
+    const userEnDB = await Usuario.findOne({ email: email.toLowerCase() }).select("+password").select("+refreshTokens")
 
     if (!userEnDB) { return res.status(400).json({ message: 'Usuario o contraseña invalidos.' }) }//si el mail no se encontró
 
@@ -71,8 +71,10 @@ export const login = async (req, res) => {
     //creo el token de login y de refresh
     const refreshToken = generateRefreshToken(userEnDB._id)
     const accessToken = generateAccessToken(userEnDB._id, refreshToken)
-
+    
+    const cantidadRefreshs = userEnDB?.refreshTokens?.length + 1;
     const response = await Usuario.findByIdAndUpdate(userEnDB._id, { $push: { refreshTokens: [refreshToken] } }, { new: true })
+    response.sesionesActivas = cantidadRefreshs;
 
     // response.refreshTokens = null; response.password = null; //limpiando, para que en la respuesta no se envien estos datos
     res.json({ perfil: response, accessToken, refreshToken, ATExpiresIn: Date.now() + token_expires * 1000, RTExpiresIn: Date.now() + refresh_expires * 1000 })//envio como respuesta el token, que va a durar 12hs

@@ -89,6 +89,9 @@ const usuarioSchema = new Schema({
         type: Date,
         default: new Date(),
         immutable: true
+    },
+    sesionesActivas: {
+        type: Number
     }
 }, {
     timestamps: false,

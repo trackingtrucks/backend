@@ -12,6 +12,7 @@ rutas.post("/crearTurno", [auth.verifyToken, auth.onlyGestor, verify.turnoYaCrea
 rutas.post("/restablecer", [verify.emailIsValid], Users.restablecerContaseña);
 
 rutas.patch("/cambiar/contrasena/token", Users.cambiarContraseñaPorToken);
+rutas.patch("/cambiar/contrasena/logueado", [auth.verifyTokenWithPassword], Users.cambiarContraseñaLogueado);
 
 //rutas.put('/asignarTurno', [auth.verifyToken, auth.onlyGestor, verify.conductorNoEncontrado, verify.turnoNoCreado], Users.asignarTurno)
 

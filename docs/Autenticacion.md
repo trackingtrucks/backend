@@ -8,6 +8,8 @@
    1. [Nuevo access token](#Nuevo-access-token)
    2. [Eliminar refresh token](#Eliminar-Refresh-Token)
    3. [Eliminar todos los Refresh Token](#Eliminar-Todos-los-Refresh-Token)
+4. [Contraseña](#Contraseña)
+   1. [Pedir email de restablecimiento (a.k.a. Olvide mi contraseña)](#Pedir-email-de-restablecimiento)
 ---
 # Login
 Usado para obtener el token de un usuario registrado.
@@ -214,3 +216,86 @@ x-access-token: <accessToken valido>
 **Codigo**: `204 (No content)`
 
 ---
+# Contraseña
+## Pedir email de restablecimiento
+Usado para pedir un token por email para poder cambiar la contraseña, en caso de haberla olvidado
+
+**URL** : `/user/restablecer`
+
+**Metodo** : `POST`
+
+**Autenticacion requerida**: NO
+
+**Parametros de la solicitud (body)**
+
+```json
+{
+    "email": "direccion de email de la cuenta"
+}
+```
+
+### Respuesta del servidor
+
+```json
+{
+  "message": "Sigue las instrucciones en el email que vas a recibir. Fijate que hayas escrito bien tu dirección! El codigo expira en 30 minutos."
+}
+```
+---
+## Cambiar contraseña por token
+Usado para cambiar la contraseña sin saber la contraseña actual, en caso de haber olvidado la misma. Se proporcionara un token secreto para identificar al usuario.
+
+**URL** : `/user/cambiar/contrasena/token`
+
+**Metodo** : `PATCH`
+
+**Autenticacion requerida**: NO
+
+**Parametros de la solicitud (body)**
+
+```json
+{
+    "password": "Contraseña nueva/contraseña a cambiar",
+    "token": "token secreto y unico, recibido por email"
+}
+```
+
+### Respuesta del servidor
+
+```json
+{
+    "message": "Contraseña cambiada con exito!"
+}
+```
+---
+## Cambiar contraseña estando logueado
+Usado para cambiar la contraseña sabiendo la contraseña actual. Se debera proporcionar la contraseña vieja y la nueva
+
+**URL** : `/user/cambiar/contrasena/logueado`
+
+**Metodo** : `PATCH`
+
+**Autenticacion requerida**: SI
+
+**Parametros de la solicitud (headers)**
+
+```txt
+x-access-token: <accessToken valido>
+```
+
+**Parametros de la solicitud (body)**
+
+```json
+{
+    "passwordActual": "Contraseña actual del usuario (vieja)",
+    "password": "Contraseña nueva, a cambiar por la vieja"
+}
+```
+
+### Respuesta del servidor
+
+```json
+{
+    "message": "Contraseña cambiada con exito! Por seguridad tendra que volver a iniciar sesión"
+}
+```

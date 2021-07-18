@@ -97,3 +97,17 @@ export async function emailRestablecerContraseña({ destino, token }) {
     console.error(error);
   }
 }
+export async function emailCambioContraseña({destino}){
+  try {
+    await enviarMail({
+      para: destino,
+      subject: `Su contraseña de Tracking Trucks ha cambiado`,
+      html: `
+      <h1>Hola!</h1>
+      <p>Este es un email para avisarte que su contraseña ha cambiado, si has sido tu, ignora este email. Si no recuerdas haberlo hecho, por favor, cambia tu contraseña (link a restablecer tu contraseña)</p>
+        `
+    });
+  } catch (error) {
+    console.error(error);
+  }
+}

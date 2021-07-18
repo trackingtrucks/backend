@@ -5,7 +5,7 @@ import Vehiculo from '../Models/Vehiculo';
 import { Agenda } from 'agenda/es';
 import config from '../config';
 const database_url = config.DATABASE_URL;
-import { emailAceptarCompania, emailRestablecerContraseña } from '../email';
+import { emailAceptarCompania, emailRestablecerContraseña, emailCambioContraseña } from '../email';
 import { sendMessage } from '../index';
 import { v4 } from 'uuid';
 
@@ -137,15 +137,42 @@ export const cambiarContraseñaPorToken = async (req, res) => {
             const passwordEncriptada = await Usuario.encriptarPassword(password);
             await Promise.all([
                 Usuario.findByIdAndUpdate(user._id, {
-                    password: passwordEncriptada
+                    password: passwordEncriptada,
+                    refreshTokens: []
                 }),
                 Token.findByIdAndDelete(tkn._id)
             ])
+            emailCambioContraseña({
+                destino: tkn.email
+            });
             return res.json({message: "Contraseña cambiada con exito!" });
         } else {
             await Token.findByIdAndDelete(tkn._id)
             return res.status(400).json({ message: "Token invalido, probablemente haya expirado" })
         }
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const cambiarContraseñaLogueado = async (req, res) => {
+    try {
+        const {password, passwordActual} = req.body;
+        if (!password || !passwordActual) {return res.status(400).json({ message: "Faltan 1 o mas campos requeridos" })}
+        if (password.length <= 6){return res.status(400).json({ message: "La contraseña debe ser mayor a 6 caracteres" })}
+        if (!await Usuario.verificarPassword(passwordActual, req.userData.password)) { return res.status(400).json({ message: "Contraseña actual incorrecta" }) }
+        if (await Usuario.verificarPassword(password, req.userData.password)) { return res.status(400).json({ message: "La contraseña nueva no puede ser igual a la anterior" }) }
+        await Promise.all([
+            Usuario.findByIdAndUpdate(req.userId, {
+                password: await Usuario.encriptarPassword(password),
+                refreshTokens: []
+            })
+        ])
+        emailCambioContraseña({
+            destino: req.userData.email
+        });
+        res.json({message: "Contraseña cambiada con exito! Por seguridad tendra que volver a iniciar sesión"})
+
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

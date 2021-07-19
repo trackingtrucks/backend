@@ -10,6 +10,8 @@
    3. [Eliminar todos los Refresh Token](#Eliminar-Todos-los-Refresh-Token)
 4. [Contraseña](#Contraseña)
    1. [Pedir email de restablecimiento (a.k.a. Olvide mi contraseña)](#Pedir-email-de-restablecimiento)
+   2. [Cambiar contraseña con token](#Cambiar-contraseña-por-token)
+   3. [Cambiar contraseña con contraseña vieja](#Cambiar-contraseña-estando-logueado)
 ---
 # Login
 Usado para obtener el token de un usuario registrado.

@@ -6,5 +6,6 @@ const rutas = Router();
 
 rutas.post('/', [auth.verifyToken, auth.onlyConductor], Data.subirDatosOBD)
 rutas.post('/2', Data.subirDatosOBD2)
+// rutas.get('/sample', Data.sample)
 
 export default rutas

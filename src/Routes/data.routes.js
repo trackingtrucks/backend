@@ -5,5 +5,6 @@ const rutas = Router();
 // import * as Data from '../Controllers/data.controller.js'
 
 rutas.post('/', [auth.verifyToken, auth.onlyConductor], Data.subirDatosOBD)
+rutas.post('/2', Data.subirDatosOBD2)
 
 export default rutas

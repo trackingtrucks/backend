@@ -26,10 +26,13 @@ app.use(cors());
 switch (config.NODE_ENV) {
     case 'development':
         app.use(morgan('dev'));
+        // app.use(require('./Libs/logSize').logSize);
         console.info("Iniciando servidor en modo 'development'");
         break;
     case 'production':
-        app.use(morgan('tiny'));
+        app.use(morgan('combined', {
+            skip: function (req, res) { return res.statusCode < 400 }
+        }));
         console.info("Iniciando servidor en modo 'production'");
         break;
 

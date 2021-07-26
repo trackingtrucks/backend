@@ -1,6 +1,8 @@
 import Usuario from '../Models/Usuario';
 import Vehiculo from '../Models/Vehiculo';
 import socketSend, { alertSend } from '../index.js';
+import { v4 } from 'uuid'
+import mongoose from 'mongoose'
 export const crear = async (req, res) => {
     try {
         const { marca, modelo, año, kmactual } = req.body;
@@ -68,12 +70,11 @@ export const desasignarConductor = async (req, res) => {
                 alertSend(req.userData.companyId, "alto", tarea.tipo, alerta, req.vehiculoId)
                 jsonRes.alerta = true;
                 jsonRes.alertaMsg = alerta;
-                Vehiculo.findByIdAndUpdate(req.vehiculoId, {
+                await Vehiculo.findByIdAndUpdate(req.vehiculoId, {
                     $push: {
-                        alertas: [{ tipo: tarea.tipo, nivel: "alto", cantidad: sePasoPor, quePasa: "sobra" }]
+                        alertas: [{ tipo: tarea.tipo, nivel: "alto", cantidad: sePasoPor, quePasa: "sobra", _id: v4().toString() }]
                     }
-                })
-
+                }, { new: true })
                 continue; //VER SI CON MAS DE UNA TAREA SE SALTA TODO O SOLO 1
             }
             if (kilometrajeActual >= tarea.cantidadUltima + tarea.cantidadCada - tarea.avisarAntes) {
@@ -85,9 +86,9 @@ export const desasignarConductor = async (req, res) => {
                 alertSend(req.userData.companyId, "medio", tarea.tipo, alerta, req.vehiculoId)
                 await Vehiculo.findByIdAndUpdate(req.vehiculoId, {
                     $push: {
-                        alertas: [{ tipo: tarea.tipo, nivel: "medio", cantidad: leFaltan, quePasa: "falta" }]
+                        alertas: [{ tipo: tarea.tipo, nivel: "medio", cantidad: leFaltan, quePasa: "falta", _id: v4().toString() }]
                     }
-                })
+                }, { new: true })
             }
             // })
         }
@@ -96,6 +97,41 @@ export const desasignarConductor = async (req, res) => {
             Usuario.findByIdAndUpdate(req.userId, { vehiculoActual: { id: null, fechaDesde: null }, $push: { vehiculosPasados: { id: req.vehiculoId, fechaDesde: conductorActual.vehiculoActual.fechaDesde, fechaHasta: new Date() } } })
         ])
         return res.json(jsonRes)
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
+export const eliminarAlertas = async (req, res) => {
+    try {
+        const { id } = req.body
+        if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({ message: "ID Invalida" });
+        if (!id) { return res.status(400).json({ message: 'No se especificó una ID' }) }
+        const vehiculoEnDB = await Vehiculo.findById(id).select("alertas").select("companyId");
+        if (!vehiculoEnDB) return res.status(404).json({ message: 'No se encontró un vehiculo' })
+        if (vehiculoEnDB.companyId !== req.userData.companyId) { return res.status(401).json({ message: "El vehiculo que estas solicitando no se encuentra en su empresa." }) }
+        await Vehiculo.findByIdAndUpdate(id, {
+            alertas: []
+        })
+        res.json({message: "Alertas eliminadas con exito!"})
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
+export const eliminarAlertaById = async (req, res) => {
+    try {
+        const { id, alerta } = req.body
+        if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({ message: "ID Invalida" });
+        if (!id || !alerta) { return res.status(400).json({ message: 'No se especificó una ID' }) }
+        const vehiculoEnDB = await Vehiculo.findById(id).select("alertas").select("companyId");
+        if (!vehiculoEnDB) return res.status(404).json({ message: 'No se encontró un vehiculo' })
+        if (vehiculoEnDB.companyId !== req.userData.companyId) { return res.status(401).json({ message: "El vehiculo que estas solicitando no se encuentra en su empresa." }) }
+        const arrayNuevo = vehiculoEnDB.alertas.filter((alert) => alert._id !== alerta);
+        const vehiculoActualizado = await Vehiculo.findByIdAndUpdate(id, {
+            alertas: arrayNuevo
+        }, {new: true})
+        return res.json({vehiculoActualizado})
     } catch (error) {
         res.status(500).json({ message: error.message })
     }

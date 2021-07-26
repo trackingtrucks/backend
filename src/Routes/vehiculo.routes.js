@@ -8,6 +8,9 @@ rutas.post('/', [auth.verifyToken, verify.existePatenteRegistrada, auth.isGestor
 rutas.put('/', [auth.verifyToken, auth.onlyConductor, verify.usuarioYaAsignado, verify.vehiculoYaAsignado], Vehiculo.asignarConductor)
 rutas.delete('/', [auth.verifyToken, auth.onlyConductor, verify.usuarioNoAsignado, verify.vehiculoNoAsignado], Vehiculo.desasignarConductor)
 
+rutas.delete('/alertas', [auth.verifyToken, auth.onlyGestor], Vehiculo.eliminarAlertas)
+rutas.delete('/alerta', [auth.verifyToken, auth.onlyGestor], Vehiculo.eliminarAlertaById)
+
 rutas.post('/tareas', [auth.verifyToken, auth.onlyGestor], Company.crearTarea)
 
 export default rutas

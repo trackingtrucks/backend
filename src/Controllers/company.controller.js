@@ -84,7 +84,7 @@ export const getUserByIdInsideCompany = async (req, res) => {
 export const getVehiculoByIdInsideCompany = async (req, res) => {
     try {
         if (!req.body.id) { return res.status(400).json({ message: 'No se especificó una ID' }) }
-        const vehiculoEnDB = await Vehiculo.findById(req.body.id);
+        const vehiculoEnDB = await Vehiculo.findById(req.body.id).populate("tareas");
         if (!vehiculoEnDB) return res.status(404).json({ message: 'No se encontró un vehiculo' })
         if (vehiculoEnDB.companyId !== req.userData.companyId) { return res.status(401).json({ message: "El vehiculo que estas solicitando no se encuentra en su empresa." }) }
         return res.json({ vehiculo: vehiculoEnDB })

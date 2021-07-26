@@ -61,22 +61,15 @@ const vehiculoSchema = new Schema({
         default: new Date(),
         immutable: true
     },
-    alertas: {
+    alertas: [{
         type: [Object],
-        tipo: {
-            enum: ['aceite', 'rueda', 'falla'],
-            type: String
-        },
-        nivel: {
-            enum: ['bajo', 'medio', 'alto'],
-            type: String
-        },
+        tipo: String,
+        nivel: String,
         cantidad: Number,
-        quePasa: {
-            enum: ['sobra', 'falta'],
-            type: String
-        }
-    }
+        quePasa: String,
+        _id: String
+    }]
+
 }, {
     timestamps: false,
     versionKey: false

@@ -56,7 +56,11 @@ export const desasignarConductor = async (req, res) => {
         socketSend(req.userData.companyId, "notificacion", msg);
         let jsonRes = { message: "Desasignado con éxito!", alerta: false };
         console.log(req.vehiculoId);
-        vehiculoActual.tareas && vehiculoActual.tareas.forEach(async (tarea) => {
+        // vehiculoActual.tareas && vehiculoActual.tareas.forEach(async (tarea) => {
+        for (let i = 0; i < vehiculoActual?.tareas?.length; i++) {
+            const tarea = vehiculoActual.tareas[i];
+
+            // }
             if (kilometrajeActual >= tarea.cantidadUltima + tarea.cantidadCada) {
                 //Alerta Urgente
                 const sePasoPor = kilometrajeActual - (tarea.cantidadUltima + tarea.cantidadCada);
@@ -70,7 +74,7 @@ export const desasignarConductor = async (req, res) => {
                     }
                 })
 
-                return; //VER SI CON MAS DE UNA TAREA SE SALTA TODO O SOLO 1
+                continue; //VER SI CON MAS DE UNA TAREA SE SALTA TODO O SOLO 1
             }
             if (kilometrajeActual >= tarea.cantidadUltima + tarea.cantidadCada - tarea.avisarAntes) {
                 //Alerta Media
@@ -85,7 +89,8 @@ export const desasignarConductor = async (req, res) => {
                     }
                 })
             }
-        })
+            // })
+        }
         await Promise.all([
             Vehiculo.findByIdAndUpdate(req.vehiculoId, { kmactual: kilometrajeActual, conductorActual: { id: null, fechaDesde: null }, $push: { conductoresPasados: { id: req.userId, fechaDesde: vehiculoActual.conductorActual.fechaDesde, fechaHasta: new Date() } } }),
             Usuario.findByIdAndUpdate(req.userId, { vehiculoActual: { id: null, fechaDesde: null }, $push: { vehiculosPasados: { id: req.vehiculoId, fechaDesde: conductorActual.vehiculoActual.fechaDesde, fechaHasta: new Date() } } })

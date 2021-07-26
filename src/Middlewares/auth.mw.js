@@ -59,11 +59,10 @@ export const verifyTokenWithPassword = async (req, res, next) => {
         const gen = decoded.gen
         const userEnDb = await Usuario.findById(req.userId).select("refreshTokens").select("password").select("email");
         req.userData = userEnDb;
-        const clone = userEnDb;
-        clone.refreshTokens.forEach((token, i) => {
-            clone.refreshTokens[i] = sha256(token + salt)
+        userEnDb.refreshTokens.forEach((token, i) => {
+            userEnDb.refreshTokens[i] = sha256(token + salt)
         })
-        if (!clone.refreshTokens.includes(gen)) return res.status(401).json({ message: 'Token revoked' });
+        if (!userEnDb.refreshTokens.includes(gen)) return res.status(401).json({ message: 'Token revoked' });
         if (!userEnDb) return res.status(404).json({ message: 'Usuario no encontrado' })
         next()
 

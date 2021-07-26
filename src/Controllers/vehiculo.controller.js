@@ -1,6 +1,6 @@
 import Usuario from '../Models/Usuario';
 import Vehiculo from '../Models/Vehiculo';
-import socketSend from '../index.js';
+import socketSend, { alertSend } from '../index.js';
 export const crear = async (req, res) => {
     try {
         const { marca, modelo, año, kmactual } = req.body;
@@ -29,8 +29,8 @@ export const crear = async (req, res) => {
 }
 
 export const asignarConductor = async (req, res) => {
-    try{
-        if(req.userData.companyId !== req.vehiculoData.companyId) return res.status(400).json({ message: 'El vehiculo al que te estás tratando de asignar no es de tu misma compania'})
+    try {
+        if (req.userData.companyId !== req.vehiculoData.companyId) return res.status(400).json({ message: 'El vehiculo al que te estás tratando de asignar no es de tu misma compania' })
         const msg = req.userData.nombre + " " + req.userData.apellido + " se ha subido al vehiculo " + req.body.patente.toUpperCase();
         socketSend(req.userData.companyId, "notificacion", msg);
         await Promise.all([
@@ -45,19 +45,52 @@ export const asignarConductor = async (req, res) => {
 }
 
 export const desasignarConductor = async (req, res) => {
-    try{
-        if(req.userData.companyId !== req.vehiculoData.companyId) return res.status(400).json({ message: 'El vehiculo del que te estás tratando de desasignar no es de tu misma compania'})
+    try {
+        if (req.userData.companyId !== req.vehiculoData.companyId) return res.status(400).json({ message: 'El vehiculo del que te estás tratando de desasignar no es de tu misma compania' })
+        const kilometrajeActual = req.body?.kilometrajeActual;
+        if (!kilometrajeActual) return res.status(400).json({ message: 'No se llenó el campo del kilometraje actual' });
+        const vehiculoActual = req.vehiculoData;
+        const conductorActual = req.userData;
+        if (kilometrajeActual < vehiculoActual.kmactual) { return res.status(400).json({ message: "El kilometraje nuevo no puede ser menor al anterior" }) }
         const msg = req.userData.nombre + " " + req.userData.apellido + " se ha bajado del vehiculo " + req.body.patente.toUpperCase();
         socketSend(req.userData.companyId, "notificacion", msg);
-        const kilometrajeActual = req.body?.kilometrajeActual;
-        if(!kilometrajeActual) return res.status(400).json({ message: 'No se llenó el campo del kilometraje actual'});
-        const vehiculoActual = req.vehiculoData
-        const conductorActual = req.userData;
+        let jsonRes = { message: "Desasignado con éxito!", alerta: false };
+        console.log(req.vehiculoId);
+        vehiculoActual.tareas && vehiculoActual.tareas.forEach(async (tarea) => {
+            if (kilometrajeActual >= tarea.cantidadUltima + tarea.cantidadCada) {
+                //Alerta Urgente
+                const sePasoPor = kilometrajeActual - (tarea.cantidadUltima + tarea.cantidadCada);
+                const alerta = `El vehiculo ha excedido el limite para el cambio de ${tarea.tipo} por ${sePasoPor}kms`
+                alertSend(req.userData.companyId, "alto", tarea.tipo, alerta, req.vehiculoId)
+                jsonRes.alerta = true;
+                jsonRes.alertaMsg = alerta;
+                Vehiculo.findByIdAndUpdate(req.vehiculoId, {
+                    $push: {
+                        alertas: [{ tipo: tarea.tipo, nivel: "alto", cantidad: sePasoPor, quePasa: "sobra" }]
+                    }
+                })
+
+                return; //VER SI CON MAS DE UNA TAREA SE SALTA TODO O SOLO 1
+            }
+            if (kilometrajeActual >= tarea.cantidadUltima + tarea.cantidadCada - tarea.avisarAntes) {
+                //Alerta Media
+                const leFaltan = (tarea.cantidadUltima + tarea.cantidadCada) - kilometrajeActual;
+                const alerta = `El vehiculo se está acercando al limite para el cambio de ${tarea.tipo} por ${leFaltan}kms`
+                jsonRes.alerta = true;
+                jsonRes.alertaMsg = alerta;
+                alertSend(req.userData.companyId, "medio", tarea.tipo, alerta, req.vehiculoId)
+                await Vehiculo.findByIdAndUpdate(req.vehiculoId, {
+                    $push: {
+                        alertas: [{ tipo: tarea.tipo, nivel: "medio", cantidad: leFaltan, quePasa: "falta" }]
+                    }
+                })
+            }
+        })
         await Promise.all([
-            Vehiculo.findByIdAndUpdate(req.vehiculoId, { kmactual: kilometrajeActual, conductorActual: { id: null, fechaDesde: null }, $push: { conductoresPasados: { id: req.userId, fechaDesde: vehiculoActual.conductorActual.fechaDesde, fechaHasta: new Date() } } }, { new: true }),
-            Usuario.findByIdAndUpdate(req.userId, { vehiculoActual: { id: null, fechaDesde: null }, $push: { vehiculosPasados: { id: req.vehiculoId, fechaDesde: conductorActual.vehiculoActual.fechaDesde, fechaHasta: new Date() } } }, { new: true })
+            Vehiculo.findByIdAndUpdate(req.vehiculoId, { kmactual: kilometrajeActual, conductorActual: { id: null, fechaDesde: null }, $push: { conductoresPasados: { id: req.userId, fechaDesde: vehiculoActual.conductorActual.fechaDesde, fechaHasta: new Date() } } }),
+            Usuario.findByIdAndUpdate(req.userId, { vehiculoActual: { id: null, fechaDesde: null }, $push: { vehiculosPasados: { id: req.vehiculoId, fechaDesde: conductorActual.vehiculoActual.fechaDesde, fechaHasta: new Date() } } })
         ])
-        return res.json({ message: "Desasignado con éxito!" })
+        return res.json(jsonRes)
     } catch (error) {
         res.status(500).json({ message: error.message })
     }

@@ -52,7 +52,7 @@ export const usuarioNoAsignado = async (req, res, next) => {
 
 export const vehiculoNoAsignado = async (req, res, next) => {
     const patente = req.body?.patente;
-    const vehiculo = await Vehiculo.findOne({ patente: formatPatente(patente) })
+    const vehiculo = await Vehiculo.findOne({ patente: formatPatente(patente) }).populate("tareas")
     if (!vehiculo) return res.status(400).json({ message: 'No se encontraron vehiculos con esa patente' })
     if (!vehiculo?.conductorActual?.id) return res.status(400).json({ message: 'Este vehiculo no esta asignado a ningun usuario' })
     req.vehiculoData = vehiculo;

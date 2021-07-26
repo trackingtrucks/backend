@@ -18,8 +18,9 @@ export const getAllData = async (req, res) => {
         Promise.all([
             Vehiculo.find({ companyId }).populate("tareas"),
             Turno.find({ companyId }),
-            Usuario.find({ companyId }).select("+agregadoPor")
-        ]).then(([vehiculos, turnos, usuarios]) => {
+            Usuario.find({ companyId }).select("+agregadoPor"),
+            Tarea.find({companyId})
+        ]).then(([vehiculos, turnos, usuarios, tareas]) => {
             let gestores = [];
             let conductores = [];
             usuarios.forEach(element => {
@@ -35,11 +36,36 @@ export const getAllData = async (req, res) => {
                 }
             });
             if (gestores.length === 0 && conductores.length === 0) return res.status(404).json({ message: "No se encontraron usuarios en esa companía" }); // Chequea si hay resultados en la busqueda
-            return res.json({ gestores, conductores, vehiculos, turnos });
+            return res.json({ gestores, conductores, vehiculos, turnos, tareas });
         })
 
     } catch (error) {
         res.status(500).json({ message: error.message }) //devulve si hay algun error
+    }
+}
+
+export const crearTarea = async (req, res) => {
+    try {
+        const { vehiculo, tipo, cantidadCada, cantidadUltima, avisarAntes } = req.body;
+        if (!vehiculo || !tipo || !cantidadCada || !cantidadUltima) { return res.status(400).json({ message: 'Faltan 1 o mas campos necesarios' }) }
+        const vehiculoEnDB = await Vehiculo.findById(vehiculo);
+        if (!vehiculoEnDB || vehiculoEnDB.companyId !== req.userData.companyId) { return res.status(400).json({ message: 'Vehiculo no encontrado' }) }
+        const nuevaTarea = new Tarea({
+            vehiculo,
+            tipo,
+            cantidadCada,
+            cantidadUltima,
+            avisarAntes,
+            companyId: req.userData.companyId
+        })
+        await Promise.all([
+            nuevaTarea.save(),
+            Vehiculo.findByIdAndUpdate(vehiculo, { $push: { tareas: [nuevaTarea._id] } }, { new: true })
+        ])
+        res.json({ nuevaTarea })
+    } catch (error) {
+        const msg = error.errors['tipo'].message ? error?.errors['tipo']?.message : error.message
+        res.status(400).json({ message: msg }) //devulve si hay algun error
     }
 }
 
@@ -67,28 +93,6 @@ export const getVehiculoByIdInsideCompany = async (req, res) => {
     }
 }
 
-export const crearTarea = async (req, res) => {
-    try {
-        const { vehiculo, tipo, cantidadCada, cantidadUltima } = req.body;
-        if (!vehiculo || !tipo || !cantidadCada || !cantidadUltima) { return res.status(400).json({ message: 'Faltan 1 o mas campos necesarios' }) }
-        const vehiculoEnDB = await Vehiculo.findById(vehiculo);
-        if (!vehiculoEnDB || vehiculoEnDB.companyId !== req.userData.companyId) { return res.status(400).json({ message: 'Vehiculo no encontrado' }) }
-        const nuevaTarea = new Tarea({
-            vehiculo,
-            tipo,
-            cantidadCada,
-            cantidadUltima
-        })
-        await Promise.all([
-            nuevaTarea.save(),
-            Vehiculo.findByIdAndUpdate(vehiculo, { $push: { tareas: [nuevaTarea._id] } }, { new: true })
-        ])
-        res.json({ nuevaTarea })
-    } catch (error) {
-        const msg = error.errors['tipo'].message ? error?.errors['tipo']?.message : error.message
-        res.status(400).json({ message: msg }) //devulve si hay algun error
-    }
-}
 export const nuevoForm = async (req, res) => {
     try {
         const {nombreEmpresa, email, descripcionUso, genteCompania} = req.body;

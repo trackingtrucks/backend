@@ -58,8 +58,7 @@ function procesar({ datos, chart = [] }) {
     const valores = Object.keys(datos).map(function (i) { return datos[i]; });
     Object.keys(datos).forEach((fecha, i) => {
         const timestamp = Date.parse(fecha);
-        // if ()
-        renameKey(datos, fecha, timestamp)
+        renameKey(datos, fecha, timestamp);
     })
     for (var i in datos) {
         chart.push({ x: parseInt(i, 10), y: datos[i] });

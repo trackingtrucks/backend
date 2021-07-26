@@ -13,7 +13,12 @@ const tareasSchema = new Schema({
         },
     },
     cantidadCada: Number,
-    cantidadUltima: Number
+    cantidadUltima: Number,
+    avisarAntes: Number,
+    companyId: {
+        select: false,
+        type: String
+    }
 }, {
     timestamps: false,
     versionKey: false

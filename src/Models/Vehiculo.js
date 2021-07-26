@@ -21,7 +21,7 @@ const vehiculoSchema = new Schema({
         type: String,
         required: true
     },
-    kmactual:{
+    kmactual: {
         type: Number,
         required: true
     },
@@ -49,17 +49,33 @@ const vehiculoSchema = new Schema({
         fechaHasta: {
             type: Date,
         },
-        type: {type: String}
+        type: { type: String }
     }],
     notaGestor: String,
     tareas: [{
         ref: "Tarea",
         type: Schema.Types.ObjectId
     }],
-    createdAt:{
+    createdAt: {
         type: Date,
         default: new Date(),
         immutable: true
+    },
+    alertas: {
+        type: [Object],
+        tipo: {
+            enum: ['aceite', 'rueda', 'falla'],
+            type: String
+        },
+        nivel: {
+            enum: ['bajo', 'medio', 'alto'],
+            type: String
+        },
+        cantidad: Number,
+        quePasa: {
+            enum: ['sobra', 'falta'],
+            type: String
+        }
     }
 }, {
     timestamps: false,

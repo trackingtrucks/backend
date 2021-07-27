@@ -56,33 +56,29 @@ export const desasignarConductor = async (req, res) => {
         if (kilometrajeActual < vehiculoActual.kmactual) { return res.status(400).json({ message: "El kilometraje nuevo no puede ser menor al anterior" }) }
         const msg = req.userData.nombre + " " + req.userData.apellido + " se ha bajado del vehiculo " + req.body.patente.toUpperCase();
         socketSend(req.userData.companyId, "notificacion", msg);
-        let jsonRes = { message: "Desasignado con éxito!", alerta: false };
-        console.log(req.vehiculoId);
-        // vehiculoActual.tareas && vehiculoActual.tareas.forEach(async (tarea) => {
+        let jsonRes = { message: "Desasignado con éxito!", alerta: false, alertas: [] };
         for (let i = 0; i < vehiculoActual?.tareas?.length; i++) {
             const tarea = vehiculoActual.tareas[i];
-
-            // }
             if (kilometrajeActual >= tarea.cantidadUltima + tarea.cantidadCada) {
                 //Alerta Urgente
                 const sePasoPor = kilometrajeActual - (tarea.cantidadUltima + tarea.cantidadCada);
                 const alerta = `El vehiculo ha excedido el limite para el cambio de ${tarea.tipo} por ${sePasoPor}kms`
                 alertSend(req.userData.companyId, "alto", tarea.tipo, alerta, req.vehiculoId)
                 jsonRes.alerta = true;
-                jsonRes.alertaMsg = alerta;
+                jsonRes.alertas.push(alerta);
                 await Vehiculo.findByIdAndUpdate(req.vehiculoId, {
                     $push: {
                         alertas: [{ tipo: tarea.tipo, nivel: "alto", cantidad: sePasoPor, quePasa: "sobra", _id: v4().toString() }]
                     }
                 }, { new: true })
-                continue; //VER SI CON MAS DE UNA TAREA SE SALTA TODO O SOLO 1
+                continue; 
             }
             if (kilometrajeActual >= tarea.cantidadUltima + tarea.cantidadCada - tarea.avisarAntes) {
                 //Alerta Media
                 const leFaltan = (tarea.cantidadUltima + tarea.cantidadCada) - kilometrajeActual;
                 const alerta = `El vehiculo se está acercando al limite para el cambio de ${tarea.tipo} por ${leFaltan}kms`
                 jsonRes.alerta = true;
-                jsonRes.alertaMsg = alerta;
+                jsonRes.alertas.push(alerta);
                 alertSend(req.userData.companyId, "medio", tarea.tipo, alerta, req.vehiculoId)
                 await Vehiculo.findByIdAndUpdate(req.vehiculoId, {
                     $push: {
@@ -90,7 +86,6 @@ export const desasignarConductor = async (req, res) => {
                     }
                 }, { new: true })
             }
-            // })
         }
         await Promise.all([
             Vehiculo.findByIdAndUpdate(req.vehiculoId, { kmactual: kilometrajeActual, conductorActual: { id: null, fechaDesde: null }, $push: { conductoresPasados: { id: req.userId, fechaDesde: vehiculoActual.conductorActual.fechaDesde, fechaHasta: new Date() } } }),

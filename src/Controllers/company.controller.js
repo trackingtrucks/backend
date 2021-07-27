@@ -4,7 +4,8 @@ import Usuario from '../Models/Usuario';
 import Formulario from '../Models/Formulario';
 import Tarea from '../Models/Tarea';
 import Turno from '../Models/Turno';
-import {emailEnvioFormulario} from '../email';
+import mongoose from 'mongoose';
+import { emailEnvioFormulario } from '../email';
 /*
 ############
 # ACCIONES #
@@ -19,7 +20,7 @@ export const getAllData = async (req, res) => {
             Vehiculo.find({ companyId }).populate("tareas"),
             Turno.find({ companyId }),
             Usuario.find({ companyId }).select("+agregadoPor"),
-            Tarea.find({companyId})
+            Tarea.find({ companyId })
         ]).then(([vehiculos, turnos, usuarios, tareas]) => {
             let gestores = [];
             let conductores = [];
@@ -69,6 +70,56 @@ export const crearTarea = async (req, res) => {
     }
 }
 
+export const editarTarea = async (req, res) => {
+    try {
+        const { id } = req.body;
+        if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({ message: "ID Invalida" });
+        if (!id) { return res.status(400).json({ message: 'No se especificó una ID' }) }
+        const tareaEnDB = await Tarea.findById(id).select("+companyId");
+        if (!tareaEnDB) return res.status(404).json({ message: 'No se encontró una tarea' })
+        const { cantidadCada = tareaEnDB.cantidadCada, cantidadUltima = tareaEnDB.cantidadUltima, avisarAntes = tareaEnDB.avisarAntes } = req.body.data; // pongo valores default
+        if (tareaEnDB.companyId !== req.userData.companyId) { return res.status(401).json({ message: "La tarea que estas solicitando no se encuentra en su empresa." }) }
+        const tareaActualizada = await Tarea.findByIdAndUpdate(id, {
+            cantidadCada,
+            cantidadUltima,
+            avisarAntes
+        }, {
+            new: true
+        })
+        return res.json(tareaActualizada)
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+export const getTareaById = async (req, res) => {
+    try {
+        const { id } = req.body;
+        if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({ message: "ID Invalida" });
+        if (!id) { return res.status(400).json({ message: 'No se especificó una ID' }) }
+        const tareaEnDB = await Tarea.findById(id).select("+companyId");
+        if (!tareaEnDB) return res.status(404).json({ message: 'No se encontraron tareas con esa ID' })
+        if (tareaEnDB.companyId !== req.userData.companyId) { return res.status(401).json({ message: "La tarea que estas solicitando no se encuentra en su empresa." }) }
+        res.json(tareaEnDB)
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+export const getTareasByVehiculo = async (req, res) => {
+    try {
+        const { vehiculo } = req.body;
+        if (!mongoose.Types.ObjectId.isValid(vehiculo)) return res.status(404).json({ message: "ID Invalida" });
+        if (!vehiculo) { return res.status(400).json({ message: 'No se especificó una ID' }) }
+        const tareas = await Tarea.find({ vehiculo: vehiculo, companyId: req.userData.companyId }).select("+companyId")
+        if (!tareas) return res.status(404).json({ message: 'No se encontraron tareas asignadas para ese vehiculo' })
+        res.json(tareas)
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 export const getUserByIdInsideCompany = async (req, res) => {
     try {
         if (!req.body.id) { return res.status(400).json({ message: 'No se especificó una ID' }) }
@@ -95,19 +146,19 @@ export const getVehiculoByIdInsideCompany = async (req, res) => {
 
 export const nuevoForm = async (req, res) => {
     try {
-        const {nombreEmpresa, email, descripcionUso, genteCompania} = req.body;
-        if (!nombreEmpresa || !email || !descripcionUso || !genteCompania){ return res.status(400).json({ message: 'Faltan 1 o mas campos necesarios' }) }
+        const { nombreEmpresa, email, descripcionUso, genteCompania } = req.body;
+        if (!nombreEmpresa || !email || !descripcionUso || !genteCompania) { return res.status(400).json({ message: 'Faltan 1 o mas campos necesarios' }) }
         const form = new Formulario({
             nombreEmpresa,
             email,
-            descripcionUso, 
+            descripcionUso,
             genteCompania
         })
         const formEnDB = await form.save();
         emailEnvioFormulario({
             destino: email
         })
-        return res.json({message: "Gracias por comunicarse con nosotros, estaremos en contacto con usted", form: formEnDB})
+        return res.json({ message: "Gracias por comunicarse con nosotros, estaremos en contacto con usted", form: formEnDB })
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

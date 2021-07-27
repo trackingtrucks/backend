@@ -12,5 +12,7 @@ rutas.delete('/alertas', [auth.verifyToken, auth.onlyGestor], Vehiculo.eliminarA
 rutas.delete('/alerta', [auth.verifyToken, auth.onlyGestor], Vehiculo.eliminarAlertaById)
 
 rutas.post('/tareas', [auth.verifyToken, auth.onlyGestor], Company.crearTarea)
-
+rutas.patch('/tarea', [auth.verifyToken, auth.onlyGestor], Company.editarTarea)
+rutas.get('/tarea', [auth.verifyToken, auth.onlyGestor], Company.getTareaById)
+rutas.get('/tareas', [auth.verifyToken, auth.onlyGestor], Company.getTareasByVehiculo)
 export default rutas

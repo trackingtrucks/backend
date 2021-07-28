@@ -7,6 +7,7 @@ rutas.post('/login',[ verify.emailIsValid], Auth.login);
 rutas.post('/register', [verify.emailIsValid, auth.verifyCodigoRegistro, verify.existeUsuarioOEmail], Auth.registrar);
 
 rutas.get('/token', Auth.newAccessToken);
+// rutas.get('/refreshtoken',  Auth.newRefreshToken);
 rutas.delete('/token', [auth.verifyToken], Auth.logout)
 rutas.delete('/tokens', [auth.verifyTokenWithPassword], Auth.logoutAllDevices)
 

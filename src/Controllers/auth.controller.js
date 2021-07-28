@@ -71,7 +71,6 @@ export const login = async (req, res) => {
     //creo el token de login y de refresh
     const refreshToken = generateRefreshToken(userEnDB._id)
     const accessToken = generateAccessToken(userEnDB._id, refreshToken)
-    
     const cantidadRefreshs = userEnDB?.refreshTokens?.length + 1;
     const response = await Usuario.findByIdAndUpdate(userEnDB._id, { $push: { refreshTokens: [refreshToken] } }, { new: true })
     response.sesionesActivas = cantidadRefreshs;
@@ -80,6 +79,21 @@ export const login = async (req, res) => {
     res.json({ perfil: response, accessToken, refreshToken, ATExpiresIn: Date.now() + token_expires * 1000, RTExpiresIn: Date.now() + refresh_expires * 1000 })//envio como respuesta el token, que va a durar 12hs
 }
 
+
+export const newRefreshToken = async (req, res) => {
+    const refreshToken = req.headers["x-refresh-token"]
+    try {
+        const decoded = verifyRefreshToken(refreshToken)
+        // if (req.userId !== decoded.id) { return res.status(401).json('._.') }
+        await Usuario.findByIdAndUpdate(decoded.id, { $pullAll: { refreshTokens: [refreshToken] } }) //elimino SOLO ese refresh token del usuario que se esta cambiando
+        const newRefreshToken = generateRefreshToken(decoded.id)
+        await Usuario.findByIdAndUpdate(decoded.id, { $push: { refreshTokens: [newRefreshToken] } }, { new: true })
+        const newAccessToken = generateAccessToken(decoded.id, newRefreshToken)
+        res.json({ refreshToken: newRefreshToken, accessToken: newAccessToken, ATExpiresIn: Date.now() + token_expires * 1000, RTExpiresIn: Date.now() + refresh_expires * 1000 })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
 
 export const logout = async (req, res) => {
     try {
@@ -99,7 +113,7 @@ export const newAccessToken = async (req, res) => {
         const decoded = verifyRefreshToken(refreshToken) //chequeo si es valido y guardo la data
         const usuarioEnDb = await Usuario.findById(decoded.id).select("refreshTokens") //busco el usuario en la base de datos mediante la id que decodeé arriba. No lo hice en el middleware ya que no le pido al usuario un accesstoken, asi que no puedo acceder a la req.userData
         if (!usuarioEnDb.refreshTokens.includes(refreshToken)) return res.status(403).json({ message: 'Refresh token revoked' }) //chequea si el refresh token está habilitado por el usuario y no fue revocado (caso que se desloguee)
-        res.json({ accessToken: generateAccessToken(decoded.id, refreshToken), ATExpiresIn: Date.now() + token_expires * 1000 }) //envio el nuevo accessToken
+        res.json({ accessToken: generateAccessToken(decoded.id, refreshToken), ATExpiresIn: Date.now() + token_expires * 1000, RTExpiresIn: Date.now() }) //envio el nuevo accessToken
     } catch (error) {
         res.status(500).json({ message: error.message })
     }

@@ -1,5 +1,6 @@
 import cron from 'cron';
 import {sendMessage} from '../index'
+import {emailTurno} from '../email'
 // import Tarea from '../Models/Tarea'
 
 var actualCronJobs = {}
@@ -13,6 +14,9 @@ var dayTable = {
     6: "Saturday"
 }
 
+export async function notificarTurno({fecha, destino}){
+    var job = new cron.CronJob(fecha, function(){emailTurno({destino})}, null, true)
+}
 
 
 function triggerClass(body, id){

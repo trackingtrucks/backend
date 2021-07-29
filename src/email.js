@@ -111,3 +111,18 @@ export async function emailCambioContraseña({destino}){
     console.error(error);
   }
 }
+
+export async function emailTurno({destino}){
+  try {
+    await enviarMail({
+      para: destino,
+      subject: `Tiene un turno pronto`,
+      html: `
+      <h1>Hola!</h1>
+      <p>Este es un mail para recordarte que dentro de dos días tendrás un turno, así que asegurate de tener listo tu camión</p>
+      `
+    });
+  } catch (error) {
+    console.error(error);
+  }
+}

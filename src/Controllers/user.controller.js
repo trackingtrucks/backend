@@ -6,6 +6,7 @@ import { Agenda } from 'agenda/es';
 import config from '../config';
 const database_url = config.DATABASE_URL;
 import { emailAceptarCompania, emailRestablecerContraseña, emailCambioContraseña } from '../email';
+import { notificarTurno } from '../Libs/cronJobs';
 import { sendMessage } from '../index';
 import { v4 } from 'uuid';
 
@@ -88,13 +89,13 @@ export const asignarTurno = async (req, res) => {
             Usuario.findByIdAndUpdate(req.conductor._id, { $push: { turnosPendientes: { id: turno._id, fechaAsignado: new Date() } } }, { new: true }),
             Turno.findByIdAndDelete(turno._id)
         ])
-        /*var fecha = turno.fechaYhora;
+        let fecha = turno.fechaYhora;
         fecha.setDate( fecha.getDate() - 2 );
-        var fechaUsada = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate(), 9, 0, 0);*/
-        //agenda.define("mandar notificacion", async (job) => {
-        //})                    ***ARREGLAR***
-        //await agenda.start();
-        //await agenda.schedule("in 5 minutes", "mandar notificacion");
+        let fechaUsada = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate(), 9, 0, 0);
+        notificarTurno({
+            fecha: fechaUsada,
+            destino: req.conductor.email
+        })
         return res.json({ message: 'Turno asignado con exito' });
     } catch (error) {
         return res.status(500).json({ message: error.message });

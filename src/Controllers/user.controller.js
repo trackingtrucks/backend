@@ -172,8 +172,19 @@ export const cambiarContraseñaLogueado = async (req, res) => {
         emailCambioContraseña({
             destino: req.userData.email
         });
-        res.json({message: "Contraseña cambiada con exito! Por seguridad tendra que volver a iniciar sesión"})
+        return res.json({message: "Contraseña cambiada con exito! Por seguridad tendra que volver a iniciar sesión"})
 
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const editarUsuario = (req, res) => {
+    try {
+        const { nombre, apellido, email } = req.body;
+        if(!nombre || !apellido || !email) return res.status(400).json({ message: "Faltan 1 o mas campos requeridos"})
+        await Usuario.findByIdAndUpdate(req.userData._id, {nombre, apellido, email});
+        return res.status(200).json({ message: "Datos cambiados con exito!" })
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

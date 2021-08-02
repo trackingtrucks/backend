@@ -13,8 +13,8 @@ rutas.post("/restablecer", [verify.emailIsValid], Users.restablecerContaseña);
 
 rutas.patch("/cambiar/contrasena/token", Users.cambiarContraseñaPorToken);
 rutas.patch("/cambiar/contrasena/logueado", [auth.verifyTokenWithPassword], Users.cambiarContraseñaLogueado);
-rutas.patch("/editarUsuario", [verify.emailIsValid, verify.existeUsuarioOEmail], Users.editarUsuario)
+rutas.patch("/editarUsuario", [auth.verifyToken, verify.emailIsValid, verify.existeUsuarioOEmail], Users.editarUsuario);
 
-rutas.put('/asignarTurno', [auth.verifyToken, auth.onlyGestor, verify.conductorNoEncontrado, verify.turnoNoCreado], Users.asignarTurno)
+rutas.put('/asignarTurno', [auth.verifyToken, auth.onlyGestor, verify.conductorNoEncontrado, verify.turnoNoCreado], Users.asignarTurno);
 
 export default rutas

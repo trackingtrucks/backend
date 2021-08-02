@@ -181,9 +181,9 @@ export const cambiarContraseñaLogueado = async (req, res) => {
 
 export const editarUsuario = async (req, res) => {
     try {
-        const { nombre, apellido, email } = req.body;
-        if(!nombre || !apellido || !email) return res.status(400).json({ message: "Faltan 1 o mas campos requeridos"})
-        const nuevosDatos = await Usuario.findByIdAndUpdate(req.userData._id, {nombre, apellido, email});
+        const { nombre, apellido } = req.body;
+        if(!nombre || !apellido ) return res.status(400).json({ message: "Faltan 1 o mas campos requeridos"})
+        const nuevosDatos = await Usuario.findByIdAndUpdate(req.userData._id, {nombre, apellido});
         return res.status(200).json({ message: "Datos cambiados con exito!" })
     } catch (error) {
         return res.status(500).json({ message: error.message });

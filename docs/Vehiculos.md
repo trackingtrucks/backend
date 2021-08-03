@@ -100,7 +100,6 @@ Usado para desasignarse de un vehiculo que está dentro de la compania
 
 ```json
 {
-    "patente": "[patente del vehiculo]",
     "kilometrajeActual": "[Numero del kilometraje actual]"
 }
 ```

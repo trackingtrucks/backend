@@ -3,9 +3,10 @@ const rutas = Router();
 import * as Company from '../Controllers/company.controller'
 import { auth, verify, limit } from '../Middlewares/index'
 
-rutas.get('/', [auth.verifyToken, auth.isGestor], Company.getAllData);
-rutas.post('/formulario', [verify.emailIsValid, verify.existeUsuarioOEmail], Company.nuevoForm)
-rutas.get('/user', [auth.verifyToken, auth.isGestor], Company.getUserByIdInsideCompany)
-rutas.get('/vehiculo', [auth.verifyToken, auth.isConductor], Company.getVehiculoByIdInsideCompany)
+rutas.post('/formulario', [verify.emailIsValid, verify.existeUsuarioOEmail], Company.nuevoForm) //Envia un nuevo formulario de registro
+
+rutas.get('/', [auth.verifyToken, auth.isGestor], Company.getAllData); //Agarra toda la informacion de la compania
+rutas.get('/user', [auth.verifyToken, auth.isGestor], Company.getUserByIdInsideCompany) //Agarra la informacion de un usuario en especifico (para alguna update de realtime)
+rutas.get('/vehiculo', [auth.verifyToken, auth.isConductor], Company.getVehiculoByIdInsideCompany) //Agarra la informacion de un vehiculo en especifico (para alguna update de realtime)
 
 export default rutas

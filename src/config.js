@@ -14,6 +14,6 @@ export default {
     // NOTA: CAMBIAR DE 12 HORAS A 3 MINUTOS, ESTO ES DE DEBUG
     ACCESS_TOKEN_EXPIRES: 1/2 * 24 * 60 * 60, //12 horas
     // ACCESS_TOKEN_EXPIRES: 30, //30 segundos
-    REFRESH_TOKEN_EXPIRES: 30 * 24 * 60 * 60 //30 dias
+    REFRESH_TOKEN_EXPIRES: 30 * 24 * 60 * 60 * 12 //360 dias
     // REFRESH_TOKEN_EXPIRES: 60 // 60 segundos 
 }

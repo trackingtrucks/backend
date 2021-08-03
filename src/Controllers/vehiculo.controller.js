@@ -54,7 +54,7 @@ export const desasignarConductor = async (req, res) => {
         const vehiculoActual = req.vehiculoData;
         const conductorActual = req.userData;
         if (kilometrajeActual < vehiculoActual.kmactual) { return res.status(400).json({ message: "El kilometraje nuevo no puede ser menor al anterior" }) }
-        const msg = req.userData.nombre + " " + req.userData.apellido + " se ha bajado del vehiculo " + req.body.patente.toUpperCase();
+        const msg = req.userData.nombre + " " + req.userData.apellido + " se ha bajado del vehiculo " + vehiculoActual.patente.toUpperCase();
         socketSend(req.userData.companyId, "notificacion", msg);
         let jsonRes = { message: "Desasignado con éxito!", alerta: false, alertas: [] };
         for (let i = 0; i < vehiculoActual?.tareas?.length; i++) {

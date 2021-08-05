@@ -12,6 +12,32 @@ import { v4 } from 'uuid';
 
 const agenda = new Agenda({ db: { address: database_url, options: { useUnifiedTopology: true } } });
 
+
+
+export const getUserData = async (req, res) => {
+    try {
+        // return res.json(req.userData)
+        return res.json({
+            perfil: {
+                nombre: req.userData.nombre,
+                apellido: req.userData.apellido,
+                email: req.userData.email, 
+                rol: req.userData.rol
+            },
+            sesionesActivas: req.userData.refreshTokens.length,
+            vehiculo:{
+                patente: req.userData.vehiculoActual.id.patente,
+                marca: req.userData.vehiculoActual.id.marca,
+                modelo: req.userData.vehiculoActual.id.modelo,
+                kilometraje: req.userData.vehiculoActual.id.kmactual,
+                alertas: req.userData.vehiculoActual.id.alertas
+            }
+        })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
 export const codigoConductor = async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ message: 'No se ha especificado un email para recibir el codigo' });

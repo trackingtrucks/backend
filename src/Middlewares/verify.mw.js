@@ -70,7 +70,10 @@ export const fechaValida = async (req, res, next) => {
     var response = req.body?.fechaYhora; // guardo la fecha que me pasan
     if(!response) return res.status(400).json({ message: 'Hay campos necesarios vacios'}); // verifico si en el campo de fechaYhora me pasaron algo
     var fecha = new Date(response); // guardo la fecha que me pasaron como Date
-    if(fecha.getTime() <= currentDate.getTime()) return res.status(400).json({ message: 'La fecha no es valida'}); // verifico que la fecha que me pasaron no sea anterior a la fecha actual
+    if(fecha.getTime() <= currentDate.getTime()) return res.status(400).json({ message: 'La fecha no es valida, porque es en el pasado'}); // verifico que la fecha que me pasaron no sea anterior a la fecha actual
+    fecha.setDate( fecha.getDate() - 2 );
+    let fechaUsada = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate(), 9, 0, 0);
+    if(fechaUsada.getTime() <= currentDate.getTime()) return res.status(400).json({ message: 'La fecha no es valida para luego ser usada para avisar al conductor'})
     req.fecha = fecha;
     next();
 }

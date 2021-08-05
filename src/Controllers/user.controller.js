@@ -70,7 +70,8 @@ export const crearTurno = async (req, res) => {
             fechaYhora: fechaYhora.toLocaleString(),
             nombreVendedor,
             codigoOrdenDeCompra,
-            companyId
+            companyId,
+            condicion: "No asignado"
         });
         const turnoNuevo = await nuevoTurno.save();
         return res.status(200).json({
@@ -85,9 +86,10 @@ export const crearTurno = async (req, res) => {
 export const asignarTurno = async (req, res) => {
     try {
         const turno = req.turno;
+        if(turno.condicion == "Asignado") return res.status(400).json({ message: "Este turno ya esta asignado" })
         await Promise.all([
             Usuario.findByIdAndUpdate(req.conductor._id, { $push: { turnosPendientes: { id: turno._id, fechaAsignado: new Date() } } }, { new: true }),
-            Turno.findByIdAndDelete(turno._id)
+            Turno.findByIdAndUpdate(turno._id, {condicion: "Asignado" })
         ])
         let fecha = turno.fechaYhora;
         fecha.setDate( fecha.getDate() - 2 );

@@ -38,9 +38,11 @@ export const asignarConductor = async (req, res) => {
         await Promise.all([
             Vehiculo.findByIdAndUpdate(req.vehiculoId, { conductorActual: { id: req.userId, fechaDesde: new Date() } }, { new: true }),
             Usuario.findByIdAndUpdate(req.userId, { vehiculoActual: { id: req.vehiculoId, fechaDesde: new Date() } }, { new: true })
-        ])
+        ]).then(([vehiculoActualizado])=> {
+        return res.json({ message: "Asignado con éxito!", marca: vehiculoActualizado.marca, modelo: vehiculoActualizado.modelo, kilometraje: vehiculoActualizado.kmactual })
+    })
         // return res.json({vehiculoEditado, usuarioEditado})
-        return res.json({ message: "Asignado con éxito!" })
+        // return res.json({ message: "Asignado con éxito!" })
     } catch (error) {
         res.status(500).json({ message: error.message })
     }

@@ -2,6 +2,7 @@
 ## **Indice**
 
 1. [Crear turno](#Crear-Turno)
+2. [Asignar turno](#Asignar-Turno)
 
 ---
 # Crear Turno
@@ -44,3 +45,37 @@ x-access-token: <accessToken de usuario>
 }
 ```
 ---
+# Asignar Turno
+Usado para asignar turnos a los diferentes conductores
+
+**URL** : `/user/asignarTurno`
+
+**Metodo** : `PUT`
+
+**Autenticacion requerida**: SI
+
+**Rol requerido**: GESTOR
+
+**Parametros de la solicitud (headers)**
+
+```txt
+Content-type: application/json
+x-access-token: <accessToken de usuario>
+```
+
+**Parametros de la solicitud (body)**
+
+```json
+{
+  "idConductor": "[id del conductor al que se le quiere asignar el turno]",
+  "codigoDeTurno": "[codigo del turno que se quiere asignar]"
+}
+```
+
+### Respuesta del servidor
+
+```json
+{
+  "message": "Turno asignado con exito"
+}
+```

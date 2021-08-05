@@ -20,6 +20,9 @@ const turnoSchema = new Schema({
     companyId: {
         type: String,
         required: true
+    },
+    condicion: {
+        type: String
     }
 }, {
     timestamps: false,

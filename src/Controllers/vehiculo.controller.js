@@ -1,6 +1,6 @@
 import Usuario from '../Models/Usuario';
 import Vehiculo from '../Models/Vehiculo';
-import socketSend, { alertSend } from '../index.js';
+import { alertSend, socketSend } from '../index.js';
 import { v4 } from 'uuid'
 import mongoose from 'mongoose'
 export const crear = async (req, res) => {

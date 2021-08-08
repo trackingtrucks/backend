@@ -53,7 +53,7 @@ import Usuario from './Models/Usuario'
 
 
 
-export default function socketSend(roomId, key, message) {
+export function socketSend(roomId, key, message) {
     console.info("enviando '" + key + "' a la sala '" + roomId + "' con el contenido '" + message + "'");
     io.to(roomId).emit(key, message);
 }

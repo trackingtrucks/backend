@@ -50,7 +50,7 @@ export const usuarioNoAsignado = async (req, res, next) => {
 }
 
 export const vehiculoNoAsignado = async (req, res, next) => {
-    const vehiculo = await Vehiculo.findById( req.vehiculoId ).populate("tareas")
+    const vehiculo = await Vehiculo.findById( req.vehiculoId ).populate("tareas").populate("alertas")
     if (!vehiculo?.conductorActual?.id) return res.status(400).json({ message: 'Este vehiculo no esta asignado a ningun usuario' })
     req.vehiculoData = vehiculo;
     next();

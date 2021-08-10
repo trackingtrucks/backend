@@ -4,6 +4,7 @@ import Usuario from '../Models/Usuario';
 import Formulario from '../Models/Formulario';
 import Tarea from '../Models/Tarea';
 import Turno from '../Models/Turno';
+import Alerta from '../Models/Alerta';
 import mongoose from 'mongoose';
 import { emailEnvioFormulario } from '../email';
 /*
@@ -17,11 +18,12 @@ export const getAllData = async (req, res) => {
         const companyId = req.userData.companyId // Agarra la id de la compania pedida.
         if (!companyId) return res.status(400).json({ message: 'No se especificó una ID' })   //Chequea que se haya mandado una companyid en al request (seria bastante raro ya que la persona en si esta registrada)    
         Promise.all([
-            Vehiculo.find({ companyId }).populate("tareas"),
+            Vehiculo.find({ companyId }).populate("tareas").populate("alertas"),
             Turno.find({ companyId }),
             Usuario.find({ companyId }).select("+agregadoPor"),
-            Tarea.find({ companyId })
-        ]).then(([vehiculos, turnos, usuarios, tareas]) => {
+            Tarea.find({ companyId }),
+            Alerta.find({ companyId }),
+        ]).then(([vehiculos, turnos, usuarios, tareas, alertas]) => {
             let gestores = [];
             let conductores = [];
             usuarios.forEach(element => {
@@ -37,7 +39,7 @@ export const getAllData = async (req, res) => {
                 }
             });
             if (gestores.length === 0 && conductores.length === 0) return res.status(404).json({ message: "No se encontraron usuarios en esa companía" }); // Chequea si hay resultados en la busqueda
-            return res.json({ gestores, conductores, vehiculos, turnos, tareas });
+            return res.json({ gestores, conductores, vehiculos, turnos, tareas, alertas });
         })
 
     } catch (error) {
@@ -51,6 +53,8 @@ export const crearTarea = async (req, res) => {
         if (!vehiculo || !tipo || !cantidadCada || !cantidadUltima) { return res.status(400).json({ message: 'Faltan 1 o mas campos necesarios' }) }
         const vehiculoEnDB = await Vehiculo.findById(vehiculo);
         if (!vehiculoEnDB || vehiculoEnDB.companyId !== req.userData.companyId) { return res.status(400).json({ message: 'Vehiculo no encontrado' }) }
+        if (cantidadUltima > vehiculoEnDB.kmactual) return res.status(400).json({message: `La ultima vez que se realizo la tarea no puede ser menor a ${vehiculoEnDB.kmactual}kms`})
+        if (cantidadCada < avisarAntes) return res.status(400).json({message: "El aviso no puede ser mayor a la cantidad de cuando se realiza la tarea"})
         const nuevaTarea = new Tarea({
             vehiculo,
             tipo,
@@ -63,7 +67,7 @@ export const crearTarea = async (req, res) => {
             nuevaTarea.save(),
             Vehiculo.findByIdAndUpdate(vehiculo, { $push: { tareas: [nuevaTarea._id] } }, { new: true })
         ])
-        res.json({ nuevaTarea })
+        res.json({ nuevaTarea, message: "Tarea creada con exito!" })
     } catch (error) {
         const msg = error.errors['tipo'].message ? error?.errors['tipo']?.message : error.message
         res.status(400).json({ message: msg }) //devulve si hay algun error

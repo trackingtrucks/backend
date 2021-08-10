@@ -62,12 +62,8 @@ const vehiculoSchema = new Schema({
         immutable: true
     },
     alertas: [{
-        type: [Object],
-        tipo: String,
-        nivel: String,
-        cantidad: Number,
-        quePasa: String,
-        _id: String
+        ref: "Alerta",
+        type: Schema.Types.ObjectId
     }]
 
 }, {

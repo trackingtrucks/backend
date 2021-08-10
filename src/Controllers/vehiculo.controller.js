@@ -1,5 +1,6 @@
 import Usuario from '../Models/Usuario';
 import Vehiculo from '../Models/Vehiculo';
+import Alerta from '../Models/Alerta';
 import { alertSend, socketSend } from '../index.js';
 import { v4 } from 'uuid'
 import mongoose from 'mongoose'
@@ -38,9 +39,9 @@ export const asignarConductor = async (req, res) => {
         await Promise.all([
             Vehiculo.findByIdAndUpdate(req.vehiculoId, { conductorActual: { id: req.userId, fechaDesde: new Date() } }, { new: true }),
             Usuario.findByIdAndUpdate(req.userId, { vehiculoActual: { id: req.vehiculoId, fechaDesde: new Date() } }, { new: true })
-        ]).then(([vehiculoActualizado])=> {
-        return res.json({ message: "Asignado con éxito!", marca: vehiculoActualizado.marca, modelo: vehiculoActualizado.modelo, kilometraje: vehiculoActualizado.kmactual })
-    })
+        ]).then(([vehiculoActualizado]) => {
+            return res.json({ message: "Asignado con éxito!", marca: vehiculoActualizado.marca, modelo: vehiculoActualizado.modelo, kilometraje: vehiculoActualizado.kmactual })
+        })
         // return res.json({vehiculoEditado, usuarioEditado})
         // return res.json({ message: "Asignado con éxito!" })
     } catch (error) {
@@ -59,7 +60,100 @@ export const desasignarConductor = async (req, res) => {
         const msg = req.userData.nombre + " " + req.userData.apellido + " se ha bajado del vehiculo " + vehiculoActual.patente.toUpperCase();
         socketSend(req.userData.companyId, "notificacion", msg);
         let jsonRes = { message: "Desasignado con éxito!", alerta: false, alertas: [] };
-        for (let i = 0; i < vehiculoActual?.tareas?.length; i++) {
+        for (let i = 0; i < vehiculoActual?.tareas?.length; i++) { //recorriendo las tareas del vehiculo.
+            const tarea = vehiculoActual.tareas[i];
+            if (kilometrajeActual >= tarea.cantidadUltima + tarea.cantidadCada) {
+                //Alerta Urgente
+                let existe = false;
+                const sePasoPor = kilometrajeActual - (tarea.cantidadUltima + tarea.cantidadCada);
+                const alertaMsg = `El vehiculo ha excedido el limite para el cambio de ${tarea.tipo} por ${sePasoPor}kms`
+                alertSend(req.userData.companyId, "alto", tarea.tipo, alertaMsg, req.vehiculoId)
+                jsonRes.alerta = true;
+                jsonRes.alertas.push(alertaMsg);
+                for (var j = 0; j < vehiculoActual.alertas.length; j++) {
+                    const alerta = vehiculoActual.alertas[j];
+                    if (alerta.tipo == tarea.tipo) {
+                        existe = true;
+                        console.log(alerta._id);
+                        await Alerta.findByIdAndUpdate(alerta._id, {
+                            cantidad: sePasoPor,
+                            nivel: "alto",
+                            quePasa: "sobra" 
+                        })
+                        break;
+                    }
+                }
+                if (existe) continue;
+                const nuevaAlerta = new Alerta({
+                    tipo: tarea.tipo, nivel: "alto", cantidad: sePasoPor, quePasa: "sobra", companyId: req.userData.companyId, vehiculo: req.vehiculoId
+                })
+                Promise.all([
+                    Vehiculo.findByIdAndUpdate(req.vehiculoId, {
+                        $push: {
+                            alertas: [nuevaAlerta._id]
+                        }
+                    }, { new: true }),
+                    nuevaAlerta.save()
+                ])
+                continue;
+            }
+            if (kilometrajeActual >= tarea.cantidadUltima + tarea.cantidadCada - tarea.avisarAntes) {
+                //Alerta Media
+                let existe = false;
+                const leFaltan = (tarea.cantidadUltima + tarea.cantidadCada) - kilometrajeActual;
+                const alerta = `El vehiculo se está acercando al limite para el cambio de ${tarea.tipo} por ${leFaltan}kms`
+                alertSend(req.userData.companyId, "medio", tarea.tipo, alerta, req.vehiculoId)
+                jsonRes.alerta = true;
+                jsonRes.alertas.push(alerta);
+                for (var j = 0; j < vehiculoActual.alertas.length; j++) {
+                    const alerta = vehiculoActual.alertas[j];
+                    if (alerta.tipo == tarea.tipo) {
+                        existe = true;
+                        console.log(alerta._id);
+                        await Alerta.findByIdAndUpdate(alerta._id, {
+                            cantidad: leFaltan,
+                            nivel: "medio",
+                            quePasa: "falta" 
+                        })
+                        break;
+                    }
+                }
+                if (existe) continue;
+                const nuevaAlerta = new Alerta({
+                    tipo: tarea.tipo, nivel: "medio", cantidad: leFaltan, quePasa: "falta", companyId: req.userData.companyId, vehiculo: req.vehiculoId
+                })
+                Promise.all([
+                    Vehiculo.findByIdAndUpdate(req.vehiculoId, {
+                        $push: {
+                            alertas: [nuevaAlerta._id]
+                        }
+                    }, { new: true }),
+                    nuevaAlerta.save()
+                ])
+            }
+        }
+        await Promise.all([
+            Vehiculo.findByIdAndUpdate(req.vehiculoId, { kmactual: kilometrajeActual, conductorActual: { id: null, fechaDesde: null }, $push: { conductoresPasados: { id: req.userId, fechaDesde: vehiculoActual.conductorActual.fechaDesde, fechaHasta: new Date() } } }),
+            Usuario.findByIdAndUpdate(req.userId, { vehiculoActual: { id: null, fechaDesde: null }, $push: { vehiculosPasados: { id: req.vehiculoId, fechaDesde: conductorActual.vehiculoActual.fechaDesde, fechaHasta: new Date() } } })
+        ])
+        return res.json(jsonRes)
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
+export const desasignarConductor2 = async (req, res) => {
+    try {
+        if (req.userData.companyId !== req.vehiculoData.companyId) return res.status(400).json({ message: 'El vehiculo del que te estás tratando de desasignar no es de tu misma compania' })
+        const kilometrajeActual = req.body?.kilometrajeActual;
+        if (!kilometrajeActual) return res.status(400).json({ message: 'No se llenó el campo del kilometraje actual' });
+        const vehiculoActual = req.vehiculoData;
+        const conductorActual = req.userData;
+        if (kilometrajeActual < vehiculoActual.kmactual) { return res.status(400).json({ message: "El kilometraje nuevo no puede ser menor al anterior" }) }
+        const msg = req.userData.nombre + " " + req.userData.apellido + " se ha bajado del vehiculo " + vehiculoActual.patente.toUpperCase();
+        socketSend(req.userData.companyId, "notificacion", msg);
+        let jsonRes = { message: "Desasignado con éxito!", alerta: false, alertas: [] };
+        for (let i = 0; i < vehiculoActual?.tareas?.length; i++) { //recorriendo las tareas del vehiculo.
             const tarea = vehiculoActual.tareas[i];
             if (kilometrajeActual >= tarea.cantidadUltima + tarea.cantidadCada) {
                 //Alerta Urgente
@@ -69,11 +163,14 @@ export const desasignarConductor = async (req, res) => {
                 jsonRes.alerta = true;
                 jsonRes.alertas.push(alerta);
                 await Vehiculo.findByIdAndUpdate(req.vehiculoId, {
+                    $pull: {
+                        alertas: { tipo: tarea.tipo }
+                    },
                     $push: {
-                        alertas: [{ tipo: tarea.tipo, nivel: "alto", cantidad: sePasoPor, quePasa: "sobra", _id: v4().toString() }]
+                        alertas: { tipo: tarea.tipo, nivel: "alto", cantidad: sePasoPor, quePasa: "sobra", _id: v4().toString() }
                     }
-                }, { new: true })
-                continue; 
+                }, { new: true, multi: true })
+                continue;
             }
             if (kilometrajeActual >= tarea.cantidadUltima + tarea.cantidadCada - tarea.avisarAntes) {
                 //Alerta Media
@@ -83,10 +180,13 @@ export const desasignarConductor = async (req, res) => {
                 jsonRes.alertas.push(alerta);
                 alertSend(req.userData.companyId, "medio", tarea.tipo, alerta, req.vehiculoId)
                 await Vehiculo.findByIdAndUpdate(req.vehiculoId, {
+                    $pull: {
+                        alertas: { tipo: tarea.tipo }
+                    },
                     $push: {
-                        alertas: [{ tipo: tarea.tipo, nivel: "medio", cantidad: leFaltan, quePasa: "falta", _id: v4().toString() }]
+                        alertas: { tipo: tarea.tipo, nivel: "medio", cantidad: leFaltan, quePasa: "falta", _id: v4().toString() }
                     }
-                }, { new: true })
+                }, { new: true, multi: true })
             }
         }
         await Promise.all([
@@ -107,28 +207,29 @@ export const eliminarAlertas = async (req, res) => {
         const vehiculoEnDB = await Vehiculo.findById(id).select("alertas").select("companyId");
         if (!vehiculoEnDB) return res.status(404).json({ message: 'No se encontró un vehiculo' })
         if (vehiculoEnDB.companyId !== req.userData.companyId) { return res.status(401).json({ message: "El vehiculo que estas solicitando no se encuentra en su empresa." }) }
-        await Vehiculo.findByIdAndUpdate(id, {
-            alertas: []
-        })
-        res.json({message: "Alertas eliminadas con exito!"})
+        await Alerta.deleteMany({ vehiculo: id })
+        res.json({ message: "Alertas eliminadas con exito!" })
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
 }
-
 export const eliminarAlertaById = async (req, res) => {
     try {
-        const { id, alerta } = req.body
+        const { id } = req.body
         if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({ message: "ID Invalida" });
-        if (!id || !alerta) { return res.status(400).json({ message: 'No se especificó una ID' }) }
-        const vehiculoEnDB = await Vehiculo.findById(id).select("alertas").select("companyId");
-        if (!vehiculoEnDB) return res.status(404).json({ message: 'No se encontró un vehiculo' })
-        if (vehiculoEnDB.companyId !== req.userData.companyId) { return res.status(401).json({ message: "El vehiculo que estas solicitando no se encuentra en su empresa." }) }
-        const arrayNuevo = vehiculoEnDB.alertas.filter((alert) => alert._id !== alerta);
-        const vehiculoActualizado = await Vehiculo.findByIdAndUpdate(id, {
-            alertas: arrayNuevo
-        }, {new: true})
-        return res.json({vehiculoActualizado})
+        if (!id) { return res.status(400).json({ message: 'No se especificó una ID' }) }
+        const alertaEnDB = await Alerta.findById(id);
+        if (!alertaEnDB) return res.status(404).json({ message: 'No se encontró una alerta' })
+        if (alertaEnDB.companyId !== req.userData.companyId) { return res.status(401).json({ message: "La alerta que estas solicitando no se encuentra en su empresa." }) }
+        Promise.all([
+            Alerta.findByIdAndDelete(id),
+            Vehiculo.findByIdAndUpdate(alertaEnDB.vehiculo, {
+                $pull: {
+                    alertas: id
+                }
+            })
+        ])
+        res.json({ message: "Alerta eliminadas con exito!" })
     } catch (error) {
         res.status(500).json({ message: error.message })
     }

@@ -306,8 +306,7 @@ Usado para eliminar una alerta en especifico con su uuid
 
 ```json
 {
-	"id": {id del vehiculo},
-	"alerta": {uuid de la alerta}
+	"id": {id de la alerta},
 }
 ```
 

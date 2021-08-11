@@ -30,7 +30,8 @@ export const getUserData = async (req, res) => {
                 marca: req.userData.vehiculoActual.id?.marca,
                 modelo: req.userData.vehiculoActual.id?.modelo,
                 kilometraje: req.userData.vehiculoActual.id?.kmactual,
-                alertas: req.alertas
+                alertas: req.alertas,
+                tareas: req.tareas
             }
         })
     } catch (error) {

@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import Usuario from '../Models/Usuario';
 import Token from '../Models/Token';
+import Tarea from '../Models/Tarea';
 import Alerta from '../Models/Alerta';
 import config from '../config';
 import sha256 from 'js-sha256';
@@ -61,9 +62,16 @@ export const verifyTokenWithVehicleData = async (req, res, next) => {
         })
         if (!userEnDb.refreshTokens.includes(decoded.gen)) return res.status(401).json({ message: 'Token revoked' });
         if (!userEnDb) return res.status(404).json({ message: 'Usuario no encontrado' })
-        const AlertasEnDB = await Alerta.find({vehiculo: req.userData.vehiculoActual.id})
-        req.alertas = AlertasEnDB;
-        next()
+        // const AlertasEnDB = await Alerta.find({vehiculo: req.userData.vehiculoActual.id})
+        Promise.all([
+            Alerta.find({vehiculo: req.userData.vehiculoActual.id, companyId: req.userData.companyId}),
+            Tarea.find({vehiculo: req.userData.vehiculoActual.id, companyId: req.userData.companyId})
+        ]).then(([AlertasEnDB, TareaEnDB]) => {
+            req.alertas = AlertasEnDB;
+            req.tareas = TareaEnDB;
+            next()
+
+        })
     } catch (error) {
         return res.status(400).json({ message: 'No autorizado', error: error.message})
     }

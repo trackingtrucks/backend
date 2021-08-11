@@ -26,11 +26,11 @@ export const getUserData = async (req, res) => {
             },
             sesionesActivas: req.userData.refreshTokens.length,
             vehiculo:{
-                patente: req.userData.vehiculoActual.id.patente,
-                marca: req.userData.vehiculoActual.id.marca,
-                modelo: req.userData.vehiculoActual.id.modelo,
-                kilometraje: req.userData.vehiculoActual.id.kmactual,
-                alertas: req.userData.vehiculoActual.id.alertas
+                patente: req.userData.vehiculoActual.id?.patente,
+                marca: req.userData.vehiculoActual.id?.marca,
+                modelo: req.userData.vehiculoActual.id?.modelo,
+                kilometraje: req.userData.vehiculoActual.id?.kmactual,
+                alertas: req.alertas
             }
         })
     } catch (error) {

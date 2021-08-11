@@ -1,9 +1,10 @@
 import jwt from "jsonwebtoken";
-import Usuario from '../Models/Usuario'
-import Token from '../Models/Token'
-import config from '../config'
+import Usuario from '../Models/Usuario';
+import Token from '../Models/Token';
+import Alerta from '../Models/Alerta';
+import config from '../config';
 import sha256 from 'js-sha256';
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
 const secret = config.SECRET;
 const salt = config.SALT;
 
@@ -60,9 +61,11 @@ export const verifyTokenWithVehicleData = async (req, res, next) => {
         })
         if (!userEnDb.refreshTokens.includes(decoded.gen)) return res.status(401).json({ message: 'Token revoked' });
         if (!userEnDb) return res.status(404).json({ message: 'Usuario no encontrado' })
+        const AlertasEnDB = await Alerta.find({vehiculo: req.userData.vehiculoActual.id})
+        req.alertas = AlertasEnDB;
         next()
     } catch (error) {
-        return res.status(400).json({ message: 'No autorizado' })
+        return res.status(400).json({ message: 'No autorizado', error: error.message})
     }
 }
 export const verifyTokenWithPassword = async (req, res, next) => {

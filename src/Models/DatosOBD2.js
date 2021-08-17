@@ -23,6 +23,9 @@ const datosOBD2Schema = new Schema({
     },
     kilometrosRecorridos: {
         type: String
+    },
+    companyId: {
+        type: String
     }
 }, {
     timestamps: true,

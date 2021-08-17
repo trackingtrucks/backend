@@ -5,6 +5,7 @@ import Formulario from '../Models/Formulario';
 import Tarea from '../Models/Tarea';
 import Turno from '../Models/Turno';
 import Alerta from '../Models/Alerta';
+import DatosOBD2 from '../Models/DatosOBD2';
 import mongoose from 'mongoose';
 import { emailEnvioFormulario } from '../email';
 /*
@@ -23,7 +24,8 @@ export const getAllData = async (req, res) => {
             Usuario.find({ companyId }).select("+agregadoPor"),
             Tarea.find({ companyId }),
             Alerta.find({ companyId }),
-        ]).then(([vehiculos, turnos, usuarios, tareas, alertas]) => {
+            DatosOBD2.find({ companyId }),
+        ]).then(([vehiculos, turnos, usuarios, tareas, alertas, datos]) => {
             let gestores = [];
             let conductores = [];
             usuarios.forEach(element => {
@@ -39,7 +41,7 @@ export const getAllData = async (req, res) => {
                 }
             });
             if (gestores.length === 0 && conductores.length === 0) return res.status(404).json({ message: "No se encontraron usuarios en esa companía" }); // Chequea si hay resultados en la busqueda
-            return res.json({ gestores, conductores, vehiculos, turnos, tareas, alertas });
+            return res.json({ gestores, conductores, vehiculos, turnos, tareas, alertas, datos });
         })
 
     } catch (error) {

@@ -63,7 +63,7 @@ export const asignarConductor = async (req, res) => {
 export const desasignarConductor = async (req, res) => {
     try {
         if (req.userData.companyId !== req.vehiculoData.companyId) return res.status(400).json({ message: 'El vehiculo del que te estás tratando de desasignar no es de tu misma compania' })
-        const kilometrajeActual = req.body?.kilometrajeActual;
+        const {kilometrajeActual} = req.body;
         if (!kilometrajeActual) return res.status(400).json({ message: 'No se llenó el campo del kilometraje actual' });
         const vehiculoActual = req.vehiculoData;
         const conductorActual = req.userData;

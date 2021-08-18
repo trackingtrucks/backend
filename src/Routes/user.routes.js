@@ -4,8 +4,8 @@ import * as Users from '../Controllers/user.controller'
 import { auth, verify, limit } from '../Middlewares/index'
 
 rutas.get('/', [auth.verifyTokenWithVehicleData, auth.onlyConductor], Users.getUserData)    
-rutas.get('/codigo/conductor', [verify.emailIsValid, verify.existeUsuarioOEmail, auth.verifyToken, auth.onlyGestor], Users.codigoConductor) //Crea un codigo de registro para conductor dentro de la compania
-rutas.get('/codigo/gestor', [verify.emailIsValid, verify.existeUsuarioOEmail, auth.verifyToken, auth.onlyGestor], Users.codigoGestor) //Crea un codigo de registro para gestor dentro de la compania
+rutas.post('/codigo/conductor', [verify.emailIsValid, verify.existeUsuarioOEmail, auth.verifyToken, auth.onlyGestor], Users.codigoConductor) //Crea un codigo de registro para conductor dentro de la compania
+rutas.post('/codigo/gestor', [verify.emailIsValid, verify.existeUsuarioOEmail, auth.verifyToken, auth.onlyGestor], Users.codigoGestor) //Crea un codigo de registro para gestor dentro de la compania
 
 rutas.post("/crearTurno", [auth.verifyToken, auth.onlyGestor, verify.turnoYaCreado, verify.fechaValida], Users.crearTurno) //Crea un turno
 

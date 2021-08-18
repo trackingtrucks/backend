@@ -8,9 +8,7 @@ export const subirDatosOBD = async (req, res) => {
         if (!vehiculo) return res.status(400).json({ message: 'No está asignado a ningun vehiculo' })
         const nuevosDatosOBD = new DatosOBD2({ vehiculo: { id: vehiculo._id }, fuelLevel, RPM, speed, coolantTemperature, kilometrosRecorridos, companyId: req.userData.companyId, $push:{ pendingTroubleCodes } });
         const newData = await nuevosDatosOBD.save();
-        const datos = coolantTemperature.split(',')
-        return res.json({ data: nuevosDatosOBD, datos })
-        return res.status(200).json({ message: 'Datos subidos con exito' })
+        return res.json({ newData })
     } catch (error) {
         return res.status(500).json({ message: error.message })
     }

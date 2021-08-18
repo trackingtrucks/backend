@@ -1,7 +1,5 @@
-// import emailjs from 'emailjs-com';
 import emailjs from 'emailjs-com';
-
-emailjs.init("user_68ReS4SouZoa39qJ4VnZh");
+// emailjs.init("user_68ReS4SouZoa39qJ4VnZh");
 // import config from './config';
 import axios from 'axios';
 
@@ -32,26 +30,11 @@ async function enviarMail({ templateId, params }) {
 
 }
 export async function emailAceptarCompania({ destino, gestor, token }) {
-  // emailjs.send("service_w5hjgkq", "tt_aceptarCompania", {
-  //   token,
-  //   destino,
-  //   gestor: gestor.nombre,
-  // });
-  // enviarMail({
-  //   templateId: "tt_aceptarCompania",
-  //   params: {
-  //     token, destino, gestor: gestor.nombre
-  //   }
-  // })
-  emailjs.send('service_w5hjgkq', 'tt_aceptarCompania', {
-    token,
-    destino,
-    gestor: gestor.nombre
-  }).then(function (response) {
-    console.log('SUCCESS!', response.status, response.text);
-  }, function (error) {
-    console.log('FAILED...', error);
-  });
+  emailjs.send("service_w5hjgkq", "tt_aceptarCompania", {
+    gestor: "Juan",
+    token: "987123812736",
+    destino: "ezequielgatica+123@gmail.com",
+  }, "user_68ReS4SouZoa39qJ4VnZh");
 }
 export async function emailEnvioFormulario({ destino }) {
   try {

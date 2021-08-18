@@ -1,14 +1,15 @@
 # **Vehiculos**
 ## **Indice**
 1. [Crear vehiculo nuevo](#Crear-vehiculo-nuevo)
-2. [Asignarse a vehiculo](#Asignarse-a-vehiculo)
-3. [Desasignarse de vehiculo](#Desasignarse-de-vehiculo)
-4. [Tareas del vehiculo](#Tareas)
+2. [Eliminar un vehiculo](#Eliminar-vehiculo)
+3. [Asignarse a vehiculo](#Asignarse-a-vehiculo)
+4. [Desasignarse de vehiculo](#Desasignarse-de-vehiculo)
+5. [Tareas del vehiculo](#Tareas)
    1. [Crear tarea](#Crear-tarea)
    2. [Modificar tarea](#Modificar-tarea)
    3. [Get tareas por vehiculo](#Get-tareas-por-vehiculo)
    4. [Get tarea por ID](#Get-tarea-por-ID)
-5. [Alertas](#Alertas)
+6. [Alertas](#Alertas)
    1. [Eliminar alerta en especifico](#Eliminar-alerta-en-especifico)
    2. [Eliminar todas las alertas de un vehiculo](#Eliminar-alertas-de-vehiculo)
 ---
@@ -50,6 +51,33 @@ x-access-token: <accessToken de usuario>
         Objeto del vehiculo nuevo
     },
     "success": true
+}
+```
+---
+# Eliminar vehiculo
+Usado para elmiminar un vehiculo de la compania
+
+**URL** : `/vehiculo/:id`
+(ejemplo: /vehiculo/60d291c91fa1ae411c56b85c)
+
+**Metodo** : `DELETE`
+
+**Autenticacion requerida**: SI
+
+**Rol requerido**: GESTOR
+
+
+**Parametros de la solicitud (headers)**
+
+```txt
+x-access-token: <accessToken de usuario>
+```
+
+### Respuesta del servidor
+
+```json
+{
+    "message": "Vehiculo eliminado con exito!"
 }
 ```
 ---

@@ -8,6 +8,8 @@ rutas.post('/', [auth.verifyToken, verify.existePatenteRegistrada, auth.onlyGest
 rutas.put('/', [auth.verifyToken, auth.onlyConductor, verify.usuarioYaAsignado, verify.vehiculoYaAsignado], Vehiculo.asignarConductor) //Asignarse a un vehiculo
 rutas.delete('/', [auth.verifyToken, auth.onlyConductor, verify.usuarioNoAsignado, verify.vehiculoNoAsignado], Vehiculo.desasignarConductor) //Desasignarse a un vehiculo
 
+rutas.delete('/:id', [auth.verifyToken, auth.onlyGestor], Vehiculo.eliminar)
+
 rutas.delete('/alertas', [auth.verifyToken, auth.onlyGestor], Vehiculo.eliminarAlertas) //Eliminar todas las alertas de un vehiculo
 rutas.delete('/alerta', [auth.verifyToken, auth.onlyGestor], Vehiculo.eliminarAlertaById) //Elimina una alerta de un vehiculo en especifico
 

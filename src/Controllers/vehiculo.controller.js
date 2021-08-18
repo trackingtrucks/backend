@@ -30,7 +30,18 @@ export const crear = async (req, res) => {
         res.status(500).json({ message: error.message, success: false })
     }
 }
-
+export const eliminar = async (req, res) => {
+    try {
+        const {id} = req.params;
+        if (!id || !mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({message: "ID Invalida"})
+        const vehiculoEnDB = await Vehiculo.findOne({_id: id, companyId: req.userData.companyId}).select("companyId")
+        if (!vehiculoEnDB || vehiculoEnDB.companyId !== req.userData.companyId) return res.status(404).json({message: "No se ha encontrado el vehiculo"})
+        await Vehiculo.findByIdAndDelete(id)
+        return res.json({message: "Vehiculo eliminado con exito!"})
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
 export const asignarConductor = async (req, res) => {
     try {
         if (req.userData.companyId !== req.vehiculoData.companyId) return res.status(400).json({ message: 'El vehiculo al que te estás tratando de asignar no es de tu misma compania' })

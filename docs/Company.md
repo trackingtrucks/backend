@@ -123,7 +123,7 @@ Usado para generar un codigo de registro para una cuenta de gestor de una compan
 
 **URL** : `/user/codigo/gestor`
 
-**Metodo** : `GET`
+**Metodo** : `POST`
 
 **Autenticacion requerida**: SI
 
@@ -157,7 +157,7 @@ Usado para generar un codigo de registro para una cuenta de conductor de una com
 
 **URL** : `/user/codigo/conductor`
 
-**Metodo** : `GET`
+**Metodo** : `POST`
 
 **Autenticacion requerida**: SI
 

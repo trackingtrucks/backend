@@ -32,12 +32,12 @@ export const crear = async (req, res) => {
 }
 export const eliminar = async (req, res) => {
     try {
-        const {id} = req.params;
-        if (!id || !mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({message: "ID Invalida"})
-        const vehiculoEnDB = await Vehiculo.findOne({_id: id, companyId: req.userData.companyId}).select("companyId")
-        if (!vehiculoEnDB || vehiculoEnDB.companyId !== req.userData.companyId) return res.status(404).json({message: "No se ha encontrado el vehiculo"})
+        const { id } = req.params;
+        if (!id || !mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ message: "ID Invalida" })
+        const vehiculoEnDB = await Vehiculo.findOne({ _id: id, companyId: req.userData.companyId }).select("companyId")
+        if (!vehiculoEnDB || vehiculoEnDB.companyId !== req.userData.companyId) return res.status(404).json({ message: "No se ha encontrado el vehiculo" })
         await Vehiculo.findByIdAndDelete(id)
-        return res.json({message: "Vehiculo eliminado con exito!"})
+        return res.json({ message: "Vehiculo eliminado con exito!" })
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
@@ -49,7 +49,7 @@ export const asignarConductor = async (req, res) => {
         socketSend(req.userData.companyId, "notificacion", msg);
         await Promise.all([
             Vehiculo.findByIdAndUpdate(req.vehiculoId, { conductorActual: { id: req.userId, fechaDesde: new Date() } }, { new: true }),
-            Usuario.findByIdAndUpdate(req.userId, { vehiculoActual: { id: req.vehiculoId, fechaDesde: new Date() } }, { new: true })
+            Usuario.findByIdAndUpdate(req.userId, { vehiculoActual: { id: req.vehiculoId, fechaDesde: new Date(), patente: req.vehiculoData.patente } }, { new: true })
         ]).then(([vehiculoActualizado]) => {
             return res.json({ message: "Asignado con éxito!", marca: vehiculoActualizado.marca, modelo: vehiculoActualizado.modelo, kilometraje: vehiculoActualizado.kmactual })
         })
@@ -89,7 +89,7 @@ export const desasignarConductor = async (req, res) => {
                         await Alerta.findByIdAndUpdate(alerta._id, {
                             cantidad: sePasoPor,
                             nivel: "alto",
-                            quePasa: "sobra" 
+                            quePasa: "sobra"
                         })
                         break;
                     }
@@ -124,7 +124,7 @@ export const desasignarConductor = async (req, res) => {
                         await Alerta.findByIdAndUpdate(alerta._id, {
                             cantidad: leFaltan,
                             nivel: "medio",
-                            quePasa: "falta" 
+                            quePasa: "falta"
                         })
                         break;
                     }
@@ -145,7 +145,7 @@ export const desasignarConductor = async (req, res) => {
         }
         await Promise.all([
             Vehiculo.findByIdAndUpdate(req.vehiculoId, { kmactual: kilometrajeActual, conductorActual: { id: null, fechaDesde: null }, $push: { conductoresPasados: { id: req.userId, fechaDesde: vehiculoActual.conductorActual.fechaDesde, fechaHasta: new Date() } } }),
-            Usuario.findByIdAndUpdate(req.userId, { vehiculoActual: { id: null, fechaDesde: null }, $push: { vehiculosPasados: { id: req.vehiculoId, fechaDesde: conductorActual.vehiculoActual.fechaDesde, fechaHasta: new Date() } } })
+            Usuario.findByIdAndUpdate(req.userId, { vehiculoActual: { id: null, fechaDesde: null, patente: null }, $push: { vehiculosPasados: { id: req.vehiculoId, fechaDesde: conductorActual.vehiculoActual.fechaDesde, fechaHasta: new Date(), patente: conductorActual.vehiculoActual.patente } } })
         ])
         return res.json(jsonRes)
     } catch (error) {

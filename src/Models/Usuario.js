@@ -34,6 +34,9 @@ const usuarioSchema = new Schema({
         },
         fechaDesde: {
             type: Date,
+        },
+        patente: {
+            type: String
         }
     },
     vehiculosPasados: [{
@@ -47,7 +50,10 @@ const usuarioSchema = new Schema({
         fechaHasta: {
             type: Date,
         },
-        type: {type: String}
+        type: {type: String},
+        patente: {
+            type: String
+        }
     }],
     turnoActual:{
         id: {

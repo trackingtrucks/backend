@@ -1,40 +1,43 @@
-import emailjs from 'emailjs-com';
-// emailjs.init("user_68ReS4SouZoa39qJ4VnZh");
-// import config from './config';
-import axios from 'axios';
+import nodemailer from 'nodemailer';
+import config from './config';
 
-async function enviarMail({ templateId, params }) {
+const emailer = nodemailer.createTransport({
+  service: 'gmail',
+  secure: false,
+  port: 25,
+  auth: {
+    user: config.EMAIL_ADDRESS,
+    pass: config.EMAIL_PASSWORD,
+  },
+});;
+
+async function enviarMail({ para, subject, html }) {
+  if (!para || !subject || !html) throw new Error("Faltan 1 o mas parametros requeridos");
   try {
-    const response = await axios({
-      method: "POST",
-      url: "https://api.emailjs.com/api/v1.0/email/send",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      data: {
-        service_id: "service_w5hjgkq",
-        template_id: templateId,
-        user_id: "user_68ReS4SouZoa39qJ4VnZh",
-        accessToken: "5d297a20d48ca263c9c530802c77b92f",
-        template_params: {
-          token: "hola",
-          destino: "ezequielgatica@gmail.com",
-          gestor: "pepe"
-        }
-      }
+    await emailer.sendMail({
+      from: `"Tracking Trucks 🚍" <${config.EMAIL_ADDRESS}>`,
+      to: para,
+      subject,
+      html
     });
-    console.log(response);
   } catch (error) {
-    console.log(error.message);
+    console.error(error);
   }
-
 }
 export async function emailAceptarCompania({ destino, gestor, token }) {
-  emailjs.send("service_w5hjgkq", "tt_aceptarCompania", {
-    gestor: "Juan",
-    token: "987123812736",
-    destino: "ezequielgatica+123@gmail.com",
-  }, "user_68ReS4SouZoa39qJ4VnZh");
+  try {
+    await enviarMail({
+      para: destino,
+      subject: `${gestor.nombre} te ha invitado a unirse a su compania! - Tracking Trucks`,
+      html: `
+      <h1>Bienvenido!</h1>
+      <p>Presiona el link para crear tu cuenta</p>
+      <a href="https://trackingtrucks.netlify.app/registro?codigo=${token}&email=${destino}">Click aqui!</a>
+      `
+    });
+  } catch (error) {
+    console.error(error);
+  }
 }
 export async function emailEnvioFormulario({ destino }) {
   try {
@@ -94,7 +97,7 @@ export async function emailRestablecerContraseña({ destino, token }) {
     console.error(error);
   }
 }
-export async function emailCambioContraseña({ destino }) {
+export async function emailCambioContraseña({destino}){
   try {
     await enviarMail({
       para: destino,
@@ -109,7 +112,7 @@ export async function emailCambioContraseña({ destino }) {
   }
 }
 
-export async function emailTurno({ destino }) {
+export async function emailTurno({destino}){
   try {
     await enviarMail({
       para: destino,

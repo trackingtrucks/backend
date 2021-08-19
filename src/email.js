@@ -1,34 +1,23 @@
-import nodemailer from 'nodemailer';
-import config from './config';
-
-const emailer = nodemailer.createTransport({
-  service: 'gmail',
-  secure: false,
-  port: 25,
-  auth: {
-    user: config.EMAIL_ADDRESS,
-    pass: config.EMAIL_PASSWORD,
-  },
-});;
+import config from './config'
+const sgMail = require('@sendgrid/mail')
+sgMail.setApiKey(config.SENDGRID_API_KEY)
 
 async function enviarMail({ para, subject, html }) {
   if (!para || !subject || !html) throw new Error("Faltan 1 o mas parametros requeridos");
-  try {
-    await emailer.sendMail({
-      from: `"Tracking Trucks 🚍" <${config.EMAIL_ADDRESS}>`,
-      to: para,
-      subject,
-      html
-    });
-  } catch (error) {
-    console.error(error);
-  }
+  sgMail.send({
+    to: para,
+    from: `Tracking Trucks 🚍 <soygati@gmail.com>`,
+    subject,
+    html,
+    text: html
+  })
+
 }
 export async function emailAceptarCompania({ destino, gestor, token }) {
   try {
     await enviarMail({
       para: destino,
-      subject: `${gestor.nombre} te ha invitado a unirse a su compania! - Tracking Trucks`,
+      subject: `${gestor.nombre} te ha invitado a unirse a su compañia! - Tracking Trucks`,
       html: `
       <h1>Bienvenido!</h1>
       <p>Presiona el link para crear tu cuenta</p>
@@ -97,7 +86,7 @@ export async function emailRestablecerContraseña({ destino, token }) {
     console.error(error);
   }
 }
-export async function emailCambioContraseña({destino}){
+export async function emailCambioContraseña({ destino }) {
   try {
     await enviarMail({
       para: destino,
@@ -112,7 +101,7 @@ export async function emailCambioContraseña({destino}){
   }
 }
 
-export async function emailTurno({destino}){
+export async function emailTurno({ destino }) {
   try {
     await enviarMail({
       para: destino,

@@ -11,6 +11,7 @@ export default {
     NODE_ENV: process.env.NODE_ENV || 'development', 
     EMAIL_PASSWORD: process.env.EMAIL_PASSWORD,
     EMAIL_ADDRESS: process.env.EMAIL_ADDRESS,
+    SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
     // NOTA: CAMBIAR DE 12 HORAS A 3 MINUTOS, ESTO ES DE DEBUG
     ACCESS_TOKEN_EXPIRES: 1/2 * 24 * 60 * 60, //12 horas
     // ACCESS_TOKEN_EXPIRES: 30, //30 segundos

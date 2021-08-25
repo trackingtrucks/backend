@@ -59,9 +59,6 @@ const usuarioSchema = new Schema({
         id: {
             ref: "Turno",
             type: Schema.Types.ObjectId
-        },
-        fechaAsignado: {
-            type: Date,
         }
     },
     turnosPendientes: [{
@@ -78,9 +75,6 @@ const usuarioSchema = new Schema({
         id: {
             ref: "Turno",
             type: Schema.Types.ObjectId
-        },
-        fechaAsignado: {
-            type: Date
         },
         fechaTerminado: {
             type: Date

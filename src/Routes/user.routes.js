@@ -17,4 +17,7 @@ rutas.patch("/cambiar/perfil", [auth.verifyToken, verify.emailIsValid, verify.ex
 
 rutas.put('/asignarTurno', [auth.verifyToken, auth.onlyGestor, verify.conductorNoEncontrado, verify.turnoNoCreado], Users.asignarTurno);//Asignar un usuario a un turno
 
+rutas.patch("/empezarEntrega", [auth.verifyToken, auth.onlyConductor], Users.empezarEntrega); //Empezar una entrega
+rutas.patch("/terminarEntrega", [auth.verifyToken, auth.onlyConductor], Users.terminarEntrega); //Finalizar una entrega
+
 export default rutas

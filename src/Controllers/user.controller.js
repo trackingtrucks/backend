@@ -7,7 +7,7 @@ import config from '../config';
 const database_url = config.DATABASE_URL;
 import { emailAceptarCompania, emailRestablecerContraseña, emailCambioContraseña } from '../email';
 import { notificarTurno } from '../Libs/cronJobs';
-import { sendMessage } from '../index';
+import { socketSend } from '../index';
 import { v4 } from 'uuid';
 
 const agenda = new Agenda({ db: { address: database_url, options: { useUnifiedTopology: true } } });
@@ -216,5 +216,38 @@ export const editarUsuario = async (req, res) => {
         return res.status(200).json({ message: "Datos cambiados con exito!" })
     } catch (error) {
         return res.status(500).json({ message: error.message });
+    }
+}
+
+export const empezarEntrega = async (req, res) => {
+    try {
+        const {codigoDeTurno} = req.body;
+        if(!codigoDeTurno) return res.status(400).json({ message: "Hay un campo vacio"})
+        const turno = await Turno.findOne({codigoDeTurno});
+        if(!turno) return res.status(400).json({ message: "No se encontro ningun turno con ese codigo"})
+        if(req.userData?.turnoActual?.id) return res.status(400).json({ message: "Ya estas en una entrega"})
+        const usuarioActualizado = await Usuario.findByIdAndUpdate(req.userId, { turnoActual: { id: turno._id }, $pull:{ turnosPendientes: { id: turno._id } } }, { new: true });
+        const msg = req.userData.nombre + " " + req.userData.apellido + " ha comenzado la entrega del turno " + req.body.codigoDeTurno;
+        socketSend(req.userData.companyId, "notificacion", msg);
+        return res.status(200).json({ message: "Entrega empezada con exito"})
+    } catch (error) {
+        return res.status(500).json({ message: error.message })
+    }
+}
+
+export const terminarEntrega = async (req, res) => {
+    try {
+        if(!req.userData?.turnoActual?.id) return res.status(400).json({ message: "No estas en ninguna entrega"});
+        const turno = await Turno.findById(req.userData.turnoActual.id);
+        if(turno.condicion == "Terminado") return res.status(400).json({ message: "Este turno ya esta terminado" })
+        await Promise.all([
+            await Usuario.findByIdAndUpdate(req.userId, { turnoActual: null, $push:{ turnosPasados: { id: turno._id} } }, { new: true }),
+            await Turno.findByIdAndUpdate(turno._id, {condicion: "Terminado"})
+        ])
+        const msg = req.userData.nombre + " " + req.userData.apellido + " ha finalizado la entrega del turno " + turno.codigoDeTurno;
+        socketSend(req.userData.companyId, "notificacion", msg);
+        return res.status(200).json({ message: "Entrega terminada con exito" })
+    } catch (error) {
+        return res.status(500).json({ message: error.message })
     }
 }

@@ -7,5 +7,5 @@ const rutas = Router();
 rutas.post('/', [auth.verifyToken, auth.onlyConductor], Data.subirDatosOBD) //subir la informacion de los sensores al sistema
 rutas.post('/2', Data.subirDatosOBD2) //ruta-de-prueba
 rutas.get('/sample', Data.sample) //ruta-de-prueba
-
+rutas.post('/test', Data.testProcesado)
 export default rutas

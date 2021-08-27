@@ -16,19 +16,35 @@ export const subirDatosOBD = async (req, res) => {
 }
 
 export const testProcesado = async (req, res) => {
-    const { fuelLevel, RPM, speed, coolantTemperature } = req.body
-    res.json({ fuelLevel, RPM, speed, coolantTemperature })
+    try {
+        const valores = ["fuelLevel", "RPM", "speed", "coolantTemperature"];
+        let state = { fuelLevel: {}, RPM: {}, speed: {}, coolantTemperature: {} };
+        valores.forEach((valor) => {
+            if (!req.body[valor]) { throw new Error() }
+            state[valor] = procesarDato({ datos: req.body[valor] })
+        })
+        res.json(state)
+    } catch (error) {
+        return res.status(500).json({ message: "Error al procesar los datos, puede ser que no se hayan enviado todos los datos o haya ocurrido un error al procesarlos" })
+    }
+
 }
 
-export const subirDatosOBD2 = async (req, res) => {
-    try {
-        const { coolantTemperature } = req.body;
-        let coolant = { datos: {}, promedio: 0 };
-        coolant.datos = JSON.parse(coolantTemperature.replace(/'/g, `"`))
-        coolant = procesar(coolant.datos)
-        return res.json({ coolant });
-    } catch (error) {
-        return res.status(500).json({ message: error.message })
+function procesarDato({ datos, chart = [] }) {
+    const keys = Object.keys(datos).map(function (i) { return i; });
+    const valores = Object.keys(datos).map(function (i) { return datos[i]; });
+    for (var i in datos) {
+        chart.push({ x: parseInt(i, 10), y: datos[i] });
+    }
+    return {
+        ultimoValor: datos[keys[keys.length - 1]],
+        promedio: sacarPromedio({ valores }),
+        datos,
+        chart,
+        timestamps: {
+            desde: keys[0],
+            hasta: keys[keys.length - 1]
+        }
     }
 }
 
@@ -43,7 +59,6 @@ export const sample = async (req, res) => {
         return res.status(500).json({ message: error.message })
     }
 }
-
 
 
 function procesar({ datos, chart = [] }) {

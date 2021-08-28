@@ -66,8 +66,8 @@ export const verifyTokenWithVehicleData = async (req, res, next) => {
         if (!userEnDb) return res.status(404).json({ message: 'Usuario no encontrado' })
         // const AlertasEnDB = await Alerta.find({vehiculo: req.userData.vehiculoActual.id})
         Promise.all([
-            Alerta.find({vehiculo: req.userData.vehiculoActual.id, companyId: req.userData.companyId}),
-            Tarea.find({vehiculo: req.userData.vehiculoActual.id, companyId: req.userData.companyId})
+            Alerta.find({vehiculo: req.userData.vehiculoActual.id, companyId: req.companyId}),
+            Tarea.find({vehiculo: req.userData.vehiculoActual.id, companyId: req.companyId})
         ]).then(([AlertasEnDB, TareaEnDB]) => {
             req.alertas = AlertasEnDB;
             req.tareas = TareaEnDB;

@@ -17,7 +17,7 @@ import { emailEnvioFormulario } from '../email';
 
 export const getAllData = async (req, res) => {
     try {
-        const companyId = req.userData.companyId // Agarra la id de la compania pedida.
+        const companyId = req.companyId // Agarra la id de la compania pedida.
         if (!companyId) return res.status(400).json({ message: 'No se especificó una ID' })   //Chequea que se haya mandado una companyid en al request (seria bastante raro ya que la persona en si esta registrada)    
         Promise.all([
             Vehiculo.find({ companyId }).populate("tareas").populate("alertas").select("-companyId"),
@@ -56,7 +56,7 @@ export const crearTarea = async (req, res) => {
         const { vehiculo, tipo, cantidadCada, cantidadUltima, avisarAntes } = req.body;
         if (!vehiculo || !tipo || !cantidadCada || !cantidadUltima) { return res.status(400).json({ message: 'Faltan 1 o mas campos necesarios' }) }
         const vehiculoEnDB = await Vehiculo.findById(vehiculo);
-        if (!vehiculoEnDB || vehiculoEnDB.companyId !== req.userData.companyId) { return res.status(400).json({ message: 'Vehiculo no encontrado' }) }
+        if (!vehiculoEnDB || vehiculoEnDB.companyId !== req.companyId) { return res.status(400).json({ message: 'Vehiculo no encontrado' }) }
         if (cantidadUltima > vehiculoEnDB.kmactual) return res.status(400).json({message: `La ultima vez que se realizo la tarea no puede ser menor a ${vehiculoEnDB.kmactual}kms`})
         if (cantidadCada < avisarAntes) return res.status(400).json({message: "El aviso no puede ser mayor a la cantidad de cuando se realiza la tarea"})
         const nuevaTarea = new Tarea({
@@ -65,7 +65,7 @@ export const crearTarea = async (req, res) => {
             cantidadCada,
             cantidadUltima,
             avisarAntes,
-            companyId: req.userData.companyId
+            companyId: req.companyId
         })
         await Promise.all([
             nuevaTarea.save(),
@@ -86,7 +86,7 @@ export const editarTarea = async (req, res) => {
         const tareaEnDB = await Tarea.findById(id).select("+companyId");
         if (!tareaEnDB) return res.status(404).json({ message: 'No se encontró una tarea' })
         const { cantidadCada = tareaEnDB.cantidadCada, cantidadUltima = tareaEnDB.cantidadUltima, avisarAntes = tareaEnDB.avisarAntes } = req.body.data; // pongo valores default
-        if (tareaEnDB.companyId !== req.userData.companyId) { return res.status(401).json({ message: "La tarea que estas solicitando no se encuentra en su empresa." }) }
+        if (tareaEnDB.companyId !== req.companyId) { return res.status(401).json({ message: "La tarea que estas solicitando no se encuentra en su empresa." }) }
         const tareaActualizada = await Tarea.findByIdAndUpdate(id, {
             cantidadCada,
             cantidadUltima,
@@ -107,7 +107,7 @@ export const getTareaById = async (req, res) => {
         if (!id) { return res.status(400).json({ message: 'No se especificó una ID' }) }
         const tareaEnDB = await Tarea.findById(id).select("+companyId");
         if (!tareaEnDB) return res.status(404).json({ message: 'No se encontraron tareas con esa ID' })
-        if (tareaEnDB.companyId !== req.userData.companyId) { return res.status(401).json({ message: "La tarea que estas solicitando no se encuentra en su empresa." }) }
+        if (tareaEnDB.companyId !== req.companyId) { return res.status(401).json({ message: "La tarea que estas solicitando no se encuentra en su empresa." }) }
         res.json(tareaEnDB)
 
     } catch (error) {
@@ -120,7 +120,7 @@ export const getTareasByVehiculo = async (req, res) => {
         const { vehiculo } = req.body;
         if (!mongoose.Types.ObjectId.isValid(vehiculo)) return res.status(404).json({ message: "ID Invalida" });
         if (!vehiculo) { return res.status(400).json({ message: 'No se especificó una ID' }) }
-        const tareas = await Tarea.find({ vehiculo: vehiculo, companyId: req.userData.companyId }).select("+companyId")
+        const tareas = await Tarea.find({ vehiculo: vehiculo, companyId: req.companyId }).select("+companyId")
         if (!tareas) return res.status(404).json({ message: 'No se encontraron tareas asignadas para ese vehiculo' })
         res.json(tareas)
     } catch (error) {
@@ -133,7 +133,7 @@ export const getUserByIdInsideCompany = async (req, res) => {
         if (!req.body.id) { return res.status(400).json({ message: 'No se especificó una ID' }) }
         const userEnDb = await Usuario.findById(req.body.id).select("+agregadoPor");
         if (!userEnDb) return res.status(404).json({ message: 'No se encontró un usuario' })
-        if (userEnDb.companyId !== req.userData.companyId) { return res.status(401).json({ message: "El usuario que estas solicitando no se encuentra en su empresa." }) }
+        if (userEnDb.companyId !== req.companyId) { return res.status(401).json({ message: "El usuario que estas solicitando no se encuentra en su empresa." }) }
         return res.json({ usuario: userEnDb })
     } catch (error) {
         res.status(404).json({ message: 'No se encontro un usuario' }) //devulve si hay algun error
@@ -145,7 +145,7 @@ export const getVehiculoByIdInsideCompany = async (req, res) => {
         if (!req.body.id) { return res.status(400).json({ message: 'No se especificó una ID' }) }
         const vehiculoEnDB = await Vehiculo.findById(req.body.id).populate("tareas");
         if (!vehiculoEnDB) return res.status(404).json({ message: 'No se encontró un vehiculo' })
-        if (vehiculoEnDB.companyId !== req.userData.companyId) { return res.status(401).json({ message: "El vehiculo que estas solicitando no se encuentra en su empresa." }) }
+        if (vehiculoEnDB.companyId !== req.companyId) { return res.status(401).json({ message: "El vehiculo que estas solicitando no se encuentra en su empresa." }) }
         return res.json({ vehiculo: vehiculoEnDB })
     } catch (error) {
         res.status(404).json({ message: 'No se encontró un vehiculo' }) //devulve si hay algun error

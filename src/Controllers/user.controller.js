@@ -44,7 +44,7 @@ export const codigoConductor = async (req, res) => {
     if (!email) return res.status(400).json({ message: 'No se ha especificado un email para recibir el codigo' });
     try {
         const newToken = new Token({
-            companyId: req.userData.companyId,
+            companyId: req.companyId,
             rol: "conductor",
             tipo: 'registro',
             email,
@@ -70,7 +70,7 @@ export const codigoGestor = async (req, res) => {
     if (!email) return res.status(400).json({ message: 'No se ha especificado un email para recibir el codigo' });
     try {
         const newToken = new Token({
-            companyId: req.userData.companyId,
+            companyId: req.companyId,
             rol: "gestor",
             tipo: 'registro',
             email
@@ -89,7 +89,7 @@ export const codigoGestor = async (req, res) => {
 }
 export const crearTurno = async (req, res) => {
     try {
-        const companyId = req.userData.companyId;
+        const companyId = req.companyId;
         const { codigoDeTurno, fechaYhora, nombreVendedor, codigoOrdenDeCompra } = req.body;
         if (!nombreVendedor || !codigoOrdenDeCompra) return res.status(400).json({ message: 'Faltan 1 o mas campos requeridos' });
         const nuevoTurno = new Turno({
@@ -228,7 +228,7 @@ export const empezarEntrega = async (req, res) => {
         if(req.userData?.turnoActual?.id) return res.status(400).json({ message: "Ya estas en una entrega"})
         const usuarioActualizado = await Usuario.findByIdAndUpdate(req.userId, { turnoActual: { id: turno._id }, $pull:{ turnosPendientes: { id: turno._id } } }, { new: true });
         const msg = req.userData.nombre + " " + req.userData.apellido + " ha comenzado la entrega del turno " + req.body.codigoDeTurno;
-        socketSend(req.userData.companyId, "notificacion", msg);
+        socketSend(req.companyId, "notificacion", msg);
         return res.status(200).json({ message: "Entrega empezada con exito"})
     } catch (error) {
         return res.status(500).json({ message: error.message })
@@ -245,7 +245,7 @@ export const terminarEntrega = async (req, res) => {
             await Turno.findByIdAndUpdate(turno._id, {condicion: "Terminado"})
         ])
         const msg = req.userData.nombre + " " + req.userData.apellido + " ha finalizado la entrega del turno " + turno.codigoDeTurno;
-        socketSend(req.userData.companyId, "notificacion", msg);
+        socketSend(req.companyId, "notificacion", msg);
         return res.status(200).json({ message: "Entrega terminada con exito" })
     } catch (error) {
         return res.status(500).json({ message: error.message })

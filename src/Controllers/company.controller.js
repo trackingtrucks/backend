@@ -26,7 +26,7 @@ export const getAllData = async (req, res) => {
             Tarea.find({ companyId }),
             Alerta.find({ companyId }),
             // DatosOBD2.find({ companyId }),
-            Data.find({companyId}),
+            Data.find({ companyId }),
         ]).then(([vehiculos, turnos, usuarios, tareas, alertas, datosProcesados]) => {
             let gestores = [];
             let conductores = [];
@@ -42,6 +42,9 @@ export const getAllData = async (req, res) => {
                         break;
                 }
             });
+            vehiculos.forEach((vehiculo) => {
+                vehiculo.datos = datosProcesados.filter(dato => dato.vehiculo.equals(vehiculo._id))
+            })
             if (gestores.length === 0 && conductores.length === 0) return res.status(404).json({ message: "No se encontraron usuarios en esa companía" }); // Chequea si hay resultados en la busqueda
             return res.json({ gestores, conductores, vehiculos, turnos, tareas, alertas, datos: datosProcesados });
         })
@@ -57,8 +60,8 @@ export const crearTarea = async (req, res) => {
         if (!vehiculo || !tipo || !cantidadCada || !cantidadUltima) { return res.status(400).json({ message: 'Faltan 1 o mas campos necesarios' }) }
         const vehiculoEnDB = await Vehiculo.findById(vehiculo);
         if (!vehiculoEnDB || vehiculoEnDB.companyId !== req.companyId) { return res.status(400).json({ message: 'Vehiculo no encontrado' }) }
-        if (cantidadUltima > vehiculoEnDB.kmactual) return res.status(400).json({message: `La ultima vez que se realizo la tarea no puede ser menor a ${vehiculoEnDB.kmactual}kms`})
-        if (cantidadCada < avisarAntes) return res.status(400).json({message: "El aviso no puede ser mayor a la cantidad de cuando se realiza la tarea"})
+        if (cantidadUltima > vehiculoEnDB.kmactual) return res.status(400).json({ message: `La ultima vez que se realizo la tarea no puede ser menor a ${vehiculoEnDB.kmactual}kms` })
+        if (cantidadCada < avisarAntes) return res.status(400).json({ message: "El aviso no puede ser mayor a la cantidad de cuando se realiza la tarea" })
         const nuevaTarea = new Tarea({
             vehiculo,
             tipo,

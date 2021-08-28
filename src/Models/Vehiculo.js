@@ -64,7 +64,8 @@ const vehiculoSchema = new Schema({
     alertas: [{
         ref: "Alerta",
         type: Schema.Types.ObjectId
-    }]
+    }],
+    datos: Array
 
 }, {
     timestamps: false,

@@ -6,6 +6,7 @@ import Tarea from '../Models/Tarea';
 import Turno from '../Models/Turno';
 import Alerta from '../Models/Alerta';
 import DatosOBD2 from '../Models/DatosOBD2';
+import Data from '../Models/Data';
 import mongoose from 'mongoose';
 import { emailEnvioFormulario } from '../email';
 /*
@@ -19,13 +20,14 @@ export const getAllData = async (req, res) => {
         const companyId = req.userData.companyId // Agarra la id de la compania pedida.
         if (!companyId) return res.status(400).json({ message: 'No se especificó una ID' })   //Chequea que se haya mandado una companyid en al request (seria bastante raro ya que la persona en si esta registrada)    
         Promise.all([
-            Vehiculo.find({ companyId }).populate("tareas").populate("alertas"),
+            Vehiculo.find({ companyId }).populate("tareas").populate("alertas").select("-companyId"),
             Turno.find({ companyId }),
             Usuario.find({ companyId }).select("+agregadoPor"),
             Tarea.find({ companyId }),
             Alerta.find({ companyId }),
-            DatosOBD2.find({ companyId }),
-        ]).then(([vehiculos, turnos, usuarios, tareas, alertas, datos]) => {
+            // DatosOBD2.find({ companyId }),
+            Data.find({companyId}),
+        ]).then(([vehiculos, turnos, usuarios, tareas, alertas, datosProcesados]) => {
             let gestores = [];
             let conductores = [];
             usuarios.forEach(element => {
@@ -41,7 +43,7 @@ export const getAllData = async (req, res) => {
                 }
             });
             if (gestores.length === 0 && conductores.length === 0) return res.status(404).json({ message: "No se encontraron usuarios en esa companía" }); // Chequea si hay resultados en la busqueda
-            return res.json({ gestores, conductores, vehiculos, turnos, tareas, alertas, datos });
+            return res.json({ gestores, conductores, vehiculos, turnos, tareas, alertas, datos: datosProcesados });
         })
 
     } catch (error) {

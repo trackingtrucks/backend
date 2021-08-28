@@ -4,7 +4,10 @@ const alertaSchema = new Schema({
     nivel: String,
     cantidad: Number,
     quePasa: String,
-    companyId: String,
+    companyId: {
+        select: false,
+        type: String
+    },
     vehiculo: {
         type: Schema.Types.ObjectId
     }

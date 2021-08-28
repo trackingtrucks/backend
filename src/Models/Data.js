@@ -7,9 +7,13 @@ const dataSchema = new Schema({
     },
     data: {
         type: Object
+    },
+    companyId: {
+        select: false,
+        type: String
     }
 }, {
-    timestamps: true,
+    timestamps: false,
     versionKey: false
 })
 

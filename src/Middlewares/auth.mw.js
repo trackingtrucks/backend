@@ -39,6 +39,7 @@ export const verifyToken = async (req, res, next) => {
         req.userId = decoded.id
         const userEnDb = await Usuario.findById(req.userId).select("+refreshTokens");
         req.userData = userEnDb;
+        req.companyId = userEnDb.companyId;
         userEnDb.refreshTokens.forEach((token, i) => {
             userEnDb.refreshTokens[i] = sha256(token + salt)
         })
@@ -57,6 +58,7 @@ export const verifyTokenWithVehicleData = async (req, res, next) => {
         req.userId = decoded.id
         const userEnDb = await Usuario.findById(req.userId).select("+refreshTokens").populate("vehiculoActual.id");
         req.userData = userEnDb;
+        req.companyId = userEnDb.companyId;
         userEnDb.refreshTokens.forEach((token, i) => {
             userEnDb.refreshTokens[i] = sha256(token + salt)
         })
@@ -84,6 +86,7 @@ export const verifyTokenWithPassword = async (req, res, next) => {
         req.userId = decoded.id
         const userEnDb = await Usuario.findById(req.userId).select("refreshTokens").select("password").select("email");
         req.userData = userEnDb;
+        req.companyId = userEnDb.companyId;
         userEnDb.refreshTokens.forEach((token, i) => {
             userEnDb.refreshTokens[i] = sha256(token + salt)
         })

@@ -65,5 +65,13 @@ export function alertSend(roomId, nivel, tipo, message, vehiculo){
         tipo,
         message,
         vehiculo
-    })
+    });
+}
+
+export function dataUpdate(roomId, vehiculo, datos){
+    console.info(`emitiendo actualizacion de informacion del vehiculo '${vehiculo}' de la compania '${roomId}'`);
+    io.to(roomId).emit("datos",{
+        vehiculo,
+        datos
+    });
 }

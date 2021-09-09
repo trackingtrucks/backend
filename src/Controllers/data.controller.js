@@ -1,7 +1,7 @@
 import DatosOBD2 from "../Models/DatosOBD2";
 import Vehiculo from '../Models/Vehiculo';
 import Data from '../Models/Data';
-
+import {dataUpdate} from '../index'
 export const subirDatosOBD = async (req, res) => {
     try {
         const { fuelLevel, RPM, speed, coolantTemperature, pendingTroubleCodes, kilometrosRecorridos } = req.body;
@@ -23,6 +23,7 @@ export const subirDatosOBD = async (req, res) => {
             companyId: req.companyId
         })
         await DataProcesada.save();
+        dataUpdate(req.companyId, vehiculo._id, datosProcesados)
         console.log("Procesado!");
         // console.log(datosProcesados);
     } catch (error) {

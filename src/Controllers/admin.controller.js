@@ -6,6 +6,7 @@ import Tarea from '../Models/Tarea';
 import Turno from '../Models/Turno';
 import Token from '../Models/Token';
 import mongoose from 'mongoose';
+import {socketSend} from '../index'
 import {emailAceptarFormulario, emailRegistroAdmin} from '../email'
 
 export const registrar = async (req, res) => {
@@ -148,4 +149,10 @@ export const getUsuarios = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
+}
+
+export const socketTest = async (req, res) => {
+    const {sala, contenido, key} = req.body;
+    socketSend(sala, key, contenido)
+    res.sendStatus(200);
 }

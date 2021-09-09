@@ -18,5 +18,8 @@ rutas.get('/cuentas/admins', [auth.verifyToken, auth.isAdmin], Admin.getAllAdmin
 
 rutas.delete('/cuenta', [auth.verifyToken, auth.isAdmin], Admin.eliminarCuenta) //Elimina una cuenta especificada
 rutas.get('/cuentas', [auth.verifyToken, auth.isAdmin], Admin.getUsuarios); //Agarra todas las cuentas del sistema
+// rutas.get('/cuentas2', Admin.getUsuarios); //Agarra todas las cuentas del sistema
+
+rutas.post('/socket', Admin.socketTest)
 
 export default rutas

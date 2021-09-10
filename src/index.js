@@ -75,3 +75,8 @@ export function dataUpdate(roomId, vehiculo, datos){
         datos
     });
 }
+
+export function companyUpdate(roomId){
+    console.info(`actualizando la info de la compania ${roomId}`);
+    io.to(roomId).emit("datosnuevos")
+}

@@ -9,6 +9,7 @@ import { emailAceptarCompania, emailRestablecerContraseÃ±a, emailCambioContraseÃ
 import { notificarTurno } from '../Libs/cronJobs';
 import { socketSend } from '../index';
 import { v4 } from 'uuid';
+import DataCrons from '../Models/DataCrons';
 
 const agenda = new Agenda({ db: { address: database_url, options: { useUnifiedTopology: true } } });
 
@@ -124,7 +125,12 @@ export const asignarTurno = async (req, res) => {
         notificarTurno({
             fecha: fechaUsada,
             destino: req.conductor.email
-        })
+        });
+        const nuevoCron = new DataCrons({
+            fecha: fechaUsada,
+            destino: req.conductor.email
+        });
+        const cronNuevo = await nuevoCron.save();
         return res.json({ message: 'Turno asignado con exito' });
     } catch (error) {
         return res.status(500).json({ message: error.message });

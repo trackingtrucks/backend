@@ -1,6 +1,7 @@
 import cron from 'cron';
 import {sendMessage} from '../index'
 import {emailTurno} from '../email'
+import DataCrons from '../Models/DataCrons'
 // import Tarea from '../Models/Tarea'
 
 var actualCronJobs = {}
@@ -16,6 +17,7 @@ var dayTable = {
 
 export async function notificarTurno({fecha, destino}){
     var job = new cron.CronJob(fecha, function(){emailTurno({destino})}, null, true)
+    job.start();
 }
 
 
@@ -71,7 +73,7 @@ function uniqueRoutine(body, id) {
 }
 
 export default {
-    fetchAll() {
+    async fetchAll() {
         console.log("Fetching all cron jobs...");
         // const db = adm.firestore()
         // db.collection('classes').get()
@@ -97,6 +99,16 @@ export default {
         //     var data = doc.data;
         //     var id = doc.id;
         // })
+        const crons = await DataCrons.find();
+         console.log(crons);
+         crons.forEach(doc => {
+             console.log(doc);
+             var fecha = doc.fecha;
+             var destino = doc.destino;
+             notificarTurno({fecha, destino});
+        })
+        
+        
     },
     createRoutine(body, id) {
         var { repeat } = body

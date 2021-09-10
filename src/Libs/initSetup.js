@@ -1,8 +1,8 @@
 import Usuario from '../Models/Usuario'
 import CONFIG from '../config'
-// import crons from './cronJobs'
+import crons from './cronJobs'
 export const initSetup = async () => {
-    // crons.fetchAll();
+    crons.fetchAll();
     const usuarioCount = await Usuario.estimatedDocumentCount()
     if (usuarioCount > 0) {
     } else {

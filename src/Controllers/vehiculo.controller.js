@@ -36,6 +36,7 @@ export const eliminar = async (req, res) => {
         if (!id || !mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ message: "ID Invalida" })
         const vehiculoEnDB = await Vehiculo.findOne({ _id: id, companyId: req.companyId }).select("companyId")
         if (!vehiculoEnDB || vehiculoEnDB.companyId !== req.companyId) return res.status(404).json({ message: "No se ha encontrado el vehiculo" })
+        if(vehiculoEnDB?.conductorActual?.id) return res.status(404).json({ message: "Hay un conductor asignado a este vehiculo"});
         await Vehiculo.findByIdAndDelete(id)
         return res.json({ message: "Vehiculo eliminado con exito!" })
     } catch (error) {

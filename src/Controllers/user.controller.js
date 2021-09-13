@@ -234,7 +234,7 @@ export const empezarEntrega = async (req, res) => {
         if(req.userData?.turnoActual?.id) return res.status(400).json({ message: "Ya estas en una entrega"})
         const usuarioActualizado = await Usuario.findByIdAndUpdate(req.userId, { turnoActual: { id: turno._id }, $pull:{ turnosPendientes: { id: turno._id } } }, { new: true });
         const msg = req.userData.nombre + " " + req.userData.apellido + " ha comenzado la entrega del turno " + req.body.codigoDeTurno;
-        socketSend(req.companyId, "notificacion", msg);
+        socketSend(req.companyId, "entrega", msg);
         return res.status(200).json({ message: "Entrega empezada con exito"})
     } catch (error) {
         return res.status(500).json({ message: error.message })
@@ -251,7 +251,7 @@ export const terminarEntrega = async (req, res) => {
             await Turno.findByIdAndUpdate(turno._id, {condicion: "Terminado"})
         ])
         const msg = req.userData.nombre + " " + req.userData.apellido + " ha finalizado la entrega del turno " + turno.codigoDeTurno;
-        socketSend(req.companyId, "notificacion", msg);
+        socketSend(req.companyId, "entrega", msg);
         return res.status(200).json({ message: "Entrega terminada con exito" })
     } catch (error) {
         return res.status(500).json({ message: error.message })

@@ -174,6 +174,15 @@ export const nuevoForm = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
+
+export const getCurrentUserData = async (req, res) => {
+    try {
+        const user = req.userData;
+        return res.json({ user });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
 /*
 #############
 # FUNCIONES #

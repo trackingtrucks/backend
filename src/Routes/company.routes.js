@@ -8,5 +8,6 @@ rutas.post('/formulario', [verify.emailIsValid, verify.existeUsuarioOEmail], Com
 rutas.get('/', [auth.verifyToken, auth.isGestor], Company.getAllData); //Agarra toda la informacion de la compania
 rutas.get('/user', [auth.verifyToken, auth.isGestor], Company.getUserByIdInsideCompany) //Agarra la informacion de un usuario en especifico (para alguna update de realtime)
 rutas.get('/vehiculo', [auth.verifyToken, auth.isConductor], Company.getVehiculoByIdInsideCompany) //Agarra la informacion de un vehiculo en especifico (para alguna update de realtime)
+rutas.get('/currentUser', [auth.verifyToken, auth.isConductor], Company.getCurrentUserData) // Agarra la informacion del usuario actual
 
 export default rutas

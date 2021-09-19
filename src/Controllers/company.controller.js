@@ -177,8 +177,13 @@ export const nuevoForm = async (req, res) => {
 
 export const getCurrentUserData = async (req, res) => {
     try {
-        const user = req.userData;
-        return res.json({ user });
+        const turnosPendientes = req.userData.turnosPendientes;
+        let turnos = [];
+        for (const turno of turnosPendientes) {
+            const turnoCompleto = await Turno.findById(turno.id);
+            turnos.push(turnoCompleto)
+          }
+        return res.json({ turnos });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

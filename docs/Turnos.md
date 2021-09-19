@@ -3,12 +3,14 @@
 
 1. [Crear turno](#Crear-Turno)
 2. [Asignar turno](#Asignar-Turno)
+3. [Empezar Entrega](#Empezar-Entrega)
+4. [Terminar Entrega](#Terminar-Entrega)
 
 ---
 # Crear Turno
 Usado para crear turnos dentro de la compania
 
-**URL** : `/user/crearTurno`
+**URL** : `/user/turno/crear`
 
 **Metodo** : `POST`
 
@@ -48,7 +50,7 @@ x-access-token: <accessToken de usuario>
 # Asignar Turno
 Usado para asignar turnos a los diferentes conductores
 
-**URL** : `/user/asignarTurno`
+**URL** : `/user/turno/asignar`
 
 **Metodo** : `PUT`
 
@@ -77,5 +79,64 @@ x-access-token: <accessToken de usuario>
 ```json
 {
   "message": "Turno asignado con exito"
+}
+```
+---
+# Empezar Entrega
+Usado para que un conductor comience una entrega
+
+**URL** : `/user/entrega/empezar`
+
+**Metodo** : `PATCH`
+
+**Autenticacion requerida**: SI
+
+**Rol requerido**: CONDUCTOR
+
+**Parametros de la solicitud (headers)**
+
+```txt
+Content-type: application/json
+x-access-token: <accessToken de usuario>
+```
+
+**Parametros de la solicitud (body)**
+
+```json
+{
+  "codigoDeTurno": "[codigo del turno que se quiere asignar]"
+}
+```
+
+### Respuesta del servidor
+
+```json
+{
+  "message": "Entrega empezada con exito"
+}
+```
+---
+# Terminar Entrega
+Usado para que un conductor finalice una entrega
+
+**URL** : `/user/entrega/terminar`
+
+**Metodo** : `PATCH`
+
+**Autenticacion requerida**: SI
+
+**Rol requerido**: CONDUCTOR
+
+**Parametros de la solicitud (headers)**
+
+```txt
+x-access-token: <accessToken de usuario>
+```
+
+### Respuesta del servidor
+
+```json
+{
+  "message": "Entrega terminada con exito"
 }
 ```

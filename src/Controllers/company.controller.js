@@ -178,12 +178,13 @@ export const nuevoForm = async (req, res) => {
 export const getCurrentUserData = async (req, res) => {
     try {
         const turnosPendientes = req.userData.turnosPendientes;
+        const turnoActual = await Turno.findById(req.userData.turnoActual);
         let turnos = [];
         for (const turno of turnosPendientes) {
             const turnoCompleto = await Turno.findById(turno.id);
             turnos.push(turnoCompleto)
           }
-        return res.json({ turnos });
+        return res.json({ turnosPendientes: turnos, turnoActual: turnoActual });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

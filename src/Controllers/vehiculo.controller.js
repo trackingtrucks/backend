@@ -1,7 +1,7 @@
 import Usuario from '../Models/Usuario';
 import Vehiculo from '../Models/Vehiculo';
 import Alerta from '../Models/Alerta';
-import { alertSend, socketSend } from '../index.js';
+import { alertSend, socketSend, companyUpdate} from '../index.js';
 import { v4 } from 'uuid'
 import mongoose from 'mongoose'
 export const crear = async (req, res) => {
@@ -25,6 +25,7 @@ export const crear = async (req, res) => {
         });
         const vehiculoEnDB = await nuevoVehiculo.save();
         //Guardar el documento
+        companyUpdate(req.companyId)
         res.json({ vehiculo: vehiculoEnDB, success: true })
     } catch (error) {
         res.status(500).json({ message: error.message, success: false })
@@ -38,6 +39,7 @@ export const eliminar = async (req, res) => {
         if (!vehiculoEnDB || vehiculoEnDB.companyId !== req.companyId) return res.status(404).json({ message: "No se ha encontrado el vehiculo" })
         if(vehiculoEnDB?.conductorActual?.id) return res.status(404).json({ message: "Hay un conductor asignado a este vehiculo"});
         await Vehiculo.findByIdAndDelete(id)
+        companyUpdate(req.companyId)
         return res.json({ message: "Vehiculo eliminado con exito!" })
     } catch (error) {
         res.status(500).json({ message: error.message })
@@ -52,6 +54,7 @@ export const asignarConductor = async (req, res) => {
             Vehiculo.findByIdAndUpdate(req.vehiculoId, { conductorActual: { id: req.userId, fechaDesde: new Date() } }, { new: true }),
             Usuario.findByIdAndUpdate(req.userId, { vehiculoActual: { id: req.vehiculoId, fechaDesde: new Date(), patente: req.vehiculoData.patente } }, { new: true })
         ]).then(([vehiculoActualizado]) => {
+            companyUpdate(req.companyId)
             return res.json({ message: "Asignado con éxito!", marca: vehiculoActualizado.marca, modelo: vehiculoActualizado.modelo, kilometraje: vehiculoActualizado.kmactual })
         })
         // return res.json({vehiculoEditado, usuarioEditado})
@@ -148,6 +151,7 @@ export const desasignarConductor = async (req, res) => {
             Vehiculo.findByIdAndUpdate(req.vehiculoId, { kmactual: kilometrajeActual, conductorActual: { id: null, fechaDesde: null }, $push: { conductoresPasados: { id: req.userId, fechaDesde: vehiculoActual.conductorActual.fechaDesde, fechaHasta: new Date() } } }),
             Usuario.findByIdAndUpdate(req.userId, { vehiculoActual: { id: null, fechaDesde: null, patente: null }, $push: { vehiculosPasados: { id: req.vehiculoId, fechaDesde: conductorActual.vehiculoActual.fechaDesde, fechaHasta: new Date(), patente: conductorActual.vehiculoActual.patente } } })
         ])
+        companyUpdate(req.companyId)
         return res.json(jsonRes)
     } catch (error) {
         res.status(500).json({ message: error.message })
@@ -205,6 +209,7 @@ export const desasignarConductor2 = async (req, res) => {
             Vehiculo.findByIdAndUpdate(req.vehiculoId, { kmactual: kilometrajeActual, conductorActual: { id: null, fechaDesde: null }, $push: { conductoresPasados: { id: req.userId, fechaDesde: vehiculoActual.conductorActual.fechaDesde, fechaHasta: new Date() } } }),
             Usuario.findByIdAndUpdate(req.userId, { vehiculoActual: { id: null, fechaDesde: null }, $push: { vehiculosPasados: { id: req.vehiculoId, fechaDesde: conductorActual.vehiculoActual.fechaDesde, fechaHasta: new Date() } } })
         ])
+        companyUpdate(req.companyId)
         return res.json(jsonRes)
     } catch (error) {
         res.status(500).json({ message: error.message })
@@ -220,6 +225,7 @@ export const eliminarAlertas = async (req, res) => {
         if (!vehiculoEnDB) return res.status(404).json({ message: 'No se encontró un vehiculo' })
         if (vehiculoEnDB.companyId !== req.companyId) { return res.status(401).json({ message: "El vehiculo que estas solicitando no se encuentra en su empresa." }) }
         await Alerta.deleteMany({ vehiculo: id })
+        companyUpdate(req.companyId)
         res.json({ message: "Alertas eliminadas con exito!" })
     } catch (error) {
         res.status(500).json({ message: error.message })
@@ -241,6 +247,7 @@ export const eliminarAlertaById = async (req, res) => {
                 }
             })
         ])
+        companyUpdate(req.companyId)
         res.json({ message: "Alerta eliminadas con exito!" })
     } catch (error) {
         res.status(500).json({ message: error.message })

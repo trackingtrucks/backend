@@ -9,6 +9,7 @@ import DatosOBD2 from '../Models/DatosOBD2';
 import Data from '../Models/Data';
 import mongoose from 'mongoose';
 import { emailEnvioFormulario } from '../email';
+import { companyUpdate } from '../index'
 /*
 ############
 # ACCIONES #
@@ -74,6 +75,7 @@ export const crearTarea = async (req, res) => {
             nuevaTarea.save(),
             Vehiculo.findByIdAndUpdate(vehiculo, { $push: { tareas: [nuevaTarea._id] } }, { new: true })
         ])
+        companyUpdate(req.companyId)
         res.json({ nuevaTarea, message: "Tarea creada con exito!" })
     } catch (error) {
         const msg = error.errors['tipo'].message ? error?.errors['tipo']?.message : error.message
@@ -97,6 +99,7 @@ export const editarTarea = async (req, res) => {
         }, {
             new: true
         })
+        companyUpdate(req.companyId)
         return res.json(tareaActualizada)
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -183,7 +186,7 @@ export const getCurrentUserData = async (req, res) => {
         for (const turno of turnosPendientes) {
             const turnoCompleto = await Turno.findById(turno.id);
             turnos.push(turnoCompleto)
-          }
+        }
         return res.json({ turnosPendientes: turnos, turnoActual: turnoActual });
     } catch (error) {
         res.status(500).json({ message: error.message });

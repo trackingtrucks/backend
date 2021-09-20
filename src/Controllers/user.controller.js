@@ -7,7 +7,7 @@ import config from '../config';
 const database_url = config.DATABASE_URL;
 import { emailAceptarCompania, emailRestablecerContraseña, emailCambioContraseña } from '../email';
 import { notificarTurno } from '../Libs/cronJobs';
-import { socketSend } from '../index';
+import { socketSend, companyUpdate } from '../index';
 import { v4 } from 'uuid';
 import DataCrons from '../Models/DataCrons';
 
@@ -102,6 +102,7 @@ export const crearTurno = async (req, res) => {
             condicion: "No asignado"
         });
         const turnoNuevo = await nuevoTurno.save();
+        companyUpdate(req.companyId)
         return res.status(200).json({
             turno: turnoNuevo,
             message: 'Turno creado con exito'
@@ -126,6 +127,7 @@ export const asignarTurno = async (req, res) => {
             fecha: fechaUsada,
             destino: req.conductor.email
         });
+        companyUpdate(req.companyId)
         const nuevoCron = new DataCrons({
             fecha: fechaUsada,
             destino: req.conductor.email

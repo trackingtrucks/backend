@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import config from '../config';
 import Token from '../Models/Token';
 import sha256 from 'js-sha256';
+import { companyUpdate } from '../index'
 
 const secret = config.SECRET;
 const refresh_secret = config.REFRESH_SECRET;
@@ -34,6 +35,8 @@ export const registrar = async (req, res) => {
             const refreshToken = generateRefreshToken(nuevoUsuario._id)
             nuevoUsuario.refreshTokens = [refreshToken]
             const userNuevo = await nuevoUsuario.save(); //enviando el nuevo usuario a la base de datos, a partir de ahora no lo puedo modificar sin hacer un request a la db
+            companyUpdate(req.companyIdValido)
+
             return res.status(200).json({
                 perfil: userNuevo,
                 accessToken: generateAccessToken(nuevoUsuario._id, refreshToken),
@@ -49,6 +52,8 @@ export const registrar = async (req, res) => {
                 date: new Date()
             }
             const userNuevo = await nuevoUsuario.save(); //enviando el nuevo usuario a la base de datos, a partir de ahora no lo puedo modificar sin hacer un request a la db
+            companyUpdate(req.companyIdValido)
+
             return res.status(200).json({ perfil: userNuevo, message: "Usuario creado con éxito!" })
         }
         return res.status(500).json({ message: "how did we get here?" }) //esto no se deveria activar nunca pero buenos 

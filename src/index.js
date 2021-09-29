@@ -3,6 +3,8 @@ import './database.js'
 import config from './config'
 import jwt from 'jsonwebtoken'
 import Usuario from './Models/Usuario'
+import * as SocketCache from './Libs/socketCache'
+import sha256 from 'js-sha256';
 // import cluster from 'cluster';
 // let io;
 
@@ -29,8 +31,13 @@ import Usuario from './Models/Usuario'
         try {
             const token = socket.handshake.query.token;
             const payload = await jwt.verify(token, config.SECRET);
+            socket.payload = payload;
             socket.userId = payload.id;
-            const userData = await Usuario.findById(payload.id);
+            const userData = await Usuario.findById(payload.id).select("+refreshTokens");
+            userData.refreshTokens.forEach((token, i) => {
+                userData.refreshTokens[i] = sha256(token + config.SALT)
+            })
+            if (!userData.refreshTokens.includes(payload.gen)) throw new Error("revoked")
             socket.userData = userData;
             next();
         } catch (error) {
@@ -41,15 +48,16 @@ import Usuario from './Models/Usuario'
     })
 
     io.on('connection', (socket) => {
-        console.info("Conexion establecida: " + socket.userId);
+        console.info("Conexion establecida con el usuario: " + socket.userId + " - " + socket.id);
+        SocketCache.add({id: socket.userId, company: socket.userData.companyId, ucid: socket.id, gen: socket.payload.gen})
         socket.join(socket.userData.companyId)
         socket.on("disconnect", () => {
-            console.info("Conexion perdida: " + socket.userId);
+            console.info("Conexion perdida con el usuario: " + socket.userId + " - " + socket.id);
+            SocketCache.remove(socket.id)
         })
     })
 
 // }
-
 
 
 

@@ -21,5 +21,6 @@ rutas.get('/cuentas', [auth.verifyToken, auth.isAdmin], Admin.getUsuarios); //Ag
 // rutas.get('/cuentas2', Admin.getUsuarios); //Agarra todas las cuentas del sistema
 
 rutas.post('/socket', Admin.socketTest)
+rutas.get('/socket', Admin.socketConnections)
 
 export default rutas

@@ -156,3 +156,13 @@ export const socketTest = async (req, res) => {
     socketSend(sala, key, contenido)
     res.sendStatus(200);
 }
+import {getAll} from '../Libs/socketCache'
+export const socketConnections = async (req, res) => {
+    const usuarios = getAll();
+    return res.json(usuarios)
+}
+import {cerrarSesion} from '../Libs/socketCache'
+export const socketLogout = async (req, res) => {
+    // const usuarios = getAll();
+    // return res.json(usuarios)
+}

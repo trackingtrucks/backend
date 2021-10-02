@@ -7,6 +7,9 @@ const companyScheme = new Schema({
     },
     nombre: {
         type: String
+    },
+    settings:{
+        type: Object
     }
 }, {
     versionKey: false,

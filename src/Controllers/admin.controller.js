@@ -4,6 +4,7 @@ import Usuario from '../Models/Usuario';
 import Formulario from '../Models/Formulario';
 import Tarea from '../Models/Tarea';
 import Turno from '../Models/Turno';
+import Compania from '../Models/Compania';
 import Token from '../Models/Token';
 import mongoose from 'mongoose';
 import {socketSend} from '../index'
@@ -41,8 +42,8 @@ export const getForms = async (req, res) => {
 
 export const aceptarForm = async (req, res) => {
     try {
-        const { companyId, id } = req.body;
-        if (!companyId || !id) return res.status(400).json({ message: 'Faltan 1 o mas campos requeridos' });
+        const { companyId, id, nombre } = req.body;
+        if (!companyId || !id || !nombre) return res.status(400).json({ message: 'Faltan 1 o mas campos requeridos' });
         if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({message: "ID Invalida"});
         const formData = await Formulario.findById(id);
         if (!formData) return res.status(404).json({ message: 'ID de formulario de registro no encontrado'});
@@ -52,8 +53,13 @@ export const aceptarForm = async (req, res) => {
             email: formData.email,
             tipo: 'registro'
         });
+        const newCompany = new Compania({
+            companyId,
+            nombre
+        })
         await Promise.all([
             newToken.save(),
+            newCompany.save(),
             Formulario.findByIdAndDelete(id),
         ]).then(([tokenNuevo])=> {
             emailAceptarFormulario({destino: formData.email, token: newToken._id, })

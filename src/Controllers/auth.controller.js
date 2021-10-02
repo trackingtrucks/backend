@@ -4,7 +4,7 @@ import config from '../config';
 import Token from '../Models/Token';
 import sha256 from 'js-sha256';
 import { companyUpdate } from '../index'
-
+import {cerrarSesion, cerrarSesionTodosLosDispositivos} from '../Libs/socketCache'
 const secret = config.SECRET;
 const refresh_secret = config.REFRESH_SECRET;
 const token_expires = config.ACCESS_TOKEN_EXPIRES;
@@ -103,6 +103,7 @@ export const newRefreshToken = async (req, res) => {
 export const logout = async (req, res) => {
     try {
         const refreshToken = req.headers["x-refresh-token"] //agarro el refresh token que se me envio y lo guardo
+        cerrarSesion(sha256(refreshToken + salt))
         await Usuario.findByIdAndUpdate(req.userId, { $pullAll: { refreshTokens: [refreshToken] } }, { new: true }) //elimino SOLO ese refresh token del usuario
         res.status(204).json({ message: 'Sesiones cerrada', success: true }) //envio el "ok"
 
@@ -129,6 +130,7 @@ export const logoutAllDevices = async (req, res) => {
         if (!req.body.password) return res.status(401).json({ message: 'Contraseña invalida' }) //chequeo si envió una contraseña
         const contraseñasCoinciden = await Usuario.verificarPassword(req.body.password, req.userData.password) // chequeo si la contraseña es valida
         if (!contraseñasCoinciden) return res.status(403).json({ message: 'Contraseña invalida' }) //si no es valida, devuelvo un error
+        cerrarSesionTodosLosDispositivos(req.userId)
         await Usuario.findByIdAndUpdate(req.userId, { refreshTokens: [] }, { new: true }) //elimino todos los refresh tokens del usuario
         res.status(200).json({ message: 'Sesiones cerradas', success: true }) //envio una confirmacion
     } catch (error) {

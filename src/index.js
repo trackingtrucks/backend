@@ -22,69 +22,77 @@ import sha256 from 'js-sha256';
 // } else {
 //     console.log(`Worker ${cluster.worker.process.pid} levantado`);
 
-    // const server = app.listen(app.get('port'));
-    const server = app.listen(app.get('port'), () => console.info(`Servidor iniciado en el puerto ${app.get('port')}`));
-    const io = require('socket.io')(server);
+// const server = app.listen(app.get('port'));
+const server = app.listen(app.get('port'), () => console.info(`Servidor iniciado en el puerto ${app.get('port')}`));
+const io = require('socket.io')(server);
 
-    //SOCKET
-    io.use(async (socket, next) => {
-        try {
-            const token = socket.handshake.query.token;
-            const payload = await jwt.verify(token, config.SECRET);
-            socket.payload = payload;
-            socket.userId = payload.id;
-            const userData = await Usuario.findById(payload.id).select("+refreshTokens");
-            userData.refreshTokens.forEach((token, i) => {
-                userData.refreshTokens[i] = sha256(token + config.SALT)
-            })
-            if (!userData.refreshTokens.includes(payload.gen)) throw new Error("revoked")
-            socket.userData = userData;
-            next();
-        } catch (error) {
-            const err = new Error("No autorizado!");
-            err.data = { type: 'forbidden' };
-            next(err);
-        }
-    })
-
-    io.on('connection', (socket) => {
-        console.info("Conexion establecida con el usuario: " + socket.userId + " - " + socket.id);
-        SocketCache.add({id: socket.userId, company: socket.userData.companyId, ucid: socket.id, gen: socket.payload.gen})
-        socket.join(socket.userData.companyId)
-        socket.on("disconnect", () => {
-            console.info("Conexion perdida con el usuario: " + socket.userId + " - " + socket.id);
-            SocketCache.remove(socket.id)
+//SOCKET
+io.use(async (socket, next) => {
+    try {
+        const token = socket.handshake.query.token;
+        const payload = await jwt.verify(token, config.SECRET);
+        socket.payload = payload;
+        socket.userId = payload.id;
+        const userData = await Usuario.findById(payload.id).select("+refreshTokens");
+        userData.refreshTokens.forEach((token, i) => {
+            userData.refreshTokens[i] = sha256(token + config.SALT)
         })
+        if (!userData.refreshTokens.includes(payload.gen)) throw new Error("revoked")
+        socket.userData = userData;
+        next();
+    } catch (error) {
+        const err = new Error("No autorizado!");
+        err.data = { type: 'forbidden' };
+        next(err);
+    }
+})
+
+io.on('connection', (socket) => {
+    console.info("Conexion establecida con el usuario: " + socket.userId + " - " + socket.id);
+    SocketCache.add({ id: socket.userId, company: socket.userData.companyId, ucid: socket.id, gen: socket.payload.gen, socket: socket.disconnect })
+    socket.join(socket.userData.companyId)
+    socket.on("disconnect", () => {
+        console.info("Conexion perdida con el usuario: " + socket.userId + " - " + socket.id);
+        SocketCache.remove(socket.id)
     })
+})
 
 // }
-
-
 
 export function socketSend(roomId, key, message) {
     console.info("enviando '" + key + "' a la sala '" + roomId + "' con el contenido '" + message + "'");
     io.to(roomId).emit(key, message);
 }
 
-export function alertSend(roomId, nivel, tipo, message, vehiculo){
+export function alertSend(roomId, nivel, tipo, message, vehiculo) {
     console.info(`emitiendo 'alerta' nivel ${nivel} de tipo ${tipo} a la sala ${roomId} con el mensaje ${message}`)
-    io.to(roomId).emit("alerta",{
-        nivel, 
+    io.to(roomId).emit("alerta", {
+        nivel,
         tipo,
         message,
         vehiculo
     });
 }
 
-export function dataUpdate(roomId, vehiculo, datos){
+export function dataUpdate(roomId, vehiculo, datos) {
     console.info(`emitiendo actualizacion de informacion del vehiculo '${vehiculo}' de la compania '${roomId}'`);
-    io.to(roomId).emit("datos",{
+    io.to(roomId).emit("datos", {
         vehiculo,
         datos
     });
 }
 
-export function companyUpdate(roomId){
+export function companyUpdate(roomId) {
     console.info(`actualizando la info de la compania ${roomId}`);
     io.to(roomId).emit("datosnuevos")
+}
+
+export function disconnectById(givenSocketID) {
+    console.log("desconectando " + givenSocketID);
+    io.sockets.sockets.forEach((socket) => {
+        if (socket.id === givenSocketID) {
+            socket.emit('logout');
+            socket.disconnect(true);
+        }
+    });
 }

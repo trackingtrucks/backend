@@ -161,8 +161,12 @@ export const socketConnections = async (req, res) => {
     const usuarios = getAll();
     return res.json(usuarios)
 }
-import {cerrarSesion} from '../Libs/socketCache'
+import {cerrarSesion, cerrarSesionTodosLosDispositivos} from '../Libs/socketCache'
 export const socketLogout = async (req, res) => {
-    // const usuarios = getAll();
-    // return res.json(usuarios)
+    const {id} = req.params;
+    res.json(cerrarSesion(id))
+}
+export const socketLogoutAllDevices = async (req, res) => {
+    const {id} = req.params;
+    res.json(cerrarSesionTodosLosDispositivos(id))
 }

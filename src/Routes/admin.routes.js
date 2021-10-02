@@ -23,4 +23,7 @@ rutas.get('/cuentas', [auth.verifyToken, auth.isAdmin], Admin.getUsuarios); //Ag
 rutas.post('/socket', Admin.socketTest)
 rutas.get('/socket', Admin.socketConnections)
 
+// rutas.get('/socket/trigger/logout/:id', Admin.socketLogout)
+// rutas.get('/socket/trigger/alldevices/:id', Admin.socketLogoutAllDevices)
+
 export default rutas

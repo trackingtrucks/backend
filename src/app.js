@@ -12,6 +12,7 @@ import companyRutas from './Routes/company.routes'
 import adminRutas from './Routes/admin.routes'
 
 // CONFIG
+// import {logSize} from './Libs/logSize'
 // import {logPID} from './Libs/logPID'
 import config from './config'
 import { initSetup } from './Libs/initSetup'
@@ -40,6 +41,7 @@ switch (config.NODE_ENV) {
         console.info("Iniciando servidor en modo 'desconocido', no se como llegaste aca pero no está bien");
         throw new Error("No se especificó modo de funcionamiento");
 }
+// app.use(logSize)
 // app.use(logPID)
 // RUTA DEFAULT
 app.get('/', (req, res) => {

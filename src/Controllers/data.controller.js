@@ -1,4 +1,4 @@
-import DatosOBD2 from "../Models/DatosOBD2";
+import DatosOBD2 from "../Models/DataRaw";
 import Vehiculo from '../Models/Vehiculo';
 import Data from '../Models/Data';
 import {dataUpdate} from '../index'

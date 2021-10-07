@@ -13,6 +13,9 @@ rutas.delete('/:id', [auth.verifyToken, auth.onlyGestor], Vehiculo.eliminar)
 rutas.delete('/alertas', [auth.verifyToken, auth.onlyGestor], Vehiculo.eliminarAlertas) //Eliminar todas las alertas de un vehiculo
 rutas.delete('/alerta', [auth.verifyToken, auth.onlyGestor], Vehiculo.eliminarAlertaById) //Elimina una alerta de un vehiculo en especifico
 
+rutas.post('/tramite', [auth.verifyToken, auth.onlyGestor], Company.crearTramite) //Crea una tarea para un vehiculo
+
+
 rutas.post('/tareas', [auth.verifyToken, auth.onlyGestor], Company.crearTarea) //Crea una tarea para un vehiculo
 rutas.patch('/tarea', [auth.verifyToken, auth.onlyGestor], Company.editarTarea) //Edita una tarea para un vehiculo
 rutas.get('/tarea', [auth.verifyToken, auth.onlyGestor], Company.getTareaById) //Agarra una tarea por su id

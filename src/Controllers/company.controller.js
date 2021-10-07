@@ -6,7 +6,9 @@ import Tarea from '../Models/Tarea';
 import Turno from '../Models/Turno';
 import Alerta from '../Models/Alerta';
 import Compania from '../Models/Compania';
-import DatosOBD2 from '../Models/DatosOBD2';
+import DatosOBD2 from '../Models/DataRaw';
+import DataCrons from '../Models/DataCrons';
+import Tramite from '../Models/Tramite';
 import Data from '../Models/Data';
 import mongoose from 'mongoose';
 import { emailEnvioFormulario } from '../email';
@@ -54,6 +56,39 @@ export const getAllData = async (req, res) => {
 
     } catch (error) {
         res.status(500).json({ message: error.message }) //devulve si hay algun error
+    }
+}
+
+
+export const crearTramite = async (req, res) => {
+    try {
+        const { date, vehiculo, titulo, descripcion, ultimavez: ultimaVez, urgencia } = req.body;
+        if (!date || !vehiculo || !titulo) { return res.status(400).json({ message: "Faltan 1 o mas campos requeridos" }) }
+        if (!mongoose.Types.ObjectId.isValid(vehiculo)) return res.status(404).json({ message: "ID Invalida" });
+
+        const newTramite = new Tramite({
+            date,
+            vehiculo,
+            titulo,
+            descripcion,
+            ultimaVez,
+            urgencia
+        })
+        const cronTramite = new DataCrons({
+            fecha: date,
+            destino: req.userData.email,
+            tipo: "tramite",
+            tramite: newTramite._id
+        })
+        await Promise.all([
+            cronTramite.save(),
+            newTramite.save()
+        ]).then(([cron, tramite]) => {
+            return res.json({ cron, tramite })
+        })
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+
     }
 }
 

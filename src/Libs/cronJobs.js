@@ -1,6 +1,6 @@
 import cron from 'cron';
-import {sendMessage} from '../index'
-import {emailTurno} from '../email'
+import { sendMessage } from '../index'
+import { emailTurno } from '../email'
 import DataCrons from '../Models/DataCrons'
 // import Tarea from '../Models/Tarea'
 
@@ -15,17 +15,17 @@ var dayTable = {
     6: "Saturday"
 }
 
-export async function notificarTurno({fecha, destino}){
-    var job = new cron.CronJob(fecha, function(){emailTurno({destino})}, null, true)
+export async function notificarTurno({ fecha, destino }) {
+    var job = new cron.CronJob(fecha, function () { emailTurno({ destino }) }, null, true)
     job.start();
 }
 
 
-function triggerClass(body, id){
+function triggerClass(body, id) {
     console.log("Triggered class with subject", body.subject, 'from', body.hierarchy)
     pusher.trigger('TIClass', 'incomingClass', body)
     sendMessage("admins", 'message', "Hola rey!");
-    if(!body.repeat){
+    if (!body.repeat) {
         delete actualCronJobs[id]
 
         const db = adm.firestore()
@@ -33,9 +33,9 @@ function triggerClass(body, id){
     }
 }
 
-function tenMinLess(hour, minute){
+function tenMinLess(hour, minute) {
     minute -= 10
-    if(Math.sign(minute)== -1){
+    if (Math.sign(minute) == -1) {
         minute = 60 + minute
         hour -= 1
     }
@@ -46,8 +46,8 @@ function repeatRoutine(body, id) {
     var [hour, minute, weekDay] = body.date.split('/')
     var [minuteNew, hourNew] = tenMinLess(parseInt(hour), parseInt(minute))
     var cronDate = `01 ${minuteNew} ${hourNew} * * ${weekDay}`
-    
-    var job = new cron.CronJob(cronDate, ()=>triggerClass(body, id),undefined, true, "America/Argentina/Buenos_Aires")
+
+    var job = new cron.CronJob(cronDate, () => triggerClass(body, id), undefined, true, "America/Argentina/Buenos_Aires")
     job.start()
     actualCronJobs[id] = {
         cronJob: job,
@@ -62,7 +62,7 @@ function uniqueRoutine(body, id) {
     var [hourNew, minuteNew] = tenMinLess(parseInt(hour), parseInt(minute))
     var monthP = parseInt(month) - 1
     var cronDate = `01 ${minuteNew} ${hourNew} ${day} ${monthP} *`
-    var job = new cron.CronJob(cronDate, ()=>triggerClass(body, id),undefined, true, "America/Argentina/Buenos_Aires")
+    var job = new cron.CronJob(cronDate, () => triggerClass(body, id), undefined, true, "America/Argentina/Buenos_Aires")
     job.start()
     actualCronJobs[id] = {
         cronJob: job,
@@ -91,7 +91,7 @@ export default {
         // .catch(error => {
         //     console.log({ msgError: true, msgBody: error })
         // })
-        
+
         // const tareas = Tarea.find();
         // console.log(tareas);
         // tareas.forEach(doc => {
@@ -99,16 +99,24 @@ export default {
         //     var data = doc.data;
         //     var id = doc.id;
         // })
-        const crons = await DataCrons.find();
-         console.log(crons);
-         crons.forEach(doc => {
-             console.log(doc);
-             var fecha = doc.fecha;
-             var destino = doc.destino;
-             notificarTurno({fecha, destino});
+        const crons = await DataCrons.find().populate("tramites");
+        console.log(crons);
+
+        crons.forEach(doc => {
+            switch (crons.tipo) {
+                case 'turno':
+                    console.log(doc);
+                    var fecha = doc.fecha;
+                    var destino = doc.destino;
+                    return notificarTurno({ fecha, destino });
+
+                default:
+                    break;
+            }
+
         })
-        
-        
+
+
     },
     createRoutine(body, id) {
         var { repeat } = body

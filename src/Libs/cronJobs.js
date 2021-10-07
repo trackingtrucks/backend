@@ -99,7 +99,7 @@ export default {
         //     var data = doc.data;
         //     var id = doc.id;
         // })
-        const crons = await DataCrons.find().populate("tramites");
+        const crons = await DataCrons.find().populate("tramite");
         console.log(crons);
 
         crons.forEach(doc => {

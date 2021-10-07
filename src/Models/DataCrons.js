@@ -7,7 +7,7 @@ const dataCronSchema = new Schema({
         enum: ['turno', 'tramite']
     },
     tramite:{
-        ref: 'tramite',
+        ref: 'Tramite',
         type: Schema.Types.ObjectId
     }
 

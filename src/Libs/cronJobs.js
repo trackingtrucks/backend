@@ -2,6 +2,7 @@ import cron from 'cron';
 import { sendMessage } from '../index'
 import { emailTurno } from '../email'
 import DataCrons from '../Models/DataCrons'
+import { socketSend } from '../index';
 // import Tarea from '../Models/Tarea'
 
 var actualCronJobs = {}
@@ -20,8 +21,20 @@ export async function notificarTurno({ fecha, destino }) {
     job.start();
 }
 
-export async function notificarTramite({fecha, destino}){
-    var job = new cron.CronJob(fecha, function () { emailTramite({ destino }) })
+export async function notificarTramitePronto({ fecha, tituloTramite, vehiculo, companyId }){
+    var job = new cron.CronJob(fecha, function () {
+        const msg = "El tramite de " + tituloTramite + " del vehiculo " + vehiculo + " esta por vencer";
+        socketSend(companyId, "tramite", msg);
+    })
+    job.start();
+}
+
+export async function notificarTramite({ fecha, destino, tituloTramite, vehiculo, companyId }){
+    var job = new cron.CronJob(fecha, function () {
+        emailTramite({ destino, tituloTramite, vehiculo });
+        const msg = "El tramite de " + tituloTramite + " del vehiculo " + vehiculo + " venció";
+        socketSend(companyId, "tramite", msg);
+    })
     job.start();
 }
 
@@ -113,7 +126,11 @@ export default {
                     console.log(doc);
                     var fecha = doc.fecha;
                     var destino = doc.destino;
-                    return notificarTurno({ fecha, destino });
+                    var tituloTramite = doc.tramite.titulo;
+                    var vehiculo = doc.tramite.vehiculo;
+                    var companyId = doc.tramite.companyId;
+                    notificarTramitePronto({ fecha, tituloTramite, vehiculo, companyId});
+                    return notificarTramite({ fecha, destino, tituloTramite, vehiculo, companyId });
                 case 'tramite':
                     console.log(doc);
                     var fecha = doc.fecha;

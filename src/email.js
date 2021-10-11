@@ -116,14 +116,15 @@ export async function emailTurno({ destino }) {
   }
 }
 
-export async function emailTramite({ destino }) {
+export async function emailTramite({ destino, tituloTramite, vehiculo }) {
   try {
     await enviarMail({
       para: destino,
-      subject: `Se venció la fecha de un tramite`,
+      subject: `Se venció la fecha del tramite de ${tituloTramite}`,
       html: `
       <h1>Hola!</h1>
-      <p>Este es un mail para notificarte que tenes un tramite vencido.</p>
+      <p>Este es un mail para notificarte que el tramite de ${tituloTramite} del vehiculo ${vehiculo} venció.</p>
+      <p>Recordá de mantener todos tus tramites al día.</p>
       `
     });
   } catch (error) {

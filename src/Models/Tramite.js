@@ -23,7 +23,9 @@ const tramiteSchema = new Schema({
         enum: ['urgente', 'moderado'],
         type: String,
         default: "moderado"
-
+    },
+    companyId: {
+        type: String
     }
 }, {
     timestamps: false,

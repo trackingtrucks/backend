@@ -10,7 +10,7 @@ import DatosOBD2 from '../Models/DataRaw';
 import DataCrons from '../Models/DataCrons';
 import Tramite from '../Models/Tramite';
 import Data from '../Models/Data';
-import { notificarTramite } from '../Libs/cronJobs';
+import { notificarTramite, notificarTramitePronto } from '../Libs/cronJobs';
 import mongoose from 'mongoose';
 import { emailEnvioFormulario } from '../email';
 import { companyUpdate } from '../index'
@@ -73,7 +73,8 @@ export const crearTramite = async (req, res) => {
             titulo,
             descripcion,
             ultimaVez,
-            urgencia
+            urgencia,
+            companyId: req.companyId
         })
         const cronTramite = new DataCrons({
             fecha: date,
@@ -84,7 +85,17 @@ export const crearTramite = async (req, res) => {
 
         notificarTramite({
             fecha: date,
-            destino: req.userData.email
+            destino: req.userData.email,
+            tituloTramite: titulo,
+            vehiculo,
+            companyId: req.companyId
+        })
+        date.setDate( date.getDate() - 7 );
+        notificarTramitePronto({
+            fecha: date,
+            tituloTramite: titulo,
+            vehiculo,
+            companyId: req.companyId
         })
         await Promise.all([
             cronTramite.save(),

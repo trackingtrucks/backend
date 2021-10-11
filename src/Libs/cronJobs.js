@@ -20,6 +20,11 @@ export async function notificarTurno({ fecha, destino }) {
     job.start();
 }
 
+export async function notificarTramite({fecha, destino}){
+    var job = new cron.CronJob(fecha, function () { emailTramite({ destino }) })
+    job.start();
+}
+
 
 function triggerClass(body, id) {
     console.log("Triggered class with subject", body.subject, 'from', body.hierarchy)
@@ -109,6 +114,11 @@ export default {
                     var fecha = doc.fecha;
                     var destino = doc.destino;
                     return notificarTurno({ fecha, destino });
+                case 'tramite':
+                    console.log(doc);
+                    var fecha = doc.fecha;
+                    var destino = doc.destino;
+                    return notificarTramite({ fecha, destino });
 
                 default:
                     break;

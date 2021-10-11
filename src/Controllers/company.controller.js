@@ -10,6 +10,7 @@ import DatosOBD2 from '../Models/DataRaw';
 import DataCrons from '../Models/DataCrons';
 import Tramite from '../Models/Tramite';
 import Data from '../Models/Data';
+import { notificarTramite } from '../Libs/cronJobs';
 import mongoose from 'mongoose';
 import { emailEnvioFormulario } from '../email';
 import { companyUpdate } from '../index'
@@ -79,6 +80,11 @@ export const crearTramite = async (req, res) => {
             destino: req.userData.email,
             tipo: "tramite",
             tramite: newTramite._id
+        })
+
+        notificarTramite({
+            fecha: date,
+            destino: req.userData.email
         })
         await Promise.all([
             cronTramite.save(),

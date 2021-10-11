@@ -115,3 +115,18 @@ export async function emailTurno({ destino }) {
     console.error(error);
   }
 }
+
+export async function emailTramite({ destino }) {
+  try {
+    await enviarMail({
+      para: destino,
+      subject: `Se venció la fecha de un tramite`,
+      html: `
+      <h1>Hola!</h1>
+      <p>Este es un mail para notificarte que tenes un tramite vencido.</p>
+      `
+    });
+  } catch (error) {
+    console.error(error);
+  }
+}

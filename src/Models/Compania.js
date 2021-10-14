@@ -18,7 +18,7 @@ const companyScheme = new Schema({
             empiezaEntrega: true,
             terminaEntrega: true,
             notificacionTramite: true
-        }
+        },
     },
     _id: String
 }, {

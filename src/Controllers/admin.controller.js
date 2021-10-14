@@ -160,8 +160,8 @@ export const getUsuarios = async (req, res) => {
 }
 
 export const socketTest = async (req, res) => {
-    const {sala, contenido, key} = req.body;
-    socketSend(sala, key, contenido)
+    const {sala, contenido, key, tipo} = req.body;
+    socketSend(sala, key, contenido, tipo)
     res.sendStatus(200);
 }
 import {getAll} from '../Libs/socketCache'

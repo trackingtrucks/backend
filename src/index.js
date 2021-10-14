@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken'
 import Usuario from './Models/Usuario'
 import * as SocketCache from './Libs/socketCache'
 import sha256 from 'js-sha256';
+import Compania from './Models/Compania'
 // import cluster from 'cluster';
 // let io;
 
@@ -59,9 +60,16 @@ io.on('connection', (socket) => {
 
 // }
 
-export function socketSend(roomId, key, message, tipo) {
-    console.info("enviando '" + key + "' a la sala '" + roomId + "' con el contenido '" + message + "'");
-    io.to(roomId).emit(key, message);
+export async function socketSend(roomId, key, message, tipo) {
+    const compania = await Compania.findOne({ companyId: roomId })
+    if (compania.alertas[tipo] === true) {
+        console.info("enviando '" + key + "' a la sala '" + roomId + "' con el contenido '" + message + "'");
+        io.to(roomId).emit(key, message);
+    } else {
+        return;
+    }
+
+
 }
 
 export function alertSend(roomId, nivel, tipo, message, vehiculo) {

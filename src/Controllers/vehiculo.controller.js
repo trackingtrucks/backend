@@ -49,7 +49,7 @@ export const asignarConductor = async (req, res) => {
     try {
         if (req.companyId !== req.vehiculoData.companyId) return res.status(400).json({ message: 'El vehiculo al que te estás tratando de asignar no es de tu misma compania' })
         const msg = req.userData.nombre + " " + req.userData.apellido + " se ha subido al vehiculo " + req.body.patente.toUpperCase();
-        socketSend(req.companyId, "notificacion", msg);
+        socketSend(req.companyId, "notificacion", msg, "subirAuto");
         await Promise.all([
             Vehiculo.findByIdAndUpdate(req.vehiculoId, { conductorActual: { id: req.userId, fechaDesde: new Date() } }, { new: true }),
             Usuario.findByIdAndUpdate(req.userId, { vehiculoActual: { id: req.vehiculoId, fechaDesde: new Date(), patente: req.vehiculoData.patente } }, { new: true })
@@ -73,7 +73,7 @@ export const desasignarConductor = async (req, res) => {
         const conductorActual = req.userData;
         if (kilometrajeActual < vehiculoActual.kmactual) { return res.status(400).json({ message: "El kilometraje nuevo no puede ser menor al anterior" }) }
         const msg = req.userData.nombre + " " + req.userData.apellido + " se ha bajado del vehiculo " + vehiculoActual.patente.toUpperCase();
-        socketSend(req.companyId, "notificacion", msg);
+        socketSend(req.companyId, "notificacion", msg, "bajarAuto");
         let jsonRes = { message: "Desasignado con éxito!", alerta: false, alertas: [] };
         for (let i = 0; i < vehiculoActual?.tareas?.length; i++) { //recorriendo las tareas del vehiculo.
             const tarea = vehiculoActual.tareas[i];
@@ -87,7 +87,7 @@ export const desasignarConductor = async (req, res) => {
                     tipo: tarea.tipo,
                     message: alertaMsg,
                     vehiculo: req.vehiculoId
-                })
+                }, "alertaAlta")
                 // alertSend(req.companyId, "alto", tarea.tipo, alertaMsg, req.vehiculoId)
                 jsonRes.alerta = true;
                 jsonRes.alertas.push(alertaMsg);
@@ -129,7 +129,7 @@ export const desasignarConductor = async (req, res) => {
                     tipo: tarea.tipo,
                     message: alerta,
                     vehiculo: req.vehiculoId
-                })
+                }, "alertaMedia")
                 jsonRes.alerta = true;
                 jsonRes.alertas.push(alerta);
                 for (var j = 0; j < vehiculoActual.alertas.length; j++) {
@@ -193,7 +193,7 @@ export const desasignarConductor2 = async (req, res) => {
                     tipo: tarea.tipo,
                     message: alerta,
                     vehiculo: req.vehiculoId
-                })
+                }, "alertaAlta")
                 jsonRes.alerta = true;
                 jsonRes.alertas.push(alerta);
                 await Vehiculo.findByIdAndUpdate(req.vehiculoId, {
@@ -218,7 +218,7 @@ export const desasignarConductor2 = async (req, res) => {
                     tipo: tarea.tipo,
                     message: alerta,
                     vehiculo: req.vehiculoId
-                })
+                }, "alertaMedia")
                 await Vehiculo.findByIdAndUpdate(req.vehiculoId, {
                     $pull: {
                         alertas: { tipo: tarea.tipo }

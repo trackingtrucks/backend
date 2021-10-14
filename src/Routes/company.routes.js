@@ -9,5 +9,5 @@ rutas.get('/', [auth.verifyToken, auth.isGestor], Company.getAllData); //Agarra 
 rutas.get('/user', [auth.verifyToken, auth.isGestor], Company.getUserByIdInsideCompany) //Agarra la informacion de un usuario en especifico (para alguna update de realtime)
 rutas.get('/vehiculo', [auth.verifyToken, auth.isConductor], Company.getVehiculoByIdInsideCompany) //Agarra la informacion de un vehiculo en especifico (para alguna update de realtime)
 rutas.get('/user/turnos', [auth.verifyToken, auth.isConductor], Company.getCurrentUserData) // Agarra los turnos del usuario actual
-
+rutas.post("/alertas", [auth.verifyTokenWithCompanyData, auth.onlyGestor], Company.updateAlertas)
 export default rutas

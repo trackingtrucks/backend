@@ -3,6 +3,7 @@ import Usuario from '../Models/Usuario';
 import Token from '../Models/Token';
 import Tarea from '../Models/Tarea';
 import Alerta from '../Models/Alerta';
+import Compania from '../Models/Compania';
 import config from '../config';
 import sha256 from 'js-sha256';
 import mongoose from 'mongoose';
@@ -66,8 +67,8 @@ export const verifyTokenWithVehicleData = async (req, res, next) => {
         if (!userEnDb) return res.status(404).json({ message: 'Usuario no encontrado' })
         // const AlertasEnDB = await Alerta.find({vehiculo: req.userData.vehiculoActual.id})
         Promise.all([
-            Alerta.find({vehiculo: req.userData.vehiculoActual.id, companyId: req.companyId}),
-            Tarea.find({vehiculo: req.userData.vehiculoActual.id, companyId: req.companyId})
+            Alerta.find({ vehiculo: req.userData.vehiculoActual.id, companyId: req.companyId }),
+            Tarea.find({ vehiculo: req.userData.vehiculoActual.id, companyId: req.companyId })
         ]).then(([AlertasEnDB, TareaEnDB]) => {
             req.alertas = AlertasEnDB;
             req.tareas = TareaEnDB;
@@ -75,7 +76,7 @@ export const verifyTokenWithVehicleData = async (req, res, next) => {
 
         })
     } catch (error) {
-        return res.status(400).json({ message: 'No autorizado', error: error.message})
+        return res.status(400).json({ message: 'No autorizado', error: error.message })
     }
 }
 export const verifyTokenWithPassword = async (req, res, next) => {
@@ -94,6 +95,28 @@ export const verifyTokenWithPassword = async (req, res, next) => {
         if (!userEnDb) return res.status(404).json({ message: 'Usuario no encontrado' })
         next()
 
+    } catch (error) {
+        return res.status(400).json({ message: 'No autorizado' })
+    }
+}
+
+export const verifyTokenWithCompanyData = async (req, res, next) => {
+    try {
+        const accessToken = req.headers["x-access-token"]
+        if (!accessToken) return res.status(403).json({ message: 'No token provided' });
+        const decoded = jwt.verify(accessToken, secret)
+        req.userId = decoded.id
+        const userEnDb = await Usuario.findById(req.userId).select("+refreshTokens");
+        req.userData = userEnDb;
+        req.companyId = userEnDb.companyId;
+        const companyData = await Compania.findOne({companyId: userEnDb.companyId})
+        req.company = companyData;
+        userEnDb.refreshTokens.forEach((token, i) => {
+            userEnDb.refreshTokens[i] = sha256(token + salt)
+        })
+        if (!userEnDb.refreshTokens.includes(decoded.gen)) return res.status(401).json({ message: 'Token revoked' });
+        if (!userEnDb) return res.status(404).json({ message: 'Usuario no encontrado' })
+        next()
     } catch (error) {
         return res.status(400).json({ message: 'No autorizado' })
     }

@@ -59,13 +59,12 @@ io.on('connection', (socket) => {
 
 // }
 
-export function socketSend(roomId, key, message) {
+export function socketSend(roomId, key, message, tipo) {
     console.info("enviando '" + key + "' a la sala '" + roomId + "' con el contenido '" + message + "'");
     io.to(roomId).emit(key, message);
 }
 
 export function alertSend(roomId, nivel, tipo, message, vehiculo) {
-    console.info(`emitiendo 'alerta' nivel ${nivel} de tipo ${tipo} a la sala ${roomId} con el mensaje ${message}`)
     io.to(roomId).emit("alerta", {
         nivel,
         tipo,

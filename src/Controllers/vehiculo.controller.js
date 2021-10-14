@@ -82,7 +82,13 @@ export const desasignarConductor = async (req, res) => {
                 let existe = false;
                 const sePasoPor = kilometrajeActual - (tarea.cantidadUltima + tarea.cantidadCada);
                 const alertaMsg = `El vehiculo ha excedido el limite para el cambio de ${tarea.tipo} por ${sePasoPor}kms`
-                alertSend(req.companyId, "alto", tarea.tipo, alertaMsg, req.vehiculoId)
+                socketSend(req.companyId, "alerta", {
+                    nivel: "alto",
+                    tipo: tarea.tipo,
+                    message: alertaMsg,
+                    vehiculo: req.vehiculoId
+                })
+                // alertSend(req.companyId, "alto", tarea.tipo, alertaMsg, req.vehiculoId)
                 jsonRes.alerta = true;
                 jsonRes.alertas.push(alertaMsg);
                 for (var j = 0; j < vehiculoActual.alertas.length; j++) {
@@ -117,7 +123,13 @@ export const desasignarConductor = async (req, res) => {
                 let existe = false;
                 const leFaltan = (tarea.cantidadUltima + tarea.cantidadCada) - kilometrajeActual;
                 const alerta = `El vehiculo se está acercando al limite para el cambio de ${tarea.tipo} por ${leFaltan}kms`
-                alertSend(req.companyId, "medio", tarea.tipo, alerta, req.vehiculoId)
+                // alertSend(req.companyId, "medio", tarea.tipo, alerta, req.vehiculoId)
+                socketSend(req.companyId, "alerta", {
+                    nivel: "medio",
+                    tipo: tarea.tipo,
+                    message: alerta,
+                    vehiculo: req.vehiculoId
+                })
                 jsonRes.alerta = true;
                 jsonRes.alertas.push(alerta);
                 for (var j = 0; j < vehiculoActual.alertas.length; j++) {
@@ -175,7 +187,13 @@ export const desasignarConductor2 = async (req, res) => {
                 //Alerta Urgente
                 const sePasoPor = kilometrajeActual - (tarea.cantidadUltima + tarea.cantidadCada);
                 const alerta = `El vehiculo ha excedido el limite para el cambio de ${tarea.tipo} por ${sePasoPor}kms`
-                alertSend(req.companyId, "alto", tarea.tipo, alerta, req.vehiculoId)
+                // alertSend(req.companyId, "alto", tarea.tipo, alerta, req.vehiculoId)
+                socketSend(req.companyId, "alerta", {
+                    nivel: "alto",
+                    tipo: tarea.tipo,
+                    message: alerta,
+                    vehiculo: req.vehiculoId
+                })
                 jsonRes.alerta = true;
                 jsonRes.alertas.push(alerta);
                 await Vehiculo.findByIdAndUpdate(req.vehiculoId, {
@@ -194,7 +212,13 @@ export const desasignarConductor2 = async (req, res) => {
                 const alerta = `El vehiculo se está acercando al limite para el cambio de ${tarea.tipo} por ${leFaltan}kms`
                 jsonRes.alerta = true;
                 jsonRes.alertas.push(alerta);
-                alertSend(req.companyId, "medio", tarea.tipo, alerta, req.vehiculoId)
+                // alertSend(req.companyId, "medio", tarea.tipo, alerta, req.vehiculoId)
+                socketSend(req.companyId, "alerta", {
+                    nivel: "medio",
+                    tipo: tarea.tipo,
+                    message: alerta,
+                    vehiculo: req.vehiculoId
+                })
                 await Vehiculo.findByIdAndUpdate(req.vehiculoId, {
                     $pull: {
                         alertas: { tipo: tarea.tipo }

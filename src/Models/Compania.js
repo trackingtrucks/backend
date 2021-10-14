@@ -8,9 +8,19 @@ const companyScheme = new Schema({
     nombre: {
         type: String
     },
-    settings:{
-        type: Object
-    }
+    alertas: {
+        type: Object,
+        default: {
+            alertaMedia: true,
+            alertaAlta: true,
+            subirAuto: true,
+            bajarAuto: true,
+            empiezaEntrega: true,
+            terminaEntrega: true,
+            notificacionTramite: true
+        }
+    },
+    _id: String
 }, {
     versionKey: false,
     timestamps: false

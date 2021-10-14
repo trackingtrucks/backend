@@ -90,7 +90,7 @@ export const crearTramite = async (req, res) => {
             vehiculo,
             companyId: req.companyId
         })
-        date.setDate( date.getDate() - 7 );
+        date.setDate(date.getDate() - 7);
         notificarTramitePronto({
             fecha: date,
             tituloTramite: titulo,
@@ -242,6 +242,27 @@ export const getCurrentUserData = async (req, res) => {
             turnos.push(turnoCompleto)
         }
         return res.json({ turnosPendientes: turnos, turnoActual: turnoActual });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+export const updateAlertas = async (req, res) => {
+    try {
+        const a = req.company.alertas
+        const { alertaMedia = a.alertaMedia, alertaAlta = a.alertaAlta, subirAuto = a.subirAuto, bajarAuto = a.bajarAuto, empiezaEntrega = a.empiezaEntrega, terminaEntrega = a.terminaEntrega, notificacionTramite = a.notificacionTramite } = req.body
+        const updatedCompany = await Compania.findOneAndUpdate({ companyId: req.companyId }, {
+            alertas: {
+                alertaMedia,
+                alertaAlta,
+                subirAuto,
+                bajarAuto,
+                empiezaEntrega,
+                terminaEntrega,
+                notificacionTramite
+            }
+        }, { new: true })
+        res.json(updatedCompany)
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

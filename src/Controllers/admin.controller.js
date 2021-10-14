@@ -55,8 +55,10 @@ export const aceptarForm = async (req, res) => {
         });
         const newCompany = new Compania({
             companyId,
-            nombre
+            nombre,
+            _id: companyId
         })
+        // return res.json(newCompany)
         await Promise.all([
             newToken.save(),
             newCompany.save(),

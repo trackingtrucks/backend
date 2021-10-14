@@ -88,7 +88,8 @@ export const crearTramite = async (req, res) => {
             destino: req.userData.email,
             tituloTramite: titulo,
             vehiculo,
-            companyId: req.companyId
+            companyId: req.companyId,
+            urgencia
         })
         date.setDate(date.getDate() - 7);
         notificarTramitePronto({

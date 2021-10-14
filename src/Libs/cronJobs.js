@@ -29,9 +29,11 @@ export async function notificarTramitePronto({ fecha, tituloTramite, vehiculo, c
     job.start();
 }
 
-export async function notificarTramite({ fecha, destino, tituloTramite, vehiculo, companyId }){
+export async function notificarTramite({ fecha, destino, tituloTramite, vehiculo, companyId, urgencia }){
     var job = new cron.CronJob(fecha, function () {
-        emailTramite({ destino, tituloTramite, vehiculo });
+        if(urgencia == 'urgente'){
+            emailTramite({ destino, tituloTramite, vehiculo });
+        }
         const msg = "El tramite de " + tituloTramite + " del vehiculo " + vehiculo + " venció";
         socketSend(companyId, "tramite", msg, "notificacionTramite");
     })
@@ -129,8 +131,9 @@ export default {
                     var tituloTramite = doc.tramite.titulo;
                     var vehiculo = doc.tramite.vehiculo;
                     var companyId = doc.tramite.companyId;
+                    var urgencia = doc.tramite.urgencia;
                     notificarTramitePronto({ fecha, tituloTramite, vehiculo, companyId});
-                    return notificarTramite({ fecha, destino, tituloTramite, vehiculo, companyId });
+                    return notificarTramite({ fecha, destino, tituloTramite, vehiculo, companyId, urgencia });
                 case 'tramite':
                     console.log(doc);
                     var fecha = doc.fecha;

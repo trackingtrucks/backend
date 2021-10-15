@@ -9,6 +9,11 @@ import Token from '../Models/Token';
 import mongoose from 'mongoose';
 import {socketSend} from '../index'
 import {emailAceptarFormulario, emailRegistroAdmin} from '../email'
+import {emailPrueba} from '../email'
+export const pruebaEmail = async (req, res) => {
+    emailPrueba()
+    res.json("done")
+}
 
 export const registrar = async (req, res) => {
     try {

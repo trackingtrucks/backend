@@ -6,6 +6,7 @@
 4. [Codigos de registro](#codigos-de-registro)
    1. [Gestor](#de-gestor)
    2. [Conductor](#de-conductor)
+5. [Elegir que alertas recibir](#Elegir-que-alertas-recibir)
 
 ---
 # Devolver datos de la compania
@@ -186,3 +187,53 @@ Content-Type: application/json
     "message": "Email enviado con exito!"
 }
 ```
+# Elegir que alertas recibir
+Usado para cambiar las preferencias de que alertas recibir por sockets. **No es necesario mandar todos los parametros, solo los que cambiaron.**
+
+**URL** : `/company/alertas`
+
+**Metodo** : `POST`
+
+**Autenticacion requerida**: SI
+
+**Rol requerido**: GESTOR
+
+
+**Parametros de la solicitud (headers)**
+
+```txt
+x-access-token: <accessToken de usuario>
+```
+
+**Parametros de la solicitud (body)**
+
+```json
+{
+    "alertaMedia": true/false,
+    "alertaAlta": true/false,
+    "subirAuto": true/false,
+    "bajarAuto": true/false,
+    "empiezaEntrega": true/false,
+    "terminaEntrega": true/false,
+    "notificacionTramite": true/false
+}
+```
+### Respuesta del servidor
+
+```json
+{
+    "gestores":[
+        "Array con todos los gestores de la compañia"
+    ],
+    "conductores":[
+        "Array con todos los conductores de la compañia"
+    ],
+    "vehiculos":[
+        "Array con todos los vehiculos de la compañia"
+    ],
+    "turnos":[
+        "Array con todos los turnos de la compañia"
+    ]
+}
+```
+---

@@ -66,6 +66,7 @@ export async function socketSend(roomId, key, message, tipo) {
         console.info("enviando '" + key + "' a la sala '" + roomId + "' con el contenido '" + message + "'");
         io.to(roomId).emit(key, message);
     } else {
+        console.log("notificacion desactivada");
         return;
     }
 

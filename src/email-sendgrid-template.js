@@ -25,26 +25,35 @@ export async function emailPrueba() {
   })
 }
 
-async function enviarMail({ para, subject, html }) {
-  if (!para || !subject || !html) throw new Error("Faltan 1 o mas parametros requeridos");
+async function enviarMail({ para, templateId, data }) {
   sgMail.send({
     to: para,
     from: `Tracking Trucks 🚍 <soygati@gmail.com>`,
-    subject,
-    html,
-    text: html
+    templateId: templateId,
+    personalizations: [
+      {
+        "to": [
+          {
+            "email": para
+          }
+        ],
+        "dynamic_template_data": data
+      }
+    ],
   })
 }
 export async function emailAceptarCompania({ destino, gestor, token }) {
   try {
     await enviarMail({
       para: destino,
-      subject: `${gestor.nombre} te ha invitado a unirse a su compañia! - Tracking Trucks`,
-      html: `
-      <h1>Bienvenido!</h1>
-      <p>Presiona el link para crear tu cuenta</p>
-      <a href="https://trackingtrucks.netlify.app/registro?codigo=${token}&email=${destino}">Click aqui!</a>
-      `
+      data: {
+        nombre: gestor.nombre,
+        token,
+        email: destino,
+        subject: `${gestor.nombre} te ha invitado a unirse a su compañia! - Tracking Trucks`,
+
+      },
+      templateId: ""
     });
   } catch (error) {
     console.error(error);

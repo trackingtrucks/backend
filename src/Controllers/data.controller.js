@@ -39,6 +39,7 @@ export const testProcesado = async (req, res) => {
             if (!req.body[valor]) { throw new Error(`No se envio el valor '${valor}'`) }
             state[valor] = procesar({ datos: req.body[valor] })
         })
+        dataUpdate("abc123", "60d299c6fb2eeb3ad4853a2f" , state)
         res.json(state)
     } catch (error) {
         return res.status(500).json({ message: "Error al procesar los datos: " + error.message })

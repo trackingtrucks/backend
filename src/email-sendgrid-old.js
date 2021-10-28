@@ -2,28 +2,28 @@ import config from './config'
 const sgMail = require('@sendgrid/mail')
 sgMail.setApiKey(config.SENDGRID_API_KEY)
 
-export async function emailPrueba() {
-  sgMail.send({
-    to: "ezequielgatica@gmail.com",
-    from: `Tracking Trucks 🚍🚍🚍 <soygati@gmail.com>`,
-    templateId: "d-b5db6d88d5524c92b643757b8b3c6cda",
-    personalizations: [
-      {
-        "to": [
-          {
-            "email": "ezequielgatica@gmail.com"
-          }
-        ],
-        subject: `Hemos recibido tu formulario! - Tracking Trucks`,
-        "dynamic_template_data": {
-          "subject": "Tracking Trucks - Admin",
-          "token": "todo%20bien%20mi%20rey",
-          "destino": "gatuigatigatis@gmail.com"
-        }
-      }
-    ],
-  })
-}
+// export async function emailPrueba() {
+//   sgMail.send({
+//     to: "ezequielgatica@gmail.com",
+//     from: `Tracking Trucks 🚍🚍🚍 <soygati@gmail.com>`,
+//     templateId: "d-b5db6d88d5524c92b643757b8b3c6cda",
+//     personalizations: [
+//       {
+//         "to": [
+//           {
+//             "email": "ezequielgatica@gmail.com"
+//           }
+//         ],
+//         subject: `Hemos recibido tu formulario! - Tracking Trucks`,
+//         "dynamic_template_data": {
+//           "subject": "Tracking Trucks - Admin",
+//           "token": "todo%20bien%20mi%20rey",
+//           "destino": "gatuigatigatis@gmail.com"
+//         }
+//       }
+//     ],
+//   })
+// }
 
 async function enviarMail({ para, subject, html }) {
   if (!para || !subject || !html) throw new Error("Faltan 1 o mas parametros requeridos");

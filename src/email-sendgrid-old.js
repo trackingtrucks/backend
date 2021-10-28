@@ -3,46 +3,48 @@ const sgMail = require('@sendgrid/mail')
 sgMail.setApiKey(config.SENDGRID_API_KEY)
 
 export async function emailPrueba() {
-  enviarMail({
-    para: "ezequielgatica@gmail.com",
-    templateId:"d-b5db6d88d5524c92b643757b8b3c6cda",
-    data: {
-      subject: "Tracking Trucks Testing!",
-      token: "12hb321jh321412yu1ghej12v378",
-      destino: "ezequielgatica@gmail.com"
-    }
-  })
-}
-
-async function enviarMail({ para, templateId, data }) {
   sgMail.send({
-    to: para,
-    from: `Tracking Trucks 🚍 <soygati@gmail.com>`,
-    templateId: templateId,
+    to: "ezequielgatica@gmail.com",
+    from: `Tracking Trucks 🚍🚍🚍 <soygati@gmail.com>`,
+    templateId: "d-b5db6d88d5524c92b643757b8b3c6cda",
     personalizations: [
       {
         "to": [
           {
-            "email": para
+            "email": "ezequielgatica@gmail.com"
           }
         ],
-        "dynamic_template_data": data
+        subject: `Hemos recibido tu formulario! - Tracking Trucks`,
+        "dynamic_template_data": {
+          "subject": "Tracking Trucks - Admin",
+          "token": "todo%20bien%20mi%20rey",
+          "destino": "gatuigatigatis@gmail.com"
+        }
       }
     ],
+  })
+}
+
+async function enviarMail({ para, subject, html }) {
+  if (!para || !subject || !html) throw new Error("Faltan 1 o mas parametros requeridos");
+  sgMail.send({
+    to: para,
+    from: `Tracking Trucks 🚍 <soygati@gmail.com>`,
+    subject,
+    html,
+    text: html
   })
 }
 export async function emailAceptarCompania({ destino, gestor, token }) {
   try {
     await enviarMail({
       para: destino,
-      data: {
-        nombre: gestor.nombre,
-        token,
-        email: destino,
-        subject: `${gestor.nombre} te ha invitado a unirse a su compañia! - Tracking Trucks`,
-
-      },
-      templateId: ""
+      subject: `${gestor.nombre} te ha invitado a unirse a su compañia! - Tracking Trucks`,
+      html: `
+      <h1>Bienvenido!</h1>
+      <p>Presiona el link para crear tu cuenta</p>
+      <a href="https://trackingtrucks.netlify.app/registro?codigo=${token}&email=${destino}">Click aqui!</a>
+      `
     });
   } catch (error) {
     console.error(error);

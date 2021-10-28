@@ -2,49 +2,33 @@ import config from './config'
 const sgMail = require('@sendgrid/mail')
 sgMail.setApiKey(config.SENDGRID_API_KEY)
 
-export async function emailPrueba() {
+async function enviarMail({ para, templateId, data }) {
   sgMail.send({
-    to: "ezequielgatica@gmail.com",
-    from: `Tracking Trucks 🚍🚍🚍 <soygati@gmail.com>`,
-    templateId: "d-b5db6d88d5524c92b643757b8b3c6cda",
+    to: para,
+    from: `Tracking Trucks 🚍 <soygati@gmail.com>`,
+    templateId: templateId,
     personalizations: [
       {
         "to": [
           {
-            "email": "ezequielgatica@gmail.com"
+            "email": para
           }
         ],
-        subject: `Hemos recibido tu formulario! - Tracking Trucks`,
-        "dynamic_template_data": {
-          "subject": "Tracking Trucks - Admin",
-          "token": "todo%20bien%20mi%20rey",
-          "destino": "gatuigatigatis@gmail.com"
-        }
+        "dynamic_template_data": data
       }
     ],
   })
 }
-
-async function enviarMail({ para, subject, html }) {
-  if (!para || !subject || !html) throw new Error("Faltan 1 o mas parametros requeridos");
-  sgMail.send({
-    to: para,
-    from: `Tracking Trucks 🚍 <soygati@gmail.com>`,
-    subject,
-    html,
-    text: html
-  })
-}
-export async function emailAceptarCompania({ destino, gestor, token }) {
+export async function emailAceptarCompania({ destino, gestor, token }) { //Cuando se invita a un conductor a la empresa
   try {
     await enviarMail({
       para: destino,
-      subject: `${gestor.nombre} te ha invitado a unirse a su compañia! - Tracking Trucks`,
-      html: `
-      <h1>Bienvenido!</h1>
-      <p>Presiona el link para crear tu cuenta</p>
-      <a href="https://trackingtrucks.netlify.app/registro?codigo=${token}&email=${destino}">Click aqui!</a>
-      `
+      data: {
+        gestor: gestor.nombre,
+        token,
+        email: destino
+      },
+      templateId: "d-64674dd154b24d68ac715b84159e9ab8"
     });
   } catch (error) {
     console.error(error);
@@ -54,11 +38,7 @@ export async function emailEnvioFormulario({ destino }) {
   try {
     await enviarMail({
       para: destino,
-      subject: `Hemos recibido tu formulario! - Tracking Trucks`,
-      html: `
-      <h1>Gracias por contactarnos!</h1>
-      <p>Estaremos en contacto contigo en breve!</p>
-      `
+      templateId: "d-b22aa2819db8471b898d4cb74610ca9c",
     });
   } catch (error) {
     console.error(error);
@@ -68,11 +48,11 @@ export async function emailAceptarFormulario({ destino, token }) {
   try {
     await enviarMail({
       para: destino,
-      subject: `Bienvenido a Tracking Trucks, crea tu cuenta!`,
-      html: `
-      <p>Para terminar con el registro, por favor</p>
-      <a href="https://trackingtrucks.netlify.app/registro?codigo=${token}&email=${destino}">Haz click aqui!</a>
-      `
+      data: {
+        token,
+        destino
+      },
+      templateId: "d-f1b8284aba634387829f0d6d46bd0420"
     });
   } catch (error) {
     console.error(error);
@@ -82,10 +62,11 @@ export async function emailRegistroAdmin({ destino, token }) {
   try {
     await enviarMail({
       para: destino,
-      subject: `Bienvenido Administrador, por favor, crea tu cuenta!`,
-      html: `
-      <p>Para terminar con el registro, <a href="https://trackingtrucks.netlify.app/registro?codigo=${token}&email=${destino}">haz click aqui!</a></p>
-      `
+      templateId: "d-840f31ce35ab4fd4b9cc06da101f92e2",
+      data: {
+        destino,
+        token
+      }
     });
   } catch (error) {
     console.error(error);
@@ -96,13 +77,11 @@ export async function emailRestablecerContraseña({ destino, token }) {
   try {
     await enviarMail({
       para: destino,
-      subject: `Restablece tu contraseña de Tracking Trucks`,
-      html: `
-      <p>
-        <URL de front/>
-      <p/>
-      <p>Mientras tanto, el codigo es ${token}<p/>
-        `
+      templateId: "d-89d29c875ad74648a6f8ad579d57f0ed",
+      data: {
+        destino,
+        token
+      }
     });
   } catch (error) {
     console.error(error);
@@ -112,11 +91,7 @@ export async function emailCambioContraseña({ destino }) {
   try {
     await enviarMail({
       para: destino,
-      subject: `Su contraseña de Tracking Trucks ha cambiado`,
-      html: `
-      <h1>Hola!</h1>
-      <p>Este es un email para avisarte que su contraseña ha cambiado, si has sido tu, ignora este email. Si no recuerdas haberlo hecho, por favor, cambia tu contraseña (link a restablecer tu contraseña)</p>
-        `
+      templateId: "d-ba124f89a1b5473fbe2a8735fde4224d"
     });
   } catch (error) {
     console.error(error);
@@ -127,11 +102,7 @@ export async function emailTurno({ destino }) {
   try {
     await enviarMail({
       para: destino,
-      subject: `Tiene un turno pronto`,
-      html: `
-      <h1>Hola!</h1>
-      <p>Este es un mail para recordarte que dentro de dos días tendrás un turno, así que asegurate de tener listo tu camión</p>
-      `
+      templateId: "d-4eb68e494126455faf4c9c07dbb4933d"
     });
   } catch (error) {
     console.error(error);
@@ -142,12 +113,12 @@ export async function emailTramite({ destino, tituloTramite, vehiculo }) {
   try {
     await enviarMail({
       para: destino,
-      subject: `Se venció la fecha del tramite de ${tituloTramite}`,
-      html: `
-      <h1>Hola!</h1>
-      <p>Este es un mail para notificarte que el tramite de ${tituloTramite} del vehiculo ${vehiculo} venció.</p>
-      <p>Recordá de mantener todos tus tramites al día.</p>
-      `
+      templateId: "d-315468131f954f6f8837a62fcf1fe452",
+      data: {
+        tituloTramite,
+        vehiculo,
+        subject: `Se venció la fecha del tramite de ${tituloTramite}`
+      }
     });
   } catch (error) {
     console.error(error);

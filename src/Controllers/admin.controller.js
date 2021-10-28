@@ -7,11 +7,11 @@ import Turno from '../Models/Turno';
 import Compania from '../Models/Compania';
 import Token from '../Models/Token';
 import mongoose from 'mongoose';
-import {socketSend} from '../index'
-import {emailAceptarFormulario, emailRegistroAdmin} from '../email'
-import {emailPrueba} from '../email'
+import { socketSend } from '../index'
+import { emailAceptarFormulario, emailRegistroAdmin } from '../email-sendgrid-old'
+import * as mails from '../email'
+
 export const pruebaEmail = async (req, res) => {
-    emailPrueba()
     res.json("done")
 }
 
@@ -42,16 +42,16 @@ export const registrar = async (req, res) => {
 
 export const getForms = async (req, res) => {
     const forms = await Formulario.find();
-    res.json({forms});
+    res.json({ forms });
 }
 
 export const aceptarForm = async (req, res) => {
     try {
         const { companyId, id, nombre } = req.body;
         if (!companyId || !id || !nombre) return res.status(400).json({ message: 'Faltan 1 o mas campos requeridos' });
-        if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({message: "ID Invalida"});
+        if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({ message: "ID Invalida" });
         const formData = await Formulario.findById(id);
-        if (!formData) return res.status(404).json({ message: 'ID de formulario de registro no encontrado'});
+        if (!formData) return res.status(404).json({ message: 'ID de formulario de registro no encontrado' });
         const newToken = new Token({
             companyId,
             rol: "gestor",
@@ -68,9 +68,9 @@ export const aceptarForm = async (req, res) => {
             newToken.save(),
             newCompany.save(),
             Formulario.findByIdAndDelete(id),
-        ]).then(([tokenNuevo])=> {
-            emailAceptarFormulario({destino: formData.email, token: newToken._id, })
-            res.json({ codigo: tokenNuevo._id, message: "Confirmado con exito!", formData }) 
+        ]).then(([tokenNuevo]) => {
+            emailAceptarFormulario({ destino: formData.email, token: newToken._id, })
+            res.json({ codigo: tokenNuevo._id, message: "Confirmado con exito!", formData })
         })
     } catch (error) {
         res.status(500).json({ message: error.message })
@@ -78,10 +78,10 @@ export const aceptarForm = async (req, res) => {
 }
 export const eliminarForm = async (req, res) => {
     try {
-        const {id} = req.params;
-        if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({message: "ID Invalida"});
+        const { id } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({ message: "ID Invalida" });
         await Formulario.findByIdAndDelete(id);
-        res.json({message: "Hecho"})
+        res.json({ message: "Hecho" })
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
@@ -123,26 +123,26 @@ export const codigoAdmins = async (req, res) => {
 }
 export const getAllAdmins = async (req, res) => {
     try {
-        const usuarios = await Usuario.find({rol: "admin"})
-        return res.json({admins: usuarios})
+        const usuarios = await Usuario.find({ rol: "admin" })
+        return res.json({ admins: usuarios })
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
 }
 export const getAdminTokens = async (req, res) => {
     try {
-        const tokens = await Token.find({rol: "admin", tipo: "registro"})
-        res.json({tokens})
+        const tokens = await Token.find({ rol: "admin", tipo: "registro" })
+        res.json({ tokens })
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
 }
 export const elminarToken = async (req, res) => {
     try {
-        const {id} = req.body;
-        if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({message: "ID Invalida"});
+        const { id } = req.body;
+        if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({ message: "ID Invalida" });
         await Token.findByIdAndDelete(id);
-        return res.json({message: "Token eliminado con exito"})
+        return res.json({ message: "Token eliminado con exito" })
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
@@ -158,28 +158,28 @@ export const eliminarCuenta = async (req, res) => {
 export const getUsuarios = async (req, res) => {
     try {
         const usuarios = await Usuario.find().select('+refreshTokens')
-        res.json({usuarios})
+        res.json({ usuarios })
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
 }
 
 export const socketTest = async (req, res) => {
-    const {sala, contenido, key, tipo} = req.body;
+    const { sala, contenido, key, tipo } = req.body;
     socketSend(sala, key, contenido, tipo)
     res.sendStatus(200);
 }
-import {getAll} from '../Libs/socketCache'
+import { getAll } from '../Libs/socketCache'
 export const socketConnections = async (req, res) => {
     const usuarios = getAll();
     return res.json(usuarios)
 }
-import {cerrarSesion, cerrarSesionTodosLosDispositivos} from '../Libs/socketCache'
+import { cerrarSesion, cerrarSesionTodosLosDispositivos } from '../Libs/socketCache'
 export const socketLogout = async (req, res) => {
-    const {id} = req.params;
+    const { id } = req.params;
     res.json(cerrarSesion(id))
 }
 export const socketLogoutAllDevices = async (req, res) => {
-    const {id} = req.params;
+    const { id } = req.params;
     res.json(cerrarSesionTodosLosDispositivos(id))
 }

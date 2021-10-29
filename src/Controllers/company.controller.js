@@ -63,7 +63,7 @@ export const getAllData = async (req, res) => {
 
 export const crearTramite = async (req, res) => {
     try {
-        const { date, vehiculo, titulo, descripcion, ultimavez: ultimaVez, urgencia } = req.body;
+        const { date, vehiculo, titulo, descripcion, ultimaVez, urgencia } = req.body;
         if (!date || !vehiculo || !titulo) { return res.status(400).json({ message: "Faltan 1 o mas campos requeridos" }) }
         if (!mongoose.Types.ObjectId.isValid(vehiculo)) return res.status(404).json({ message: "ID Invalida" });
 

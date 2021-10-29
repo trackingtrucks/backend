@@ -12,6 +12,8 @@
 6. [Alertas](#Alertas)
    1. [Eliminar alerta en especifico](#Eliminar-alerta-en-especifico)
    2. [Eliminar todas las alertas de un vehiculo](#Eliminar-alertas-de-vehiculo)
+7. [Tramites](#Tramites)
+    1. [Crear tramite](#Crear-tramite)
 ---
 # Crear vehiculo nuevo
 Usado para crear un vehiculo dentro de la compania
@@ -386,5 +388,48 @@ x-access-token: <accessToken de usuario>
 ```json
 {
   "message": "Alertas eliminadas con exito!"
+}
+```
+---
+# Tramites
+## Crear tramite
+
+Usado para crear un tramite para un vehiculo en especifico
+
+**URL** : `/vehiculo/tramite`
+
+**Metodo** : `POST`
+
+**Autenticacion requerida**: SI
+
+**Rol requerido**: GESTOR
+
+**Parametros de la solicitud (body)**
+
+```json
+{
+	"vehiculo": {id del vehiculo},
+	"titulo": {titulo del tramite},
+	"descripcion": {descripcion del tramite},
+	"date": {fecha en la que se vence el tramite},
+	"ultimaVez": {fecha de la ultima vez que se actualizo el tramite},
+    "urgencia": {urgencia del tramite, por ahora es "urgente" o "moderado"}
+}
+```
+
+**Parametros de la solicitud (headers)**
+
+```txt
+Content-Type: application/json
+x-access-token: <accessToken de usuario>
+```
+
+### Respuesta del servidor
+
+```json
+{
+    "nuevoTramite": {
+        Objeto del tramite nuevo
+    }
 }
 ```

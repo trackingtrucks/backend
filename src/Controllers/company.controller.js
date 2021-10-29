@@ -33,7 +33,8 @@ export const getAllData = async (req, res) => {
             // DatosOBD2.find({ companyId }),
             Data.find({ companyId }),
             Compania.findOne({ companyId }).select("-_id"),
-        ]).then(([vehiculos, turnos, usuarios, tareas, alertas, datosProcesados, company]) => {
+            Tramite.find({companyId}),
+        ]).then(([vehiculos, turnos, usuarios, tareas, alertas, datosProcesados, company, tramites]) => {
             let gestores = [];
             let conductores = [];
             usuarios.forEach(element => {
@@ -52,7 +53,7 @@ export const getAllData = async (req, res) => {
                 vehiculo.datos = datosProcesados.filter(dato => dato.vehiculo.equals(vehiculo._id))
             })
             if (gestores.length === 0 && conductores.length === 0) return res.status(404).json({ message: "No se encontraron usuarios en esa companía" }); // Chequea si hay resultados en la busqueda
-            return res.json({ company, gestores, conductores, vehiculos, turnos, tareas, alertas, datos: datosProcesados });
+            return res.json({ company, gestores, conductores, vehiculos, tramites, turnos, tareas, alertas, datos: datosProcesados });
         })
 
     } catch (error) {

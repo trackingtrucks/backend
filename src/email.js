@@ -5,7 +5,7 @@ sgMail.setApiKey(config.SENDGRID_API_KEY)
 async function enviarMail({ para, templateId, data }) {
   sgMail.send({
     to: para,
-    from: `Tracking Trucks 🚍 <soygati@gmail.com>`,
+    from: `Tracking Trucks 🚍 <trackingtrucksarg@gmail.com>`,
     templateId: templateId,
     personalizations: [
       {

@@ -2,7 +2,6 @@ import Usuario from '../Models/Usuario';
 import Token from '../Models/Token';
 import Turno from '../Models/Turno';
 import Vehiculo from '../Models/Vehiculo';
-import { Agenda } from 'agenda/es';
 import config from '../config';
 const database_url = config.DATABASE_URL;
 import { emailAceptarCompania, emailRestablecerContraseña, emailCambioContraseña } from '../email';
@@ -10,8 +9,6 @@ import { notificarTurno } from '../Libs/cronJobs';
 import { socketSend, companyUpdate } from '../index';
 import { v4 } from 'uuid';
 import DataCrons from '../Models/DataCrons';
-
-const agenda = new Agenda({ db: { address: database_url, options: { useUnifiedTopology: true } } });
 
 
 

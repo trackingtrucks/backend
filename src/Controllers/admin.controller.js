@@ -8,7 +8,7 @@ import Compania from '../Models/Compania';
 import Token from '../Models/Token';
 import mongoose from 'mongoose';
 import { socketSend } from '../index'
-import { emailAceptarFormulario, emailRegistroAdmin } from '../email-sendgrid-old'
+import { emailAceptarFormulario, emailRegistroAdmin } from '../email'
 import * as mails from '../email'
 
 export const pruebaEmail = async (req, res) => {

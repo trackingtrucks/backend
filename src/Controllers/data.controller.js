@@ -9,7 +9,7 @@ export const subirDatosOBD = async (req, res) => {
         if (!vehiculo) return res.status(400).json({ message: 'No está asignado a ningun vehiculo' })
         const nuevosDatosOBD = new DatosOBD2({ vehiculo: { id: vehiculo._id }, fuelLevel, RPM, speed, coolantTemperature, kilometrosRecorridos, companyId: req.companyId, pendingTroubleCodes });
         const newData = await nuevosDatosOBD.save();
-        console.log(nuevosDatosOBD);
+        // console.log(nuevosDatosOBD);
         res.json({message: "Datos guardados!", datos: nuevosDatosOBD, vehiculo: vehiculo._id});
 
         const valores = ["fuelLevel", "RPM", "speed", "coolantTemperature"];
@@ -23,7 +23,8 @@ export const subirDatosOBD = async (req, res) => {
             companyId: req.companyId
         })
         await DataProcesada.save();
-        dataUpdate(req.companyId, vehiculo._id, DataProcesada)
+        console.log(vehiculo.patente);
+        dataUpdate(req.companyId, vehiculo._id, DataProcesada, vehiculo.patente);
         console.log("Procesado!");
         // console.log(datosProcesados);
     } catch (error) {

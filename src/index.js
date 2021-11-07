@@ -82,11 +82,12 @@ export function alertSend(roomId, nivel, tipo, message, vehiculo) {
     });
 }
 
-export function dataUpdate(roomId, vehiculo, datos) {
+export function dataUpdate(roomId, vehiculo, datos, patente) {
     console.info(`emitiendo actualizacion de informacion del vehiculo '${vehiculo}' de la compania '${roomId}'`);
     io.to(roomId).emit("datos", {
         vehiculo,
-        datos
+        datos,
+        patente
     });
 }
 

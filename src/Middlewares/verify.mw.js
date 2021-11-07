@@ -83,6 +83,7 @@ export const conductorNoEncontrado = async (req, res, next) => {
     if(!_id) return res.status(400).json({ message: 'Hay campos necesarios vacios'});
     const conductorEncontrado = await Usuario.findById( _id );
     if(!conductorEncontrado) return res.status(400).json({ message: 'No se encontró ningun conductor con ese id'});
+    if(conductorEncontrado.rol != 'conductor') return res.status(400).json({ message: 'Este id no esta asignado a un conductor'});
     req.conductor = conductorEncontrado;
     next();
 }

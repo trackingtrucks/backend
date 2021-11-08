@@ -67,7 +67,7 @@ export const crearTramite = async (req, res) => {
         const { date, vehiculo, titulo, descripcion, ultimaVez, urgencia } = req.body;
         if (!date || !vehiculo || !titulo) { return res.status(400).json({ message: "Faltan 1 o mas campos requeridos" }) }
         if (!mongoose.Types.ObjectId.isValid(vehiculo)) return res.status(404).json({ message: "ID Invalida" });
-
+        let fecha = new Date(date);
         const newTramite = new Tramite({
             date,
             vehiculo,
@@ -92,7 +92,7 @@ export const crearTramite = async (req, res) => {
             companyId: req.companyId,
             urgencia
         })
-        date.setDate(date.getDate() - 7);
+        fecha.setDate(fecha.getDate() - 7);
         notificarTramitePronto({
             fecha: date,
             tituloTramite: titulo,

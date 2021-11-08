@@ -112,7 +112,7 @@ export const crearTurno = async (req, res) => {
 export const asignarTurno = async (req, res) => {
     try {
         const turno = req.turno;
-        if(turno.condicion == "Asignado") return res.status(400).json({ message: "Este turno ya esta asignado" })
+        if(turno.condicion != "No asignado") return res.status(400).json({ message: "Este turno ya esta asignado" })
         await Promise.all([
             Usuario.findByIdAndUpdate(req.conductor._id, { $push: { turnosPendientes: { id: turno._id, fechaAsignado: new Date() } } }, { new: true }),
             Turno.findByIdAndUpdate(turno._id, {condicion: "Asignado" })
